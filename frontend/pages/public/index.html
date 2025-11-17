@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paints - Sistema de Gestión</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .features-section {
+            padding: 4rem 0;
+            background: var(--gray-50);
+        }
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+        .footer-section {
+            background: var(--gray-800);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-blue);
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+        .footer-links a {
+            color: var(--gray-300);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer-links a:hover {
+            color: white;
+        }
+        .footer-bottom {
+            border-top: 1px solid var(--gray-600);
+            padding-top: 1rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--gray-400);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/public/index.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Paints
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#inicio" class="nav-link">Inicio</a></li>
+                    <li><a href="/frontend/pages/public/catalogo.html" class="nav-link">Catálogo</a></li>
+                    <li><a href="#caracteristicas" class="nav-link">Características</a></li>
+                    <li><a href="#contacto" class="nav-link">Contacto</a></li>
+                </ul>
+            </nav>
+            <div class="user-menu">
+                <a href="/frontend/pages/public/login.html" class="btn btn-primary btn-sm">Iniciar Sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Sistema de Gestión Paints</h1>
+            <p class="hero-subtitle">
+                Solución integral para la gestión de cadenas de pintura.<br>
+                Control de inventario, ventas, facturación y reportes en tiempo real.
+            </p>
+            <div class="hero-buttons">
+                <a href="/frontend/pages/public/login.html" class="btn btn-lg" style="background: white; color: var(--primary-blue);">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Acceder al Sistema
+                </a>
+                <a href="/frontend/pages/public/catalogo.html" class="btn btn-lg btn-secondary">
+                    <i class="fas fa-paint-brush"></i>
+                    Ver Catálogo
+                </a>
+                <a href="#caracteristicas" class="btn btn-lg btn-secondary">
+                    <i class="fas fa-info-circle"></i>
+                    Conocer Más
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="caracteristicas" class="features-section">
+        <div class="features-container">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h2 style="font-size: 2.5rem; color: var(--gray-800); margin-bottom: 1rem;">
+                    Características del Sistema
+                </h2>
+                <p style="font-size: 1.1rem; color: var(--gray-600);">
+                    Herramientas profesionales para la gestión completa de tu negocio
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <h3>Gestión de Inventario</h3>
+                    <p>Control total del inventario con alertas de stock bajo, categorización de productos y seguimiento en tiempo real.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cash-register"></i>
+                    </div>
+                    <h3>Punto de Venta</h3>
+                    <p>Sistema POS completo con facturación automática, múltiples métodos de pago y impresión de comprobantes.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Reportes Avanzados</h3>
+                    <p>Informes detallados de ventas, productos más vendidos, análisis de rentabilidad y estadísticas en tiempo real.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Gestión de Usuarios</h3>
+                    <p>Sistema de roles y permisos para diferentes tipos de usuarios: administradores, cajeros, digitadores y gerentes.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3>Multi-Sucursal</h3>
+                    <p>Gestión centralizada de múltiples sucursales con inventarios independientes y reportes consolidados.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Seguridad</h3>
+                    <p>Sistema seguro con autenticación JWT, encriptación de datos y control de acceso granular.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contacto" class="footer-section">
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div>
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <span class="logo-icon" style="margin-right: 0.5rem;">
+                            <i class="fas fa-paint-brush"></i>
+                        </span>
+                        <h3>Paints</h3>
+                    </div>
+                    <p style="color: var(--gray-300); line-height: 1.6;">
+                        Sistema integral de gestión para cadenas de pintura. 
+                        Desarrollado con tecnología moderna y segura.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4>Enlaces Rápidos</h4>
+                    <ul class="footer-links">
+                        <li><a href="#inicio">Inicio</a></li>
+                        <li><a href="/frontend/pages/public/catalogo.html">Catálogo</a></li>
+                        <li><a href="#caracteristicas">Características</a></li>
+                        <li><a href="/frontend/pages/public/login.html">Iniciar Sesión</a></li>
+                        <li><a href="/frontend/pages/public/register.html">Registrarse</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4>Información del Proyecto</h4>
+                    <ul class="footer-links">
+                        <li>Universidad UMES</li>
+                        <li>Bases de Datos II</li>
+                        <li>Programación Web</li>
+                        <li>Sexto Semestre - 2025</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4>Tecnología</h4>
+                    <ul class="footer-links">
+                        <li>Node.js + Express</li>
+                        <li>MySQL + Sequelize</li>
+                        <li>JavaScript ES6+</li>
+                        <li>JWT Authentication</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Sistema Paints - Universidad UMES. Proyecto Académico.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script>
+        // Verificar si ya está logueado
+        if (auth.isAuthenticated()) {
+            // Mostrar botón de dashboard en lugar de login
+            const userMenu = document.querySelector('.user-menu');
+            userMenu.innerHTML = `
+                <a href="/frontend/pages/public/catalogo.html" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-paint-brush"></i>
+                    Catálogo
+                </a>
+                <a href="/frontend/pages/admin/dashboard.html" class="btn btn-primary btn-sm">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+                <button onclick="auth.logout()" class="btn btn-secondary btn-sm" style="margin-left: 0.5rem;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Salir
+                </button>
+            `;
+        }
+
+        // Smooth scrolling para los enlaces del menú
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

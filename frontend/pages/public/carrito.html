@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .cart-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+        .cart-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            background: white;
+        }
+        .cart-item-image {
+            width: 100px;
+            height: 100px;
+            background: var(--gray-100);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-400);
+            font-size: 2rem;
+        }
+        .cart-item-info {
+            flex: 1;
+        }
+        .cart-item-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-800);
+        }
+        .cart-item-price {
+            font-size: 1rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid var(--gray-300);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .quantity-btn:hover {
+            background: var(--gray-100);
+        }
+        .quantity-input {
+            width: 60px;
+            padding: 0.5rem;
+            text-align: center;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+        }
+        .remove-btn {
+            color: var(--error-red);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        .remove-btn:hover {
+            background: var(--error-red);
+            color: white;
+        }
+        .cart-summary {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-200);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+        }
+        .summary-total {
+            border-top: 1px solid var(--gray-200);
+            padding-top: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-500);
+        }
+        .empty-cart i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .checkout-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .shipping-options {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+        .shipping-option {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .shipping-option:hover {
+            border-color: var(--primary-blue);
+        }
+        .shipping-option input[type="radio"] {
+            margin-right: 0.75rem;
+        }
+        .shipping-option.selected {
+            border-color: var(--primary-blue);
+            background: var(--blue-50);
+        }
+        .promo-code {
+            margin-bottom: 1rem;
+        }
+        .promo-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/public/index.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Paints
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/frontend/pages/public/index.html" class="nav-link">Inicio</a></li>
+                    <li><a href="/frontend/pages/public/catalogo.html" class="nav-link">Catálogo</a></li>
+                    <li><a href="/frontend/pages/public/tiendas.html" class="nav-link">Tiendas</a></li>
+                    <li><a href="/frontend/pages/public/cotizacion.html" class="nav-link">Cotización</a></li>
+                </ul>
+            </nav>
+            <div class="user-menu" id="userMenu">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="cart-container">
+        <div style="margin-bottom: 2rem;">
+            <h1><i class="fas fa-shopping-cart"></i> Mi Carrito de Compras</h1>
+            <nav style="margin-top: 0.5rem;">
+                <a href="/frontend/pages/public/catalogo.html" style="color: var(--primary-blue); text-decoration: none;">
+                    <i class="fas fa-arrow-left"></i> Continuar Comprando
+                </a>
+            </nav>
+        </div>
+
+        <div id="cartContent">
+            <!-- Se llena dinámicamente -->
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    
+    <script>
+        // Variables globales
+        let cartItems = getCartFromStorage();
+        let selectedShipping = 'pickup';
+        let shippingCost = 0;
+        let promoDiscount = 0;
+
+        // Cargar carrito desde localStorage
+        function getCartFromStorage() {
+            const cart = localStorage.getItem('paints_cart');
+            return cart ? JSON.parse(cart) : [];
+        }
+
+        // Guardar carrito en localStorage
+        function saveCartToStorage() {
+            localStorage.setItem('paints_cart', JSON.stringify(cartItems));
+        }
+
+        // Configurar menú según autenticación
+        function setupUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            
+            if (auth.isAuthenticated()) {
+                userMenu.innerHTML = `
+                    <a href="/frontend/pages/admin/dashboard.html" class="btn btn-primary btn-sm">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                    <button onclick="auth.logout()" class="btn btn-secondary btn-sm" style="margin-left: 0.5rem;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Salir
+                    </button>
+                `;
+            } else {
+                userMenu.innerHTML = `
+                    <a href="/frontend/pages/public/login.html" class="btn btn-primary btn-sm">Iniciar Sesión</a>
+                    <a href="/frontend/pages/public/register.html" class="btn btn-secondary btn-sm">Registrarse</a>
+                `;
+            }
+        }
+
+        // Mostrar carrito
+        function displayCart() {
+            const container = document.getElementById('cartContent');
+            
+            if (cartItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h2>Tu carrito está vacío</h2>
+                        <p>Explora nuestro catálogo y encuentra productos increíbles</p>
+                        <a href="/frontend/pages/public/catalogo.html" class="btn btn-primary">
+                            <i class="fas fa-paint-brush"></i>
+                            Ver Catálogo
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            const cartItemsHTML = cartItems.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="cart-item-info">
+                        <h3 class="cart-item-name">${item.name}</h3>
+                        <div class="cart-item-price">${Utils.formatCurrency(item.price)} c/u</div>
+                        <div class="cart-item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" value="${item.quantity}" class="quantity-input" 
+                                       onchange="updateQuantity(${item.id}, parseInt(this.value))" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
+                                <strong>${Utils.formatCurrency(item.price * item.quantity)}</strong>
+                                <button class="remove-btn" onclick="removeFromCart(${item.id})" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="cart-layout">
+                    <div class="cart-items">
+                        <h2 style="margin-bottom: 1.5rem;">Productos (${cartItems.length})</h2>
+                        ${cartItemsHTML}
+                        
+                        <div style="margin-top: 2rem; padding: 1rem; background: var(--gray-50); border-radius: var(--border-radius);">
+                            <h4>¿Necesitas ayuda con tu compra?</h4>
+                            <p style="margin: 0.5rem 0; color: var(--gray-600);">
+                                Nuestros expertos pueden asesorarte para elegir los productos correctos.
+                            </p>
+                            <button class="btn btn-secondary" onclick="requestAdvice()">
+                                <i class="fas fa-comment"></i>
+                                Solicitar Asesoría
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-summary">
+                        <h3 style="margin-bottom: 1rem;">Resumen del Pedido</h3>
+                        
+                        ${generateSummaryHTML()}
+                        
+                        ${generateShippingHTML()}
+                        
+                        ${generatePromoHTML()}
+                        
+                        <div class="checkout-section">
+                            <button class="btn btn-primary" style="width: 100%;" onclick="proceedToCheckout()">
+                                <i class="fas fa-credit-card"></i>
+                                Proceder al Pago
+                            </button>
+                            
+                            <div style="margin-top: 1rem; text-align: center;">
+                                <button class="btn btn-secondary" style="width: 100%;" onclick="generateQuote()">
+                                    <i class="fas fa-file-pdf"></i>
+                                    Generar Cotización PDF
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: 1rem; text-align: center; font-size: 0.875rem; color: var(--gray-500);">
+                                <i class="fas fa-shield-alt"></i>
+                                Compra 100% segura y protegida
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generar HTML del resumen
+        function generateSummaryHTML() {
+            const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.12; // IVA 12%
+            const total = subtotal + tax + shippingCost - promoDiscount;
+
+            return `
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>${Utils.formatCurrency(subtotal)}</span>
+                </div>
+                <div class="summary-row">
+                    <span>IVA (12%):</span>
+                    <span>${Utils.formatCurrency(tax)}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Envío:</span>
+                    <span>${shippingCost > 0 ? Utils.formatCurrency(shippingCost) : 'Gratis'}</span>
+                </div>
+                ${promoDiscount > 0 ? `
+                <div class="summary-row" style="color: var(--success-green);">
+                    <span>Descuento:</span>
+                    <span>-${Utils.formatCurrency(promoDiscount)}</span>
+                </div>
+                ` : ''}
+                <div class="summary-row summary-total">
+                    <span>Total:</span>
+                    <span>${Utils.formatCurrency(total)}</span>
+                </div>
+            `;
+        }
+
+        // Generar opciones de envío
+        function generateShippingHTML() {
+            return `
+                <div class="shipping-options">
+                    <h4>Opciones de Entrega</h4>
+                    <label class="shipping-option ${selectedShipping === 'pickup' ? 'selected' : ''}" onclick="selectShipping('pickup')">
+                        <input type="radio" name="shipping" value="pickup" ${selectedShipping === 'pickup' ? 'checked' : ''}>
+                        <div>
+                            <strong>Recoger en tienda</strong>
+                            <div style="font-size: 0.875rem; color: var(--gray-600);">Gratis - Disponible hoy</div>
+                        </div>
+                    </label>
+                    <label class="shipping-option ${selectedShipping === 'delivery' ? 'selected' : ''}" onclick="selectShipping('delivery')">
+                        <input type="radio" name="shipping" value="delivery" ${selectedShipping === 'delivery' ? 'checked' : ''}>
+                        <div>
+                            <strong>Entrega a domicilio</strong>
+                            <div style="font-size: 0.875rem; color: var(--gray-600);">Q25.00 - 1-2 días hábiles</div>
+                        </div>
+                    </label>
+                </div>
+            `;
+        }
+
+        // Generar sección de código promocional
+        function generatePromoHTML() {
+            return `
+                <div class="promo-code">
+                    <h4>Código Promocional</h4>
+                    <div class="promo-input">
+                        <input type="text" placeholder="Ingresa tu código" class="form-input" id="promoInput">
+                        <button class="btn btn-secondary" onclick="applyPromoCode()">
+                            Aplicar
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Actualizar cantidad
+        function updateQuantity(itemId, newQuantity) {
+            if (newQuantity <= 0) {
+                removeFromCart(itemId);
+                return;
+            }
+
+            const item = cartItems.find(item => item.id === itemId);
+            if (item) {
+                item.quantity = newQuantity;
+                saveCartToStorage();
+                displayCart();
+            }
+        }
+
+        // Remover del carrito
+        function removeFromCart(itemId) {
+            cartItems = cartItems.filter(item => item.id !== itemId);
+            saveCartToStorage();
+            displayCart();
+            Utils.showToast('Producto eliminado del carrito', 'success');
+        }
+
+        // Seleccionar método de envío
+        function selectShipping(method) {
+            selectedShipping = method;
+            shippingCost = method === 'delivery' ? 25 : 0;
+            displayCart();
+        }
+
+        // Aplicar código promocional
+        function applyPromoCode() {
+            const promoInput = document.getElementById('promoInput');
+            const code = promoInput.value.trim().toUpperCase();
+            
+            // Códigos de prueba
+            const promoCodes = {
+                'DESCUENTO10': 0.10,
+                'PRIMERA': 0.15,
+                'ESTUDIANTE': 0.05
+            };
+
+            if (promoCodes[code]) {
+                const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                promoDiscount = subtotal * promoCodes[code];
+                
+                Utils.showToast(`¡Código aplicado! Descuento: ${(promoCodes[code] * 100)}%`, 'success');
+                promoInput.value = '';
+                displayCart();
+            } else {
+                Utils.showToast('Código promocional inválido', 'error');
+            }
+        }
+
+        // Solicitar asesoría
+        function requestAdvice() {
+            if (auth.isAuthenticated()) {
+                Utils.showToast('Un asesor se contactará contigo pronto', 'success');
+            } else {
+                Utils.showToast('Inicia sesión para solicitar asesoría personalizada', 'info');
+                setTimeout(() => {
+                    window.location.href = '/frontend/pages/public/login.html';
+                }, 2000);
+            }
+        }
+
+        // Generar cotización
+        function generateQuote() {
+            Utils.showToast('Generando cotización PDF...', 'info');
+            // Implementar generación de PDF
+            setTimeout(() => {
+                Utils.showToast('Cotización generada exitosamente', 'success');
+            }, 2000);
+        }
+
+        // Proceder al checkout
+        function proceedToCheckout() {
+            if (cartItems.length === 0) {
+                Utils.showToast('Tu carrito está vacío', 'error');
+                return;
+            }
+
+            if (auth.isAuthenticated()) {
+                // Redirigir al proceso de pago
+                const orderData = {
+                    items: cartItems,
+                    shipping: selectedShipping,
+                    shipping_cost: shippingCost,
+                    discount: promoDiscount,
+                    total: calculateTotal()
+                };
+                
+                localStorage.setItem('paints_checkout_data', JSON.stringify(orderData));
+                Utils.showToast('Redirigiendo al proceso de pago...', 'info');
+                
+                // Si es recogida en tienda, ir al POS
+                if (selectedShipping === 'pickup') {
+                    setTimeout(() => {
+                        window.location.href = '/frontend/pages/ventas/pos.html';
+                    }, 1500);
+                } else {
+                    // Para entrega, implementar checkout online
+                    Utils.showToast('Proceso de pago online en desarrollo', 'info');
+                }
+            } else {
+                Utils.showToast('Inicia sesión para continuar con la compra', 'info');
+                setTimeout(() => {
+                    window.location.href = '/frontend/pages/public/login.html';
+                }, 2000);
+            }
+        }
+
+        // Calcular total
+        function calculateTotal() {
+            const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.12;
+            return subtotal + tax + shippingCost - promoDiscount;
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.updateQuantity = updateQuantity;
+        window.removeFromCart = removeFromCart;
+        window.selectShipping = selectShipping;
+        window.applyPromoCode = applyPromoCode;
+        window.requestAdvice = requestAdvice;
+        window.generateQuote = generateQuote;
+        window.proceedToCheckout = proceedToCheckout;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', () => {
+            setupUserMenu();
+            displayCart();
+        });
+    </script>
+</body>
+</html>

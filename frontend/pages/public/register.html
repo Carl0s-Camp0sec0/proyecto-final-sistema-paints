@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <div class="login-brand">
+                <h1 class="login-title">Únete a nuestro equipo</h1>
+                <p class="login-subtitle">Gestión profesional de pinturas.</p>
+            </div>
+            <div class="login-footer">
+                © 2024 Paints. Todos los derechos reservados.
+                <div style="margin-top: 0.5rem;">
+                    <a href="/frontend/pages/public/index.html" style="color: currentColor; margin-right: 1rem;">Inicio</a>
+                    <a href="/frontend/pages/public/login.html" style="color: currentColor;">Iniciar Sesión</a>
+                </div>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="login-form-container">
+                <h2 class="login-form-title">Crear cuenta nueva</h2>
+                <p class="login-form-subtitle">Complete los siguientes datos</p>
+                
+                <form id="registerForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="nombre" class="form-input" 
+                                   placeholder="Nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Apellido</label>
+                            <input type="text" name="apellido" class="form-input" 
+                                   placeholder="Apellido" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" name="email" class="form-input" 
+                               placeholder="tu@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" name="telefono" class="form-input" 
+                               placeholder="+502 1234-5678">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Sucursal</label>
+                        <select name="sucursal_id" class="form-select" required id="sucursalSelect">
+                            <option value="">Seleccione una sucursal</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Rol</label>
+                        <select name="rol" class="form-select" required>
+                            <option value="">Seleccione un rol</option>
+                            <option value="Digitador">Digitador</option>
+                            <option value="Cajero">Cajero</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <div class="password-input-container">
+                            <input type="password" name="password" class="form-input" 
+                                   placeholder="••••••••" required minlength="6">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Confirmar Contraseña</label>
+                        <div class="password-input-container">
+                            <input type="password" name="confirmPassword" class="form-input" 
+                                   placeholder="••••••••" required minlength="6">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" required>
+                            Acepto los <a href="#" style="color: var(--primary-blue);">términos y condiciones</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                        Crear Cuenta
+                    </button>
+                </form>
+                
+                <div class="login-links">
+                    ¿Ya tienes una cuenta? <a href="/frontend/pages/public/login.html">Inicia sesión aquí</a>
+                </div>
+                
+                <!-- Nota académica -->
+                <div style="margin-top: 2rem; padding: 1rem; background: var(--gray-100); border-radius: var(--border-radius);">
+                    <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">
+                        <strong>Nota:</strong> Este es un proyecto académico
+                    </p>
+                    <div style="font-size: 0.75rem; color: var(--gray-500);">
+                        Universidad UMES - Sexto Semestre 2025
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    
+    <script>
+        // Verificar si ya está logueado
+        if (auth.isAuthenticated()) {
+            window.location.href = '/frontend/pages/admin/dashboard.html';
+        }
+
+        // Función para alternar visibilidad de contraseña
+        function togglePasswordVisibility(button) {
+            const input = button.previousElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        // Cargar sucursales
+        async function loadSucursales() {
+            try {
+                const response = await api.getSucursales();
+                if (response.success) {
+                    const select = document.getElementById('sucursalSelect');
+                    const options = response.data.map(sucursal => 
+                        `<option value="${sucursal.id}">${sucursal.nombre} - ${sucursal.ubicacion}</option>`
+                    ).join('');
+                    select.innerHTML = '<option value="">Seleccione una sucursal</option>' + options;
+                }
+            } catch (error) {
+                console.error('Error loading sucursales:', error);
+                Utils.showToast('Error cargando sucursales', 'warning');
+            }
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+
+            // Validar contraseñas
+            if (password !== confirmPassword) {
+                Utils.showToast('Las contraseñas no coinciden', 'error');
+                return;
+            }
+
+            // Preparar datos para envío
+            const registerData = {
+                nombre_completo: `${formData.get('nombre')} ${formData.get('apellido')}`,
+                email: formData.get('email'),
+                telefono: formData.get('telefono'),
+                sucursal_id: parseInt(formData.get('sucursal_id')),
+                rol: formData.get('rol'),
+                password: password,
+                activo: true
+            };
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px;"></div>';
+            submitBtn.disabled = true;
+
+            try {
+                // Crear usuario (nota: esta función debe implementarse en api.js)
+                const response = await api.createUsuario(registerData);
+                
+                if (response.success) {
+                    Utils.showToast('¡Cuenta creada exitosamente!', 'success');
+                    
+                    // Redireccionar después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/frontend/pages/public/login.html';
+                    }, 2000);
+                } else {
+                    Utils.showToast(response.message || 'Error creando la cuenta', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                Utils.showToast('Error de conexión al crear la cuenta', 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Cargar datos iniciales
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSucursales();
+        });
+    </script>
+</body>
+</html>

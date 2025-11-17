@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .report-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin: 0 auto 1.5rem;
+        }
+        .report-filters {
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        .report-content {
+            min-height: 400px;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar" id="userAvatar">U</span>
+                    <div>
+                        <div style="font-weight: 500;" id="userName">Cargando...</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);" id="userRole">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title" id="sidebarRole">Usuario</h2>
+                <p class="sidebar-subtitle" id="sidebarEmail">usuario@paints.com</p>
+            </div>
+            <nav>
+                <ul class="sidebar-nav" id="sidebarNav">
+                    <!-- Se llena dinámicamente según el rol -->
+                </ul>
+            </nav>
+            <button class="logout-btn" onclick="auth.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div style="margin-bottom: 2rem;">
+                <h1>Panel de Reportes</h1>
+                <p style="color: var(--gray-600);">Análisis y estadísticas del sistema de ventas</p>
+            </div>
+
+            <!-- Filtros Generales -->
+            <div class="report-filters">
+                <h3 style="margin-bottom: 1rem;">Filtros Generales</h3>
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" class="form-input" id="fechaInicio">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha Final</label>
+                        <input type="date" class="form-input" id="fechaFinal">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sucursal</label>
+                        <select class="form-select" id="sucursalFilter">
+                            <option value="">Todas las Sucursales</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" onclick="applyFilters()">
+                            <i class="fas fa-filter"></i>
+                            Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Grid de Reportes -->
+            <div class="reports-grid">
+                <!-- Total Facturado -->
+                <div class="report-card" onclick="showReport('total-facturado')">
+                    <div class="report-icon" style="background: var(--success-green);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Total Facturado</h3>
+                    <p style="color: var(--gray-600);">Monto total facturado por períodos con desglose por método de pago</p>
+                    <button class="btn btn-primary">
+                        Ver Reporte <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Productos con Mayor Ingreso -->
+                <div class="report-card" onclick="showReport('mayor-ingreso')">
+                    <div class="report-icon" style="background: var(--primary-blue);">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Productos con Mayor Ingreso</h3>
+                    <p style="color: var(--gray-600);">Productos que generan más dinero en el período seleccionado</p>
+                    <button class="btn btn-primary">
+                        Ver Reporte <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Productos Más Vendidos -->
+                <div class="report-card" onclick="showReport('mas-vendidos')">
+                    <div class="report-icon" style="background: var(--warning-yellow);">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Productos Más Vendidos</h3>
+                    <p style="color: var(--gray-600);">Ranking de productos por cantidad vendida</p>
+                    <button class="btn btn-primary">
+                        Ver Reporte <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Estado de Inventario -->
+                <div class="report-card" onclick="showReport('inventario')">
+                    <div class="report-icon" style="background: var(--gray-600);">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <h3>Estado de Inventario</h3>
+                    <p style="color: var(--gray-600);">Inventario actual de todos los productos por sucursal</p>
+                    <button class="btn btn-primary">
+                        Ver Reporte <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Productos Menos Vendidos -->
+                <div class="report-card" onclick="showReport('menos-vendidos')">
+                    <div class="report-icon" style="background: var(--error-red);">
+                        <i class="fas fa-chart-line-down"></i>
+                    </div>
+                    <h3>Productos Menos Vendidos</h3>
+                    <p style="color: var(--gray-600);">Productos con menor rotación y baja demanda</p>
+                    <button class="btn btn-primary">
+                        Ver Reporte <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Productos Agotados -->
+                <div class="report-card" onclick="showReport('agotados')">
+                    <div class="report-icon" style="background: var(--error-red);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Productos Agotados</h3>
+                    <p style="color: var(--gray-600);">Productos sin stock que requieren reabastecimiento</p>
+                    <button class="btn btn-primary">
+                        Ver Reporte <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Buscar Factura -->
+                <div class="report-card" onclick="showFacturaSearch()">
+                    <div class="report-icon" style="background: var(--secondary-blue);">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Buscar Factura</h3>
+                    <p style="color: var(--gray-600);">Búsqueda detallada de facturas por número de correlativo</p>
+                    <button class="btn btn-primary">
+                        Buscar <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Stock Mínimo -->
+                <div class="report-card" onclick="showReport('stock-minimo')">
+                    <div class="report-icon" style="background: var(--warning-yellow);">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h3>Stock Mínimo</h3>
+                    <p style="color: var(--gray-600);">Productos que están por debajo del stock mínimo</p>
+                    <button class="btn btn-primary">
+                        Ver Reporte <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido del Reporte -->
+            <div id="reportContent" class="report-content">
+                <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
+                    <i class="fas fa-chart-bar" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h3>Selecciona un Reporte</h3>
+                    <p>Elige uno de los reportes disponibles para ver los resultados</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    <script src="/frontend/assets/js/components.js"></script>
+    
+    <script>
+        // Verificar autenticación y permisos
+        if (!auth.isAuthenticated()) {
+            window.location.href = '/frontend/pages/public/login.html';
+        }
+
+        if (!auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.GERENTE])) {
+            Utils.showToast('No tienes permisos para acceder a los reportes', 'error');
+            window.location.href = '/frontend/pages/admin/dashboard.html';
+        }
+
+        // Cargar datos del usuario
+        function loadUserData() {
+            document.getElementById('userAvatar').textContent = auth.getUserInitials();
+            document.getElementById('userName').textContent = auth.user.nombre_completo;
+            document.getElementById('userRole').textContent = auth.user.rol;
+            document.getElementById('sidebarRole').textContent = auth.user.rol;
+            document.getElementById('sidebarEmail').textContent = auth.user.email;
+        }
+
+        // Cargar menú según rol
+        function loadSidebarMenu() {
+            const menuItems = [];
+            
+            // Dashboard - siempre visible
+            menuItems.push({
+                icon: 'fas fa-home',
+                label: 'Dashboard',
+                href: '/frontend/pages/admin/dashboard.html',
+                active: false
+            });
+
+            // Gestión de Productos - Admin y Digitador
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR])) {
+                menuItems.push({
+                    icon: 'fas fa-box',
+                    label: 'Productos',
+                    href: '/frontend/pages/productos/productos.html',
+                    active: false
+                });
+
+                menuItems.push({
+                    icon: 'fas fa-tags',
+                    label: 'Categorías',
+                    href: '/frontend/pages/productos/categorias.html',
+                    active: false
+                });
+            }
+
+            // Inventario - todos los roles
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR, CONFIG.ROLES.CAJERO, CONFIG.ROLES.GERENTE])) {
+                menuItems.push({
+                    icon: 'fas fa-boxes',
+                    label: 'Inventario',
+                    href: '/frontend/pages/productos/inventario.html',
+                    active: false
+                });
+            }
+
+            // Ventas - Cajero, Digitador, Admin
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR, CONFIG.ROLES.CAJERO])) {
+                menuItems.push({
+                    icon: 'fas fa-cash-register',
+                    label: 'Punto de Venta',
+                    href: '/frontend/pages/ventas/pos.html',
+                    active: false
+                });
+            }
+
+            // Reportes - Gerente, Admin
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.GERENTE])) {
+                menuItems.push({
+                    icon: 'fas fa-chart-bar',
+                    label: 'Reportes',
+                    href: '/frontend/pages/reportes/reportes.html',
+                    active: true
+                });
+            }
+
+            // Gestión de Usuarios - Solo Admin
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN])) {
+                menuItems.push({
+                    icon: 'fas fa-users',
+                    label: 'Usuarios',
+                    href: '/frontend/pages/admin/usuarios.html',
+                    active: false
+                });
+            }
+
+            const menuHTML = menuItems.map(item => `
+                <li>
+                    <a href="${item.href}" class="${item.active ? 'active' : ''}">
+                        <i class="${item.icon}"></i>
+                        ${item.label}
+                    </a>
+                </li>
+            `).join('');
+
+            document.getElementById('sidebarNav').innerHTML = menuHTML;
+        }
+
+        // Cargar sucursales
+        async function loadSucursales() {
+            try {
+                const response = await api.getSucursales();
+                if (response.success) {
+                    const select = document.getElementById('sucursalFilter');
+                    const options = response.data.map(sucursal => 
+                        `<option value="${sucursal.id}">${sucursal.nombre}</option>`
+                    ).join('');
+                    select.innerHTML = '<option value="">Todas las Sucursales</option>' + options;
+                }
+            } catch (error) {
+                console.error('Error loading sucursales:', error);
+            }
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            const fechaFinal = document.getElementById('fechaFinal').value;
+            
+            if (fechaInicio && fechaFinal && fechaInicio > fechaFinal) {
+                Utils.showToast('La fecha de inicio no puede ser mayor a la fecha final', 'error');
+                return;
+            }
+            
+            Utils.showToast('Filtros aplicados', 'success');
+        }
+
+        // Mostrar reporte
+        async function showReport(reportType) {
+            const content = document.getElementById('reportContent');
+            content.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                let reportData;
+                let reportHTML = '';
+
+                switch (reportType) {
+                    case 'total-facturado':
+                        reportData = await api.getEstadisticasVentas();
+                        reportHTML = generateTotalFacturadoReport(reportData);
+                        break;
+                    
+                    case 'inventario':
+                        reportData = await api.getInventarioSucursal(1, { limit: 50 });
+                        reportHTML = generateInventarioReport(reportData);
+                        break;
+                    
+                    case 'mayor-ingreso':
+                    case 'mas-vendidos':
+                    case 'menos-vendidos':
+                    case 'agotados':
+                    case 'stock-minimo':
+                        reportHTML = generatePlaceholderReport(reportType);
+                        break;
+                    
+                    default:
+                        reportHTML = '<p>Reporte no implementado</p>';
+                }
+
+                content.innerHTML = reportHTML;
+                
+            } catch (error) {
+                console.error('Error generating report:', error);
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--error-red);">
+                        Error generando el reporte: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Generar reporte de total facturado
+        function generateTotalFacturadoReport(data) {
+            if (!data.success) {
+                return `<div class="card"><div class="card-content"><p>Error cargando datos de ventas</p></div></div>`;
+            }
+
+            const stats = data.data?.estadisticas_generales || {};
+            
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line"></i>
+                            Total Facturado
+                        </h3>
+                        <button class="btn btn-secondary" onclick="exportReport('total-facturado')">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                            <div style="text-align: center; padding: 1rem; background: var(--gray-50); border-radius: 8px;">
+                                <h4 style="color: var(--primary-blue); font-size: 2rem; margin: 0;">
+                                    ${stats.total_facturas || 0}
+                                </h4>
+                                <p style="margin: 0; color: var(--gray-600);">Total Facturas</p>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: var(--gray-50); border-radius: 8px;">
+                                <h4 style="color: var(--success-green); font-size: 2rem; margin: 0;">
+                                    ${Utils.formatCurrency(stats.monto_total || 0)}
+                                </h4>
+                                <p style="margin: 0; color: var(--gray-600);">Monto Total</p>
+                            </div>
+                        </div>
+                        
+                        <h4>Desglose por Método de Pago</h4>
+                        <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Efectivo:</span>
+                                <span>${Utils.formatCurrency(stats.total_efectivo || 0)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Tarjeta:</span>
+                                <span>${Utils.formatCurrency(stats.total_tarjeta || 0)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Cheque:</span>
+                                <span>${Utils.formatCurrency(stats.total_cheque || 0)}</span>
+                            </div>
+                            <hr>
+                            <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                                <span>Total:</span>
+                                <span>${Utils.formatCurrency(stats.monto_total || 0)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generar reporte de inventario
+        function generateInventarioReport(data) {
+            if (!data.success) {
+                return `<div class="card"><div class="card-content"><p>Error cargando inventario</p></div></div>`;
+            }
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-boxes"></i>
+                            Estado de Inventario
+                        </h3>
+                        <button class="btn btn-secondary" onclick="exportReport('inventario')">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        ${Components.inventoryTable(data.data)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generar reporte placeholder
+        function generatePlaceholderReport(reportType) {
+            const titles = {
+                'mayor-ingreso': 'Productos con Mayor Ingreso',
+                'mas-vendidos': 'Productos Más Vendidos',
+                'menos-vendidos': 'Productos Menos Vendidos',
+                'agotados': 'Productos Agotados',
+                'stock-minimo': 'Productos con Stock Mínimo'
+            };
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">${titles[reportType] || 'Reporte'}</h3>
+                        <button class="btn btn-secondary" onclick="exportReport('${reportType}')">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                            <i class="fas fa-tools" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <h4>Reporte en Desarrollo</h4>
+                            <p>Este reporte estará disponible en la próxima actualización del sistema.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Mostrar búsqueda de factura
+        function showFacturaSearch() {
+            const content = document.getElementById('reportContent');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-search"></i>
+                            Buscar Factura
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                            <input type="text" placeholder="Número de factura (ej: A-001)" 
+                                   class="form-input" id="facturaNumber" style="flex: 1;">
+                            <button class="btn btn-primary" onclick="searchFactura()">
+                                <i class="fas fa-search"></i>
+                                Buscar
+                            </button>
+                        </div>
+                        <div id="facturaResult">
+                            <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                                <i class="fas fa-file-invoice" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <p>Ingrese el número de factura para buscar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Buscar factura específica
+        async function searchFactura() {
+            const facturaNumber = document.getElementById('facturaNumber').value.trim();
+            if (!facturaNumber) {
+                Utils.showToast('Ingrese un número de factura', 'error');
+                return;
+            }
+
+            const resultDiv = document.getElementById('facturaResult');
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                const response = await api.getFacturaPorNumero(facturaNumber);
+                
+                if (response.success) {
+                    resultDiv.innerHTML = `
+                        <div style="background: var(--gray-50); padding: 1.5rem; border-radius: 8px;">
+                            <h4>Factura Encontrada</h4>
+                            <p><strong>Número:</strong> ${response.data.serie}-${response.data.correlativo}</p>
+                            <p><strong>Cliente:</strong> ${response.data.cliente_nombre}</p>
+                            <p><strong>Fecha:</strong> ${Utils.formatDate(response.data.fecha_emision)}</p>
+                            <p><strong>Total:</strong> ${Utils.formatCurrency(response.data.total)}</p>
+                            <p><strong>Empleado:</strong> ${response.data.empleado?.nombre_completo}</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--error-red);">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>No se encontró la factura ${facturaNumber}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error searching factura:', error);
+                resultDiv.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--error-red);">
+                        Error buscando la factura
+                    </div>
+                `;
+            }
+        }
+
+        // Exportar reporte
+        function exportReport(reportType) {
+            Utils.showToast('Función de exportar en desarrollo', 'info');
+        }
+
+        // Configurar fechas por defecto
+        function setupDefaultDates() {
+            const today = new Date();
+            const firstDayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            document.getElementById('fechaInicio').value = firstDayMonth.toISOString().split('T')[0];
+            document.getElementById('fechaFinal').value = today.toISOString().split('T')[0];
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.showReport = showReport;
+        window.showFacturaSearch = showFacturaSearch;
+        window.searchFactura = searchFactura;
+        window.exportReport = exportReport;
+        window.applyFilters = applyFilters;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
+            loadSidebarMenu();
+            loadSucursales();
+            setupDefaultDates();
+        });
+    </script>
+</body>
+</html>

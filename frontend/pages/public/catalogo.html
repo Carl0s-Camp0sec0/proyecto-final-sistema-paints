@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .catalog-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        .catalog-filters {
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-200);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-400);
+            font-size: 3rem;
+        }
+        .product-content {
+            padding: 1.5rem;
+        }
+        .product-category {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+        .product-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-800);
+        }
+        .product-brand {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .cart-button {
+            flex: 1;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        .cart-button:hover {
+            background: var(--secondary-blue);
+        }
+        .cart-button:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+        .wishlist-button, .view-button {
+            width: 45px;
+            height: 45px;
+            border: 1px solid var(--gray-300);
+            background: white;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .wishlist-button:hover, .view-button:hover {
+            background: var(--gray-100);
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .floating-cart {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .floating-cart:hover {
+            transform: scale(1.1);
+        }
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--error-red);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/public/index.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Paints
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/frontend/pages/public/index.html" class="nav-link">Inicio</a></li>
+                    <li><a href="/frontend/pages/public/catalogo.html" class="nav-link active">Catálogo</a></li>
+                    <li><a href="/frontend/pages/public/tiendas.html" class="nav-link">Tiendas</a></li>
+                    <li><a href="/frontend/pages/public/cotizacion.html" class="nav-link">Cotización</a></li>
+                </ul>
+            </nav>
+            <div class="user-menu" id="userMenu">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="catalog-header">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
+            <h1>Catálogo de Productos</h1>
+            <p>Descubre nuestra amplia gama de pinturas, accesorios y solventes</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main style="max-width: 1200px; margin: 0 auto; padding: 2rem 1rem;">
+        
+        <!-- Filtros -->
+        <div class="catalog-filters">
+            <h3 style="margin-bottom: 1rem;">Filtros de Búsqueda</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label class="form-label">Buscar Producto</label>
+                    <input type="text" placeholder="Nombre, marca, descripción..." 
+                           class="form-input" id="searchInput">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Categoría</label>
+                    <select class="form-select" id="categoryFilter">
+                        <option value="">Todas las Categorías</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Marca</label>
+                    <select class="form-select" id="brandFilter">
+                        <option value="">Todas las Marcas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Precio</label>
+                    <select class="form-select" id="priceFilter">
+                        <option value="">Todos los Precios</option>
+                        <option value="0-50">Q0 - Q50</option>
+                        <option value="50-100">Q50 - Q100</option>
+                        <option value="100-200">Q100 - Q200</option>
+                        <option value="200+">Q200+</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-search"></i>
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ordenamiento y Resultados -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <span id="resultsCount">Cargando productos...</span>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <label>Ordenar por:</label>
+                <select class="form-select" id="sortFilter" onchange="applySort()" style="width: 150px;">
+                    <option value="name">Nombre</option>
+                    <option value="price_asc">Precio: Menor a Mayor</option>
+                    <option value="price_desc">Precio: Mayor a Menor</option>
+                    <option value="category">Categoría</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Grid de Productos -->
+        <div id="productsContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        <div id="paginationContainer" class="pagination-container">
+            <!-- Se llena dinámicamente -->
+        </div>
+    </main>
+
+    <!-- Botón Flotante del Carrito -->
+    <button class="floating-cart" onclick="goToCart()" id="floatingCart">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+    </button>
+
+    <!-- Scripts -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    <script src="/frontend/assets/js/components.js"></script>
+    
+    <script>
+        // Variables globales
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentProducts = [];
+        let cartItems = getCartFromStorage();
+
+        // Cargar carrito desde localStorage
+        function getCartFromStorage() {
+            const cart = localStorage.getItem('paints_cart');
+            return cart ? JSON.parse(cart) : [];
+        }
+
+        // Guardar carrito en localStorage
+        function saveCartToStorage() {
+            localStorage.setItem('paints_cart', JSON.stringify(cartItems));
+            updateCartBadge();
+        }
+
+        // Actualizar badge del carrito
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
+            const total = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (total > 0) {
+                badge.textContent = total;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Configurar menú según autenticación
+        function setupUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            
+            if (auth.isAuthenticated()) {
+                userMenu.innerHTML = `
+                    <button class="cart-icon" onclick="goToCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" id="headerCartBadge" style="display: none;">0</span>
+                    </button>
+                    <a href="/frontend/pages/admin/dashboard.html" class="btn btn-primary btn-sm">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                    <button onclick="auth.logout()" class="btn btn-secondary btn-sm" style="margin-left: 0.5rem;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Salir
+                    </button>
+                `;
+            } else {
+                userMenu.innerHTML = `
+                    <button class="cart-icon" onclick="goToCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" id="headerCartBadge" style="display: none;">0</span>
+                    </button>
+                    <a href="/frontend/pages/public/login.html" class="btn btn-primary btn-sm">Iniciar Sesión</a>
+                    <a href="/frontend/pages/public/register.html" class="btn btn-secondary btn-sm">Registrarse</a>
+                `;
+            }
+            updateCartBadge();
+        }
+
+        // Cargar filtros
+        async function loadFilters() {
+            try {
+                // Cargar categorías
+                const categoriesResponse = await api.getCategorias();
+                if (categoriesResponse.success) {
+                    const categorySelect = document.getElementById('categoryFilter');
+                    const categoryOptions = categoriesResponse.data.map(cat => 
+                        `<option value="${cat.id}">${cat.nombre}</option>`
+                    ).join('');
+                    categorySelect.innerHTML = '<option value="">Todas las Categorías</option>' + categoryOptions;
+                }
+
+                // Cargar marcas (simulado - implementar en API)
+                const brandSelect = document.getElementById('brandFilter');
+                const commonBrands = ['Sherwin Williams', 'Comex', 'Pittsburgh', 'Behr', 'Benjamin Moore'];
+                const brandOptions = commonBrands.map(brand => 
+                    `<option value="${brand}">${brand}</option>`
+                ).join('');
+                brandSelect.innerHTML = '<option value="">Todas las Marcas</option>' + brandOptions;
+
+            } catch (error) {
+                console.error('Error loading filters:', error);
+            }
+        }
+
+        // Cargar productos
+        async function loadProducts(page = 1) {
+            try {
+                currentPage = page;
+                
+                const params = {
+                    page: currentPage,
+                    limit: 12
+                };
+
+                // Aplicar filtros
+                const searchTerm = document.getElementById('searchInput').value;
+                const categoryId = document.getElementById('categoryFilter').value;
+                const brand = document.getElementById('brandFilter').value;
+                const priceRange = document.getElementById('priceFilter').value;
+                const sortBy = document.getElementById('sortFilter').value;
+
+                if (searchTerm) params.buscar = searchTerm;
+                if (categoryId) params.categoria_id = categoryId;
+                if (brand) params.marca = brand;
+                if (priceRange) params.precio_rango = priceRange;
+                if (sortBy) params.orden = sortBy;
+
+                const response = await api.getProductos(params);
+                
+                if (response.success) {
+                    currentProducts = response.data;
+                    displayProducts(response.data);
+                    
+                    // Actualizar conteo
+                    const resultsCount = document.getElementById('resultsCount');
+                    resultsCount.textContent = `${response.data.length} productos encontrados`;
+                    
+                    // Actualizar paginación
+                    if (response.pagination) {
+                        totalPages = response.pagination.pages;
+                        displayPagination();
+                    }
+                } else {
+                    throw new Error(response.message);
+                }
+
+            } catch (error) {
+                console.error('Error loading products:', error);
+                displayError('Error cargando productos');
+            }
+        }
+
+        // Mostrar productos
+        function displayProducts(products) {
+            const container = document.getElementById('productsContainer');
+            
+            if (!products || products.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
+                        <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3>No se encontraron productos</h3>
+                        <p>Intenta ajustar los filtros de búsqueda</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const productsHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="product-content">
+                        <span class="product-category">${product.categoria?.nombre || 'General'}</span>
+                        <h3 class="product-name">${product.nombre}</h3>
+                        <p class="product-brand">${product.marca || 'Marca genérica'}</p>
+                        <div class="product-price">${Utils.formatCurrency(product.precio_base)}</div>
+                        <div class="product-actions">
+                            <button class="cart-button" onclick="addToCart(${product.id}, '${product.nombre.replace(/'/g, "\\'")}', ${product.precio_base})">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar
+                            </button>
+                            <button class="view-button" onclick="viewProduct(${product.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="wishlist-button" onclick="addToWishlist(${product.id})">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `<div class="products-grid">${productsHTML}</div>`;
+        }
+
+        // Mostrar error
+        function displayError(message) {
+            document.getElementById('productsContainer').innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--error-red);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Mostrar paginación
+        function displayPagination() {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            // Botón anterior
+            if (currentPage > 1) {
+                paginationHTML += `<button class="btn btn-secondary" onclick="loadProducts(${currentPage - 1})">Anterior</button>`;
+            }
+            
+            // Números de página
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                const activeClass = i === currentPage ? 'btn-primary' : 'btn-secondary';
+                paginationHTML += `<button class="btn ${activeClass}" onclick="loadProducts(${i})">${i}</button>`;
+            }
+            
+            // Botón siguiente
+            if (currentPage < totalPages) {
+                paginationHTML += `<button class="btn btn-secondary" onclick="loadProducts(${currentPage + 1})">Siguiente</button>`;
+            }
+
+            container.innerHTML = `<div style="display: flex; gap: 0.5rem;">${paginationHTML}</div>`;
+        }
+
+        // Agregar al carrito
+        function addToCart(productId, productName, price) {
+            const existingItem = cartItems.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cartItems.push({
+                    id: productId,
+                    name: productName,
+                    price: price,
+                    quantity: 1
+                });
+            }
+            
+            saveCartToStorage();
+            Utils.showToast(`${productName} agregado al carrito`, 'success');
+        }
+
+        // Ver producto
+        function viewProduct(productId) {
+            Utils.showToast('Función de vista detallada en desarrollo', 'info');
+        }
+
+        // Agregar a lista de deseos
+        function addToWishlist(productId) {
+            Utils.showToast('Función de lista de deseos en desarrollo', 'info');
+        }
+
+        // Ir al carrito
+        function goToCart() {
+            window.location.href = '/frontend/pages/public/carrito.html';
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            loadProducts(1);
+        }
+
+        // Aplicar ordenamiento
+        function applySort() {
+            loadProducts(currentPage);
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Búsqueda en tiempo real
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', Utils.debounce(() => {
+                loadProducts(1);
+            }, 300));
+
+            // Filtros
+            ['categoryFilter', 'brandFilter', 'priceFilter'].forEach(filterId => {
+                document.getElementById(filterId).addEventListener('change', () => {
+                    loadProducts(1);
+                });
+            });
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.addToCart = addToCart;
+        window.viewProduct = viewProduct;
+        window.addToWishlist = addToWishlist;
+        window.goToCart = goToCart;
+        window.applyFilters = applyFilters;
+        window.applySort = applySort;
+        window.loadProducts = loadProducts;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', () => {
+            setupUserMenu();
+            setupEventListeners();
+            loadFilters();
+            loadProducts();
+            updateCartBadge();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar" id="userAvatar">U</span>
+                    <div>
+                        <div style="font-weight: 500;" id="userName">Cargando...</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);" id="userRole">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title" id="sidebarRole">Usuario</h2>
+                <p class="sidebar-subtitle" id="sidebarEmail">usuario@paints.com</p>
+            </div>
+            <nav>
+                <ul class="sidebar-nav" id="sidebarNav">
+                    <!-- Se llena dinámicamente según el rol -->
+                </ul>
+            </nav>
+            <button class="logout-btn" onclick="auth.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">Gestión de Inventario</h1>
+                    <div id="inventoryActions">
+                        <!-- Botones de acción según permisos -->
+                    </div>
+                </div>
+                
+                <div class="card-content">
+                    <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+                        <div style="flex: 1;">
+                            <input type="text" placeholder="Buscar por nombre, código o descripción..." 
+                                   class="form-input" id="searchInput">
+                        </div>
+                        <select class="form-select" style="width: 200px;" id="categoryFilter">
+                            <option value="">Todas las Categorías</option>
+                        </select>
+                        <select class="form-select" style="width: 150px;" id="stockFilter">
+                            <option value="">Todos</option>
+                            <option value="low">Stock Bajo</option>
+                            <option value="out">Sin Stock</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="loadInventory()">
+                            <i class="fas fa-sync"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                    
+                    <div id="inventoryContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="paginationContainer">
+                        <!-- Paginación se carga dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    <script src="/frontend/assets/js/components.js"></script>
+    
+    <script>
+        // Verificar autenticación
+        if (!auth.isAuthenticated()) {
+            window.location.href = '/frontend/pages/public/login.html';
+        }
+
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        // Cargar datos del usuario
+        function loadUserData() {
+            document.getElementById('userAvatar').textContent = auth.getUserInitials();
+            document.getElementById('userName').textContent = auth.user.nombre_completo;
+            document.getElementById('userRole').textContent = auth.user.rol;
+            document.getElementById('sidebarRole').textContent = auth.user.rol;
+            document.getElementById('sidebarEmail').textContent = auth.user.email;
+        }
+
+        // Cargar menú según rol
+        function loadSidebarMenu() {
+            const menuItems = [];
+            
+            // Dashboard - siempre visible
+            menuItems.push({
+                icon: 'fas fa-home',
+                label: 'Dashboard',
+                href: '/frontend/pages/admin/dashboard.html',
+                active: false
+            });
+
+            // Gestión de Productos - Admin y Digitador
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR])) {
+                menuItems.push({
+                    icon: 'fas fa-box',
+                    label: 'Productos',
+                    href: '/frontend/pages/productos/productos.html',
+                    active: false
+                });
+
+                menuItems.push({
+                    icon: 'fas fa-tags',
+                    label: 'Categorías',
+                    href: '/frontend/pages/productos/categorias.html',
+                    active: false
+                });
+            }
+
+            // Inventario - todos los roles
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR, CONFIG.ROLES.CAJERO, CONFIG.ROLES.GERENTE])) {
+                menuItems.push({
+                    icon: 'fas fa-boxes',
+                    label: 'Inventario',
+                    href: '/frontend/pages/productos/inventario.html',
+                    active: true
+                });
+            }
+
+            // Ventas - Cajero, Digitador, Admin
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR, CONFIG.ROLES.CAJERO])) {
+                menuItems.push({
+                    icon: 'fas fa-cash-register',
+                    label: 'Punto de Venta',
+                    href: '/frontend/pages/ventas/pos.html',
+                    active: false
+                });
+            }
+
+            // Reportes - Gerente, Admin
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.GERENTE])) {
+                menuItems.push({
+                    icon: 'fas fa-chart-bar',
+                    label: 'Reportes',
+                    href: '/frontend/pages/reportes/reportes.html',
+                    active: false
+                });
+            }
+
+            // Gestión de Usuarios - Solo Admin
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN])) {
+                menuItems.push({
+                    icon: 'fas fa-users',
+                    label: 'Usuarios',
+                    href: '/frontend/pages/admin/usuarios.html',
+                    active: false
+                });
+            }
+
+            const menuHTML = menuItems.map(item => `
+                <li>
+                    <a href="${item.href}" class="${item.active ? 'active' : ''}">
+                        <i class="${item.icon}"></i>
+                        ${item.label}
+                    </a>
+                </li>
+            `).join('');
+
+            document.getElementById('sidebarNav').innerHTML = menuHTML;
+        }
+
+        // Cargar botones de acción según permisos
+        function loadInventoryActions() {
+            const actionsContainer = document.getElementById('inventoryActions');
+            let actionsHTML = '';
+
+            if (auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR])) {
+                actionsHTML = `
+                    <a href="/frontend/pages/productos/productos.html" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Nuevo Producto
+                    </a>
+                `;
+            }
+
+            actionsContainer.innerHTML = actionsHTML;
+        }
+
+        // Cargar categorías en el filtro
+        async function loadCategories() {
+            try {
+                const response = await api.getCategorias();
+                if (response.success) {
+                    const categorySelect = document.getElementById('categoryFilter');
+                    const options = response.data.map(cat => 
+                        `<option value="${cat.id}">${cat.nombre}</option>`
+                    ).join('');
+                    categorySelect.innerHTML = '<option value="">Todas las Categorías</option>' + options;
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Cargar inventario
+        async function loadInventory(page = 1) {
+            try {
+                currentPage = page;
+                const searchTerm = document.getElementById('searchInput').value;
+                const categoryId = document.getElementById('categoryFilter').value;
+                const stockFilter = document.getElementById('stockFilter').value;
+
+                const params = {
+                    page: currentPage,
+                    limit: itemsPerPage
+                };
+
+                if (searchTerm) params.buscar = searchTerm;
+                if (categoryId) params.categoria_id = categoryId;
+                if (stockFilter) params.stock_bajo = stockFilter === 'low';
+
+                document.getElementById('inventoryContent').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                const response = await api.getInventarioSucursal(1, params);
+                
+                if (response.success) {
+                    document.getElementById('inventoryContent').innerHTML = Components.inventoryTable(response.data);
+                    
+                    if (response.pagination) {
+                        document.getElementById('paginationContainer').innerHTML = Components.pagination(
+                            response.pagination.page,
+                            response.pagination.pages,
+                            'loadInventory'
+                        );
+                    }
+                } else {
+                    throw new Error(response.message);
+                }
+
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                document.getElementById('inventoryContent').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--error-red);">
+                        Error cargando inventario: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Búsqueda con debounce
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', Utils.debounce(() => {
+                loadInventory(1);
+            }, 300));
+
+            // Filtros
+            document.getElementById('categoryFilter').addEventListener('change', () => {
+                loadInventory(1);
+            });
+
+            document.getElementById('stockFilter').addEventListener('change', () => {
+                loadInventory(1);
+            });
+        }
+
+        // Funciones para botones de acción (placeholder)
+        function editProduct(productId) {
+            window.location.href = `/frontend/pages/productos/productos.html?edit=${productId}`;
+        }
+
+        async function deleteProduct(productId) {
+            const confirmed = await Utils.confirm(
+                '¿Estás seguro de que deseas eliminar este producto?',
+                'Confirmar eliminación'
+            );
+            
+            if (confirmed) {
+                Utils.showToast('Función de eliminar producto en desarrollo', 'info');
+            }
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.editProduct = editProduct;
+        window.deleteProduct = deleteProduct;
+        window.loadInventory = loadInventory;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadUserData();
+            loadSidebarMenu();
+            loadInventoryActions();
+            setupEventListeners();
+            await loadCategories();
+            await loadInventory();
+        });
+    </script>
+</body>
+</html>
