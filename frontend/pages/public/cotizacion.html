@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cotizaciones - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .cotizacion-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+        }
+        .cotizacion-header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-blue);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .producto-card {
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            background: var(--gray-50);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .producto-card:hover {
+            border-color: var(--primary-blue);
+            background: white;
+        }
+        .producto-card.selected {
+            border-color: var(--primary-blue);
+            background: var(--gray-100);
+        }
+        .productos-seleccionados {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .item-seleccionado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .precio-total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--success-green);
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+        .cantidad-input {
+            width: 80px;
+            text-align: center;
+        }
+        .text-muted {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+        @media (max-width: 768px) {
+            .productos-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <button onclick="history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <h1><i class="fas fa-file-invoice"></i> Sistema de Cotizaciones</h1>
+            </div>
+        </header>
+
+        <!-- Formulario de Cotización -->
+        <div class="cotizacion-container">
+            <!-- Header de la Cotización -->
+            <div class="cotizacion-header">
+                <h2><i class="fas fa-paint-brush"></i> PAINTS - Cotización</h2>
+                <p>Sistema de Gestión para Cadena de Pinturas</p>
+            </div>
+
+            <!-- Formulario de Cliente -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <div class="form-group">
+                    <label class="form-label" for="cliente_nombre">Nombre del Cliente *</label>
+                    <input type="text" id="cliente_nombre" name="cliente_nombre" class="form-input" required 
+                           placeholder="Nombre completo del cliente">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="cliente_empresa">Empresa</label>
+                    <input type="text" id="cliente_empresa" name="cliente_empresa" class="form-input"
+                           placeholder="Nombre de la empresa (opcional)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="cliente_telefono">Teléfono *</label>
+                    <input type="tel" id="cliente_telefono" name="cliente_telefono" class="form-input" required 
+                           placeholder="Número de contacto">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="cliente_email">Correo Electrónico</label>
+                    <input type="email" id="cliente_email" name="cliente_email" class="form-input"
+                           placeholder="correo@ejemplo.com">
+                </div>
+            </div>
+
+            <!-- Selección de Productos -->
+            <div>
+                <h3><i class="fas fa-shopping-cart"></i> Seleccionar Productos</h3>
+                
+                <!-- Filtros -->
+                <div style="margin-bottom: 1rem;">
+                    <select id="categoria_filter" class="form-select" style="display: inline-block; width: 200px; margin-right: 1rem;">
+                        <option value="">Todas las Categorías</option>
+                        <option value="pinturas">Pinturas</option>
+                        <option value="solventes">Solventes</option>
+                        <option value="accesorios">Accesorios</option>
+                    </select>
+                    <input type="text" id="buscar_producto" placeholder="Buscar producto..." 
+                           class="form-input" style="display: inline-block; width: 300px;">
+                </div>
+
+                <!-- Grid de Productos -->
+                <div class="productos-grid" id="productosGrid">
+                    <!-- Los productos se cargarán dinámicamente -->
+                </div>
+
+                <!-- Productos Seleccionados -->
+                <div class="productos-seleccionados">
+                    <h4>Productos Seleccionados</h4>
+                    <div id="productosSeleccionados">
+                        <p class="text-muted">No hay productos seleccionados</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de la Cotización -->
+            <div style="background: var(--gray-50); padding: 2rem; border-radius: var(--border-radius); margin: 2rem 0;">
+                <h3><i class="fas fa-calculator"></i> Resumen de Cotización</h3>
+                <div id="resumenDetalles">
+                    <div>Subtotal: <span id="subtotal">Q 0.00</span></div>
+                    <div>IVA (12%): <span id="iva">Q 0.00</span></div>
+                    <div class="precio-total">
+                        Total: <span id="total">Q 0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                <button type="button" class="btn btn-primary" onclick="generarCotizacionPDF()">
+                    <i class="fas fa-file-pdf"></i> Generar PDF
+                </button>
+                <button type="button" class="btn btn-success" onclick="enviarCotizacion()">
+                    <i class="fas fa-paper-plane"></i> Enviar por Email
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="limpiarCotizacion()">
+                    <i class="fas fa-trash"></i> Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    <script>
+        // Estado global de la cotización
+        let cotizacionState = {
+            cliente: {},
+            productos: [],
+            subtotal: 0,
+            iva: 0,
+            total: 0
+        };
+
+        // Productos de ejemplo
+        const productosEjemplo = [
+            {
+                id: 1,
+                nombre: "Pintura Base Agua Blanca",
+                marca: "Sherwin Williams",
+                categoria: "pinturas",
+                precio: 125.00,
+                unidad: "Galón",
+                color: "Blanco",
+                descripcion: "Pintura de alta calidad base agua"
+            },
+            {
+                id: 2,
+                nombre: "Solvente Limpiador",
+                marca: "Comex",
+                categoria: "solventes",
+                precio: 35.50,
+                unidad: "1/4 Galón",
+                descripcion: "Solvente para limpieza de herramientas"
+            },
+            {
+                id: 3,
+                nombre: "Brocha Professional 4\"",
+                marca: "Purdy",
+                categoria: "accesorios",
+                precio: 85.00,
+                unidad: "Pieza",
+                descripcion: "Brocha profesional para acabados finos"
+            },
+            {
+                id: 4,
+                nombre: "Rodillo Antigoteo 9\"",
+                marca: "Wooster",
+                categoria: "accesorios",
+                precio: 45.00,
+                unidad: "Pieza",
+                descripcion: "Rodillo de alta absorción"
+            },
+            {
+                id: 5,
+                nombre: "Pintura Base Aceite Azul",
+                marca: "Benjamin Moore",
+                categoria: "pinturas",
+                precio: 180.00,
+                unidad: "Galón",
+                color: "Azul Marino",
+                descripcion: "Pintura durable para exteriores"
+            }
+        ];
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarProductos();
+            configurarEventos();
+        });
+
+        function cargarProductos(filtroCategoria = '', busqueda = '') {
+            const grid = document.getElementById('productosGrid');
+            let productos = productosEjemplo;
+
+            // Aplicar filtros
+            if (filtroCategoria) {
+                productos = productos.filter(p => p.categoria === filtroCategoria);
+            }
+            if (busqueda) {
+                productos = productos.filter(p => 
+                    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+                    p.marca.toLowerCase().includes(busqueda.toLowerCase())
+                );
+            }
+
+            grid.innerHTML = productos.map(producto => `
+                <div class="producto-card" data-producto-id="${producto.id}">
+                    <h4>${producto.nombre}</h4>
+                    <p><strong>Marca:</strong> ${producto.marca}</p>
+                    ${producto.color ? `<p><strong>Color:</strong> ${producto.color}</p>` : ''}
+                    <p><strong>Precio:</strong> Q ${producto.precio.toFixed(2)} / ${producto.unidad}</p>
+                    <p class="text-muted">${producto.descripcion}</p>
+                    <div style="margin-top: 1rem;">
+                        <label>Cantidad:</label>
+                        <input type="number" min="1" value="1" class="cantidad-input form-input" 
+                               data-producto-id="${producto.id}">
+                        <button type="button" class="btn btn-sm btn-primary" 
+                                onclick="agregarProducto(${producto.id})">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function configurarEventos() {
+            // Filtros
+            document.getElementById('categoria_filter').addEventListener('change', function() {
+                const categoria = this.value;
+                const busqueda = document.getElementById('buscar_producto').value;
+                cargarProductos(categoria, busqueda);
+            });
+
+            document.getElementById('buscar_producto').addEventListener('input', function() {
+                const busqueda = this.value;
+                const categoria = document.getElementById('categoria_filter').value;
+                cargarProductos(categoria, busqueda);
+            });
+        }
+
+        function agregarProducto(productoId) {
+            const producto = productosEjemplo.find(p => p.id === productoId);
+            const cantidadInput = document.querySelector(`input[data-producto-id="${productoId}"]`);
+            const cantidad = parseInt(cantidadInput.value);
+
+            // Verificar si ya existe el producto
+            const existeIndex = cotizacionState.productos.findIndex(p => p.id === productoId);
+            
+            if (existeIndex > -1) {
+                cotizacionState.productos[existeIndex].cantidad += cantidad;
+                cotizacionState.productos[existeIndex].subtotal = cotizacionState.productos[existeIndex].precio * cotizacionState.productos[existeIndex].cantidad;
+            } else {
+                cotizacionState.productos.push({
+                    ...producto,
+                    cantidad: cantidad,
+                    subtotal: producto.precio * cantidad
+                });
+            }
+
+            actualizarVistaProductos();
+            calcularTotales();
+        }
+
+        function removerProducto(productoId) {
+            cotizacionState.productos = cotizacionState.productos.filter(p => p.id !== productoId);
+            actualizarVistaProductos();
+            calcularTotales();
+        }
+
+        function actualizarVistaProductos() {
+            const container = document.getElementById('productosSeleccionados');
+            
+            if (cotizacionState.productos.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay productos seleccionados</p>';
+                return;
+            }
+
+            container.innerHTML = cotizacionState.productos.map(producto => `
+                <div class="item-seleccionado">
+                    <div>
+                        <strong>${producto.nombre}</strong><br>
+                        <small>${producto.marca} - Q ${producto.precio.toFixed(2)}/${producto.unidad}</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <div>Cantidad: ${producto.cantidad}</div>
+                        <div><strong>Q ${producto.subtotal.toFixed(2)}</strong></div>
+                        <button class="btn btn-danger btn-sm" onclick="removerProducto(${producto.id})" style="margin-top: 0.5rem;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function calcularTotales() {
+            cotizacionState.subtotal = cotizacionState.productos.reduce((sum, p) => sum + p.subtotal, 0);
+            cotizacionState.iva = cotizacionState.subtotal * 0.12;
+            cotizacionState.total = cotizacionState.subtotal + cotizacionState.iva;
+
+            document.getElementById('subtotal').textContent = `Q ${cotizacionState.subtotal.toFixed(2)}`;
+            document.getElementById('iva').textContent = `Q ${cotizacionState.iva.toFixed(2)}`;
+            document.getElementById('total').textContent = `Q ${cotizacionState.total.toFixed(2)}`;
+        }
+
+        function generarCotizacionPDF() {
+            // Validar datos del cliente
+            const nombre = document.getElementById('cliente_nombre').value.trim();
+            const telefono = document.getElementById('cliente_telefono').value.trim();
+            
+            if (!nombre || !telefono) {
+                alert('Por favor complete los datos del cliente (nombre y teléfono son obligatorios)');
+                return;
+            }
+
+            if (cotizacionState.productos.length === 0) {
+                alert('Por favor seleccione al menos un producto');
+                return;
+            }
+
+            // Crear PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Header del PDF
+            doc.setFillColor(37, 99, 235);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.text('PAINTS', 20, 25);
+            doc.setFontSize(12);
+            doc.text('Sistema de Gestión para Cadena de Pinturas', 20, 32);
+
+            // Información de la cotización
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(18);
+            doc.text('COTIZACIÓN', 140, 60);
+            
+            const fecha = new Date().toLocaleDateString('es-GT');
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${fecha}`, 140, 70);
+            doc.text(`Cotización No: COT-${Date.now()}`, 140, 75);
+
+            // Datos del cliente
+            doc.setFontSize(14);
+            doc.text('DATOS DEL CLIENTE', 20, 60);
+            doc.setFontSize(10);
+            doc.text(`Nombre: ${document.getElementById('cliente_nombre').value}`, 20, 70);
+            const empresa = document.getElementById('cliente_empresa').value;
+            if (empresa) doc.text(`Empresa: ${empresa}`, 20, 75);
+            doc.text(`Teléfono: ${document.getElementById('cliente_telefono').value}`, 20, 80);
+            const email = document.getElementById('cliente_email').value;
+            if (email) doc.text(`Email: ${email}`, 20, 85);
+
+            // Tabla de productos
+            const tableData = cotizacionState.productos.map(producto => [
+                producto.nombre,
+                producto.marca,
+                `Q ${producto.precio.toFixed(2)}`,
+                producto.cantidad.toString(),
+                `Q ${producto.subtotal.toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                head: [['Producto', 'Marca', 'Precio Unit.', 'Cantidad', 'Subtotal']],
+                body: tableData,
+                startY: 100,
+                styles: { fontSize: 9 },
+                headStyles: { fillColor: [37, 99, 235] }
+            });
+
+            // Totales
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.text(`Subtotal: Q ${cotizacionState.subtotal.toFixed(2)}`, 140, finalY);
+            doc.text(`IVA (12%): Q ${cotizacionState.iva.toFixed(2)}`, 140, finalY + 5);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text(`TOTAL: Q ${cotizacionState.total.toFixed(2)}`, 140, finalY + 15);
+
+            // Footer
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text('Esta cotización es válida por 15 días a partir de la fecha de emisión', 20, 280);
+            doc.text('Gracias por preferirnos - PAINTS', 20, 285);
+
+            // Descargar PDF
+            const nombreArchivo = `cotizacion_${nombre.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+            doc.save(nombreArchivo);
+        }
+
+        function enviarCotizacion() {
+            alert('Funcionalidad de envío por email será implementada próximamente');
+        }
+
+        function limpiarCotizacion() {
+            if (confirm('¿Está seguro que desea limpiar toda la cotización?')) {
+                document.getElementById('cliente_nombre').value = '';
+                document.getElementById('cliente_empresa').value = '';
+                document.getElementById('cliente_telefono').value = '';
+                document.getElementById('cliente_email').value = '';
+                cotizacionState = {
+                    cliente: {},
+                    productos: [],
+                    subtotal: 0,
+                    iva: 0,
+                    total: 0
+                };
+                actualizarVistaProductos();
+                calcularTotales();
+            }
+        }
+    </script>
+</body>
+</html>

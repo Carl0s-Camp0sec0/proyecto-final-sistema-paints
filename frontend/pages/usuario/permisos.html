@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Permisos - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .permissions-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .permissions-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .role-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .role-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .role-name {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .role-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .role-icon.admin { background: var(--error-100); color: var(--error-red); }
+        .role-icon.manager { background: var(--warning-100); color: var(--warning-yellow); }
+        .role-icon.cashier { background: var(--success-100); color: var(--success-green); }
+        .role-icon.digitizer { background: var(--primary-50); color: var(--primary-blue); }
+        
+        .role-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .role-description {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+        
+        .role-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+        
+        .role-stat {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+        
+        .permissions-list {
+            padding: 1.5rem;
+        }
+        
+        .permission-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .permission-item:last-child {
+            border-bottom: none;
+        }
+        
+        .permission-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .permission-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+        
+        .permission-icon.read { background: var(--success-100); color: var(--success-green); }
+        .permission-icon.write { background: var(--warning-100); color: var(--warning-yellow); }
+        .permission-icon.delete { background: var(--error-100); color: var(--error-red); }
+        .permission-icon.admin { background: var(--primary-50); color: var(--primary-blue); }
+        
+        .permission-details h4 {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+        
+        .permission-details p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        
+        .permission-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .permission-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gray-300);
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background: var(--primary-blue);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
+        .users-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+            margin-top: 2rem;
+        }
+        
+        .users-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            transition: background-color 0.2s ease;
+        }
+        
+        .user-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+        
+        .user-email {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+        
+        .user-role {
+            margin-right: 1rem;
+        }
+        
+        .audit-trail {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+            margin-top: 2rem;
+        }
+        
+        .audit-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .audit-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .audit-item:last-child {
+            border-bottom: none;
+        }
+        
+        .audit-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+        }
+        
+        .audit-icon.permission { background: var(--warning-100); color: var(--warning-yellow); }
+        .audit-icon.user { background: var(--success-100); color: var(--success-green); }
+        .audit-icon.role { background: var(--primary-50); color: var(--primary-blue); }
+        
+        .audit-details {
+            flex: 1;
+        }
+        
+        .audit-action {
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+        
+        .audit-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+        
+        .audit-time {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+        
+        @media (max-width: 768px) {
+            .permissions-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .roles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .user-role {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <button onclick="history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <h1><i class="fas fa-shield-alt"></i> Gestión de Permisos</h1>
+            </div>
+        </header>
+
+        <div class="permissions-container">
+            <!-- Header de Permisos -->
+            <div class="permissions-header">
+                <div>
+                    <h1>Gestión de Permisos y Roles</h1>
+                    <p>Administra los roles y permisos de los usuarios del sistema</p>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="exportPermissions()">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button class="btn btn-success" onclick="createRole()">
+                        <i class="fas fa-plus"></i> Nuevo Rol
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid de Roles -->
+            <div class="roles-grid">
+                <!-- Administrador -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-name">
+                            <div class="role-icon admin">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div>
+                                <h3 class="role-title">Administrador</h3>
+                                <p class="role-description">Acceso completo al sistema</p>
+                            </div>
+                        </div>
+                        <div class="role-stats">
+                            <span class="role-stat"><i class="fas fa-users"></i> 2 usuarios</span>
+                            <span class="role-stat"><i class="fas fa-key"></i> Todos los permisos</span>
+                        </div>
+                    </div>
+                    <div class="permissions-list">
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon admin">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Gestión del Sistema</h4>
+                                    <p>Configuración y administración completa</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked disabled>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon admin">
+                                    <i class="fas fa-users-cog"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Gestión de Usuarios</h4>
+                                    <p>Crear, editar y eliminar usuarios</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked disabled>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon write">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Modificar Datos</h4>
+                                    <p>Editar información del sistema</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked disabled>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon delete">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Eliminar Registros</h4>
+                                    <p>Borrar información del sistema</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked disabled>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gerente -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-name">
+                            <div class="role-icon manager">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div>
+                                <h3 class="role-title">Gerente</h3>
+                                <p class="role-description">Gestión de tienda y reportes</p>
+                            </div>
+                        </div>
+                        <div class="role-stats">
+                            <span class="role-stat"><i class="fas fa-users"></i> 6 usuarios</span>
+                            <span class="role-stat"><i class="fas fa-key"></i> Permisos limitados</span>
+                        </div>
+                    </div>
+                    <div class="permissions-list">
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon read">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Ver Reportes</h4>
+                                    <p>Acceso a reportes y estadísticas</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('manager', 'reports', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon write">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Gestión de Inventario</h4>
+                                    <p>Administrar productos y stock</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('manager', 'inventory', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon write">
+                                    <i class="fas fa-file-invoice"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Aprobar Ventas</h4>
+                                    <p>Autorizar transacciones importantes</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('manager', 'approve_sales', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon delete">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Eliminar Registros</h4>
+                                    <p>Borrar información del sistema</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" onchange="updatePermission('manager', 'delete', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cajero -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-name">
+                            <div class="role-icon cashier">
+                                <i class="fas fa-cash-register"></i>
+                            </div>
+                            <div>
+                                <h3 class="role-title">Cajero</h3>
+                                <p class="role-description">Procesamiento de ventas</p>
+                            </div>
+                        </div>
+                        <div class="role-stats">
+                            <span class="role-stat"><i class="fas fa-users"></i> 12 usuarios</span>
+                            <span class="role-stat"><i class="fas fa-key"></i> Permisos básicos</span>
+                        </div>
+                    </div>
+                    <div class="permissions-list">
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon read">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Procesar Ventas</h4>
+                                    <p>Realizar transacciones de venta</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('cashier', 'sales', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon read">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Consultar Productos</h4>
+                                    <p>Ver información de productos</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('cashier', 'view_products', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon read">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Gestión de Clientes</h4>
+                                    <p>Registro y consulta de clientes</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('cashier', 'customers', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon write">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Modificar Inventario</h4>
+                                    <p>Editar información de productos</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" onchange="updatePermission('cashier', 'edit_inventory', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Digitador -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-name">
+                            <div class="role-icon digitizer">
+                                <i class="fas fa-keyboard"></i>
+                            </div>
+                            <div>
+                                <h3 class="role-title">Digitador</h3>
+                                <p class="role-description">Captura de información</p>
+                            </div>
+                        </div>
+                        <div class="role-stats">
+                            <span class="role-stat"><i class="fas fa-users"></i> 4 usuarios</span>
+                            <span class="role-stat"><i class="fas fa-key"></i> Solo lectura/escritura</span>
+                        </div>
+                    </div>
+                    <div class="permissions-list">
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon write">
+                                    <i class="fas fa-plus-circle"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Registrar Productos</h4>
+                                    <p>Agregar nuevos productos al sistema</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('digitizer', 'add_products', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon write">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Editar Información</h4>
+                                    <p>Modificar datos de productos</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('digitizer', 'edit_products', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon read">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Ver Reportes Básicos</h4>
+                                    <p>Consultar reportes de inventario</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" checked onchange="updatePermission('digitizer', 'basic_reports', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <div class="permission-info">
+                                <div class="permission-icon delete">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                                <div class="permission-details">
+                                    <h4>Eliminar Productos</h4>
+                                    <p>Borrar productos del inventario</p>
+                                </div>
+                            </div>
+                            <label class="permission-toggle">
+                                <input type="checkbox" onchange="updatePermission('digitizer', 'delete_products', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Usuarios -->
+            <div class="users-section">
+                <div class="users-header">
+                    <h3><i class="fas fa-users"></i> Usuarios por Rol</h3>
+                    <button class="btn btn-primary" onclick="assignRole()">
+                        <i class="fas fa-user-plus"></i> Asignar Rol
+                    </button>
+                </div>
+                
+                <div class="user-item">
+                    <div class="user-avatar">HG</div>
+                    <div class="user-info">
+                        <div class="user-name">Hidan García</div>
+                        <div class="user-email">hidan.garcia@email.com</div>
+                    </div>
+                    <div class="user-role">
+                        <span class="badge badge-error">Administrador</span>
+                    </div>
+                    <button class="btn-action btn-edit" onclick="editUserRole(1)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                
+                <div class="user-item">
+                    <div class="user-avatar" style="background: var(--warning-yellow);">MG</div>
+                    <div class="user-info">
+                        <div class="user-name">María González</div>
+                        <div class="user-email">maria.gonzalez@email.com</div>
+                    </div>
+                    <div class="user-role">
+                        <span class="badge badge-warning">Gerente</span>
+                    </div>
+                    <button class="btn-action btn-edit" onclick="editUserRole(2)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                
+                <div class="user-item">
+                    <div class="user-avatar" style="background: var(--success-green);">CL</div>
+                    <div class="user-info">
+                        <div class="user-name">Carlos López</div>
+                        <div class="user-email">carlos.lopez@email.com</div>
+                    </div>
+                    <div class="user-role">
+                        <span class="badge badge-success">Cajero</span>
+                    </div>
+                    <button class="btn-action btn-edit" onclick="editUserRole(3)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                
+                <div class="user-item">
+                    <div class="user-avatar" style="background: var(--primary-blue);">AR</div>
+                    <div class="user-info">
+                        <div class="user-name">Ana Rodríguez</div>
+                        <div class="user-email">ana.rodriguez@email.com</div>
+                    </div>
+                    <div class="user-role">
+                        <span class="badge" style="background: var(--primary-50); color: var(--primary-blue);">Digitador</span>
+                    </div>
+                    <button class="btn-action btn-edit" onclick="editUserRole(4)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Auditoría -->
+            <div class="audit-trail">
+                <div class="audit-header">
+                    <h3><i class="fas fa-history"></i> Registro de Cambios</h3>
+                    <p class="text-muted">Historial de modificaciones en permisos y roles</p>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="audit-icon permission">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="audit-details">
+                        <div class="audit-action">Permiso Modificado</div>
+                        <div class="audit-description">Se habilitó "Eliminar Registros" para el rol Gerente por Hidan García</div>
+                    </div>
+                    <div class="audit-time">Hace 2 horas</div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="audit-icon user">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="audit-details">
+                        <div class="audit-action">Rol Asignado</div>
+                        <div class="audit-description">Carlos López fue asignado como Cajero en Tienda Guatemala</div>
+                    </div>
+                    <div class="audit-time">Hace 5 horas</div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="audit-icon role">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="audit-details">
+                        <div class="audit-action">Nuevo Rol Creado</div>
+                        <div class="audit-description">Se creó el rol "Supervisor" con permisos personalizados</div>
+                    </div>
+                    <div class="audit-time">Hace 1 día</div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="audit-icon permission">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div class="audit-details">
+                        <div class="audit-action">Permiso Revocado</div>
+                        <div class="audit-description">Se deshabilitó "Modificar Inventario" para el rol Digitador</div>
+                    </div>
+                    <div class="audit-time">Hace 2 días</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let permissions = {
+            manager: {
+                reports: true,
+                inventory: true,
+                approve_sales: true,
+                delete: false
+            },
+            cashier: {
+                sales: true,
+                view_products: true,
+                customers: true,
+                edit_inventory: false
+            },
+            digitizer: {
+                add_products: true,
+                edit_products: true,
+                basic_reports: true,
+                delete_products: false
+            }
+        };
+
+        // Actualizar permiso
+        function updatePermission(role, permission, enabled) {
+            if (permissions[role]) {
+                permissions[role][permission] = enabled;
+                
+                // Simular guardado
+                setTimeout(() => {
+                    const action = enabled ? 'habilitado' : 'deshabilitado';
+                    alert(`✅ Permiso "${permission}" ${action} para el rol "${role}"`);
+                    
+                    // Agregar al registro de auditoría (simulado)
+                    logAuditChange(role, permission, enabled);
+                }, 500);
+            }
+        }
+
+        // Registrar cambio en auditoría
+        function logAuditChange(role, permission, enabled) {
+            console.log(`Audit: ${role} - ${permission} - ${enabled ? 'enabled' : 'disabled'}`);
+        }
+
+        // Crear nuevo rol
+        function createRole() {
+            const roleName = prompt('Ingrese el nombre del nuevo rol:');
+            if (roleName) {
+                alert(`🆕 Nuevo rol "${roleName}" creado exitosamente`);
+            }
+        }
+
+        // Asignar rol
+        function assignRole() {
+            alert('👤 Función de asignación de roles en desarrollo');
+        }
+
+        // Editar rol de usuario
+        function editUserRole(userId) {
+            const roles = ['Administrador', 'Gerente', 'Cajero', 'Digitador'];
+            const selectedRole = prompt(`Seleccione el nuevo rol para el usuario ${userId}:\n${roles.join('\n')}`);
+            
+            if (selectedRole && roles.includes(selectedRole)) {
+                alert(`✅ Rol "${selectedRole}" asignado al usuario ${userId}`);
+            }
+        }
+
+        // Exportar permisos
+        function exportPermissions() {
+            alert('📊 Exportando configuración de permisos...');
+            
+            // Simular descarga
+            setTimeout(() => {
+                alert('✅ Archivo de permisos descargado exitosamente');
+            }, 1500);
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Gestión de permisos inicializada');
+        });
+    </script>
+</body>
+</html>

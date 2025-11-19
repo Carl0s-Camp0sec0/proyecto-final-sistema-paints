@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Facturas - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar" id="userAvatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;" id="userName">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);" id="userRole">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Módulo Ventas</h2>
+                <p class="sidebar-subtitle">Gestión de facturas</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/pos.html">
+                        <i class="fas fa-cash-register"></i>
+                        Punto de Venta
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/facturas.html" class="active">
+                        <i class="fas fa-file-invoice"></i>
+                        Gestión Facturas
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/clientes.html">
+                        <i class="fas fa-users"></i>
+                        Clientes
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/anular-factura.html">
+                        <i class="fas fa-ban"></i>
+                        Anular Facturas
+                    </a></li>
+                    <li><a href="/frontend/pages/productos/inventario.html">
+                        <i class="fas fa-boxes"></i>
+                        Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Reportes
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div style="margin-bottom: 2rem;">
+                <h1>
+                    <i class="fas fa-file-invoice"></i>
+                    Gestión de Facturas
+                </h1>
+                <p style="color: var(--gray-600);">Consulta y gestiona todas las facturas del sistema</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="nuevaFactura()">
+                    <i class="fas fa-plus"></i>
+                    Nueva Factura
+                </button>
+                <button class="btn btn-secondary" onclick="exportarFacturas()">
+                    <i class="fas fa-download"></i>
+                    Exportar
+                </button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Facturas Hoy</p>
+                                <h2 style="color: var(--primary-blue);">24</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-file-invoice" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Ventas del Día</p>
+                                <h2 style="color: var(--success-green);">Q 15,450</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-dollar-sign" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Facturas Anuladas</p>
+                                <h2 style="color: var(--error-red);">2</h2>
+                            </div>
+                            <div style="background: var(--error-100); padding: 1rem; border-radius: 50%; color: var(--error-red);">
+                                <i class="fas fa-ban" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Promedio Venta</p>
+                                <h2 style="color: var(--warning-yellow);">Q 643</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-chart-line" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Card -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Filtros de Búsqueda</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Número de Factura</label>
+                            <input type="text" class="form-input" id="filtroNumero" placeholder="Ej: A00001234">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cliente</label>
+                            <input type="text" class="form-input" id="filtroCliente" placeholder="Nombre del cliente">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" id="filtroEstado">
+                                <option value="">Todos los estados</option>
+                                <option value="activa">Activa</option>
+                                <option value="anulada">Anulada</option>
+                                <option value="pagada">Pagada</option>
+                                <option value="pendiente">Pendiente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha Desde</label>
+                            <input type="date" class="form-input" id="fechaDesde">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha Hasta</label>
+                            <input type="date" class="form-input" id="fechaHasta">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sucursal</label>
+                            <select class="form-select" id="filtroSucursal">
+                                <option value="">Todas las sucursales</option>
+                                <option value="1">Pradera Chimaltenango</option>
+                                <option value="2">Pradera Escuintla</option>
+                                <option value="3">Las Américas Mazatenango</option>
+                                <option value="4">La Trinidad Coatepeque</option>
+                                <option value="5">Pradera Xela</option>
+                                <option value="6">Miraflores Ciudad</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="aplicarFiltros()">
+                            <i class="fas fa-search"></i>
+                            Buscar
+                        </button>
+                        <button class="btn btn-secondary" onclick="limpiarFiltros()">
+                            <i class="fas fa-times"></i>
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Facturas Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Lista de Facturas</h3>
+                    <div>
+                        <span class="text-muted">Total: 45 registros</span>
+                    </div>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <!-- Table Container -->
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nº Factura</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Sucursal</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Método Pago</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>A00001234</strong></td>
+                                    <td>17 Nov 2024, 10:30</td>
+                                    <td>
+                                        <div>
+                                            <strong>María García</strong><br>
+                                            <small class="text-muted">maria.garcia@email.com</small>
+                                        </div>
+                                    </td>
+                                    <td>Pradera Chimaltenango</td>
+                                    <td><strong>Q 1,250</strong></td>
+                                    <td><span class="status-badge status-activo">Activa</span></td>
+                                    <td>Tarjeta</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetalleFactura(1)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="imprimirFactura(1)" title="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="anularFactura(1)" title="Anular">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>A00001235</strong></td>
+                                    <td>17 Nov 2024, 11:15</td>
+                                    <td>
+                                        <div>
+                                            <strong>Juan Pérez</strong><br>
+                                            <small class="text-muted">juan.perez@email.com</small>
+                                        </div>
+                                    </td>
+                                    <td>Pradera Escuintla</td>
+                                    <td><strong>Q 850</strong></td>
+                                    <td><span class="status-badge status-activo">Activa</span></td>
+                                    <td>Efectivo</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetalleFactura(2)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="imprimirFactura(2)" title="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="anularFactura(2)" title="Anular">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>A00001236</strong></td>
+                                    <td>17 Nov 2024, 12:45</td>
+                                    <td>
+                                        <div>
+                                            <strong>Ana López</strong><br>
+                                            <small class="text-muted">ana.lopez@email.com</small>
+                                        </div>
+                                    </td>
+                                    <td>Las Américas Mazatenango</td>
+                                    <td><strong>Q 2,100</strong></td>
+                                    <td><span class="status-badge status-completado">Pagada</span></td>
+                                    <td>Tarjeta</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetalleFactura(3)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="imprimirFactura(3)" title="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>A00001237</strong></td>
+                                    <td>17 Nov 2024, 13:20</td>
+                                    <td>
+                                        <div>
+                                            <strong>Carlos Ruiz</strong><br>
+                                            <small class="text-muted">carlos.ruiz@email.com</small>
+                                        </div>
+                                    </td>
+                                    <td>La Trinidad Coatepeque</td>
+                                    <td><strong>Q 450</strong></td>
+                                    <td><span class="status-badge status-inactivo">Anulada</span></td>
+                                    <td>Efectivo</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetalleFactura(4)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="imprimirFactura(4)" title="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" style="margin-top: 2rem;">
+                <button class="page-btn">« Anterior</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">Siguiente »</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Detalles Factura -->
+    <div id="modalDetalleFactura" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalles de Factura</h3>
+                <button class="close-modal" onclick="cerrarModal('modalDetalleFactura')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="detalleFacturaContent">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Configurar event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de facturas cargada correctamente');
+            
+            // Configurar filtros
+            const filtros = ['filtroNumero', 'filtroCliente', 'filtroEstado', 'fechaDesde', 'fechaHasta', 'filtroSucursal'];
+            filtros.forEach(filtro => {
+                const elemento = document.getElementById(filtro);
+                if (elemento) {
+                    elemento.addEventListener('change', debounce(aplicarFiltros, 500));
+                }
+            });
+        });
+
+        // Aplicar filtros
+        function aplicarFiltros() {
+            console.log('Aplicando filtros...');
+            // En una implementación real, aquí se haría la consulta al backend
+            alert('Filtros aplicados (simulación)');
+        }
+
+        // Limpiar filtros
+        function limpiarFiltros() {
+            const filtros = ['filtroNumero', 'filtroCliente', 'filtroEstado', 'fechaDesde', 'fechaHasta', 'filtroSucursal'];
+            filtros.forEach(filtro => {
+                const elemento = document.getElementById(filtro);
+                if (elemento) {
+                    elemento.value = '';
+                }
+            });
+            console.log('Filtros limpiados');
+        }
+
+        // Ver detalle de factura
+        function verDetalleFactura(facturaId) {
+            const content = document.getElementById('detalleFacturaContent');
+            
+            content.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div>
+                        <h4>Información de la Factura</h4>
+                        <p><strong>Número:</strong> A${facturaId.toString().padStart(8, '0')}</p>
+                        <p><strong>Fecha:</strong> 17 Nov 2024, 10:30</p>
+                        <p><strong>Estado:</strong> <span class="status-badge status-activo">Activa</span></p>
+                        <p><strong>Método de Pago:</strong> Tarjeta</p>
+                        <p><strong>Sucursal:</strong> Pradera Chimaltenango</p>
+                    </div>
+                    <div>
+                        <h4>Información del Cliente</h4>
+                        <p><strong>Nombre:</strong> María García</p>
+                        <p><strong>Email:</strong> maria.garcia@email.com</p>
+                        <p><strong>Teléfono:</strong> +502 1234 5678</p>
+                        <p><strong>Dirección:</strong> Ciudad de Guatemala</p>
+                    </div>
+                </div>
+
+                <h4>Productos</h4>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Pintura Latex Blanca 1 Galón</td>
+                                <td>2 galones</td>
+                                <td>Q 350</td>
+                                <td>Q 700</td>
+                            </tr>
+                            <tr>
+                                <td>Brocha 3 pulgadas</td>
+                                <td>1 unidad</td>
+                                <td>Q 85</td>
+                                <td>Q 85</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="text-align: right; margin-top: 1rem; border-top: 1px solid var(--gray-200); padding-top: 1rem;">
+                    <p style="font-size: 1.2rem;"><strong>Total: Q 1,250</strong></p>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="cerrarModal('modalDetalleFactura')">Cerrar</button>
+                    <button class="btn btn-primary" onclick="imprimirFactura(${facturaId})">
+                        <i class="fas fa-print"></i>
+                        Imprimir
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('modalDetalleFactura').style.display = 'block';
+        }
+
+        // Funciones de acción
+        function nuevaFactura() {
+            window.location.href = '/frontend/pages/ventas/pos.html';
+        }
+
+        function exportarFacturas() {
+            alert('Función de exportar en desarrollo');
+        }
+
+        function anularFactura(facturaId) {
+            if (confirm('¿Está seguro de que desea anular esta factura?')) {
+                alert(`Factura ${facturaId} anulada (simulación)`);
+            }
+        }
+
+        function imprimirFactura(facturaId) {
+            alert(`Imprimiendo factura ${facturaId} (simulación)`);
+        }
+
+        // Utilidades
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

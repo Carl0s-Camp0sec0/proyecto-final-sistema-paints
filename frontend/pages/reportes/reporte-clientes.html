@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Clientes - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Reportes</h2>
+                <p class="sidebar-subtitle">Clientes</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Panel de Reportes
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-ventas.html">
+                        <i class="fas fa-chart-line"></i>
+                        Reporte de Ventas
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-inventario.html">
+                        <i class="fas fa-boxes"></i>
+                        Reporte de Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-productos.html">
+                        <i class="fas fa-box"></i>
+                        Reporte de Productos
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-clientes.html" class="active">
+                        <i class="fas fa-users"></i>
+                        Reporte de Clientes
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div style="margin-bottom: 2rem;">
+                <h1><i class="fas fa-users"></i> Reporte de Clientes</h1>
+                <p style="color: var(--gray-600);">Análisis de comportamiento y valor de clientes</p>
+            </div>
+
+            <!-- Estadísticas de Clientes -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Clientes</p>
+                                <h2 style="color: var(--primary-blue);">2,847</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-users" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Clientes Activos (30d)</p>
+                                <h2 style="color: var(--success-green);">1,245</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-user-check" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Nuevos Clientes (30d)</p>
+                                <h2 style="color: var(--info-color);">89</h2>
+                            </div>
+                            <div style="background: var(--info-100); padding: 1rem; border-radius: 50%; color: var(--info-700);">
+                                <i class="fas fa-user-plus" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Ticket Promedio</p>
+                                <h2 style="color: var(--warning-yellow);">Q 742</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-dollar-sign" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Filtros de Clientes</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Cliente</label>
+                            <select class="form-select">
+                                <option>Todos los Tipos</option>
+                                <option>Consumidor Final</option>
+                                <option>Empresa</option>
+                                <option>Contratista</option>
+                                <option>Distribuidor</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Sucursal Principal</label>
+                            <select class="form-select">
+                                <option>Todas las Sucursales</option>
+                                <option>Pradera Chimaltenango</option>
+                                <option>Pradera Escuintla</option>
+                                <option>Las Américas Mazatenango</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Segmento</label>
+                            <select class="form-select">
+                                <option>Todos los Segmentos</option>
+                                <option>VIP (>Q 10,000/año)</option>
+                                <option>Premium (Q 5,000-10,000/año)</option>
+                                <option>Regular (Q 1,000-5,000/año)</option>
+                                <option>Nuevo (<Q 1,000/año)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select">
+                                <option>Todos los Estados</option>
+                                <option>Activo</option>
+                                <option>Inactivo (>90 días)</option>
+                                <option>Bloqueado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Período de Análisis</label>
+                            <select class="form-select">
+                                <option>Últimos 30 días</option>
+                                <option>Últimos 90 días</option>
+                                <option>Último año</option>
+                                <option>Histórico</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Búsqueda</label>
+                            <input type="text" class="form-input" placeholder="Nombre o NIT...">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-filter"></i>
+                            Aplicar Filtros
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Clientes y Análisis -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <!-- Top Clientes por Ventas -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Top 10 Clientes por Ventas (30d)</h3>
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Cliente</th>
+                                        <th>Compras</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>🥇</td>
+                                        <td>
+                                            <strong>Constructora Maya S.A.</strong><br>
+                                            <small class="text-muted">Empresa</small>
+                                        </td>
+                                        <td>23</td>
+                                        <td><strong>Q 45,670</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>🥈</td>
+                                        <td>
+                                            <strong>Juan Carlos Méndez</strong><br>
+                                            <small class="text-muted">Contratista</small>
+                                        </td>
+                                        <td>18</td>
+                                        <td><strong>Q 32,450</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>🥉</td>
+                                        <td>
+                                            <strong>Pinturas del Norte</strong><br>
+                                            <small class="text-muted">Distribuidor</small>
+                                        </td>
+                                        <td>15</td>
+                                        <td><strong>Q 28,900</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>
+                                            <strong>María Elena García</strong><br>
+                                            <small class="text-muted">Consumidor Final</small>
+                                        </td>
+                                        <td>8</td>
+                                        <td><strong>Q 12,340</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>
+                                            <strong>Decoraciones Elite</strong><br>
+                                            <small class="text-muted">Empresa</small>
+                                        </td>
+                                        <td>12</td>
+                                        <td><strong>Q 18,670</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nuevos Clientes -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Nuevos Clientes (30 días)</h3>
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Registro</th>
+                                        <th>Primera Compra</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <strong>Carlos Rodríguez</strong><br>
+                                            <small class="text-muted">Contratista</small>
+                                        </td>
+                                        <td>15/11/2024</td>
+                                        <td>Q 1,240</td>
+                                        <td>Q 3,670</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Renovaciones SA</strong><br>
+                                            <small class="text-muted">Empresa</small>
+                                        </td>
+                                        <td>12/11/2024</td>
+                                        <td>Q 5,890</td>
+                                        <td>Q 12,450</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Ana Patricia López</strong><br>
+                                            <small class="text-muted">Consumidor Final</small>
+                                        </td>
+                                        <td>10/11/2024</td>
+                                        <td>Q 450</td>
+                                        <td>Q 1,890</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Obras Civiles GT</strong><br>
+                                            <small class="text-muted">Empresa</small>
+                                        </td>
+                                        <td>08/11/2024</td>
+                                        <td>Q 8,900</td>
+                                        <td>Q 23,450</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Roberto Morales</strong><br>
+                                            <small class="text-muted">Consumidor Final</small>
+                                        </td>
+                                        <td>05/11/2024</td>
+                                        <td>Q 340</td>
+                                        <td>Q 890</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segmentación de Clientes -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Segmentación de Clientes</h3>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Segmento</th>
+                                    <th>Cantidad</th>
+                                    <th>% del Total</th>
+                                    <th>Compra Promedio</th>
+                                    <th>Frecuencia</th>
+                                    <th>Ingresos Totales</th>
+                                    <th>% de Ingresos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>VIP</strong><br>
+                                        <small class="text-muted">>Q 10,000/año</small>
+                                    </td>
+                                    <td>89</td>
+                                    <td>3.1%</td>
+                                    <td>Q 2,450</td>
+                                    <td>2.3x/mes</td>
+                                    <td><strong>Q 456,890</strong></td>
+                                    <td>42.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Premium</strong><br>
+                                        <small class="text-muted">Q 5,000-10,000/año</small>
+                                    </td>
+                                    <td>234</td>
+                                    <td>8.2%</td>
+                                    <td>Q 1,230</td>
+                                    <td>1.8x/mes</td>
+                                    <td><strong>Q 287,650</strong></td>
+                                    <td>26.8%</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Regular</strong><br>
+                                        <small class="text-muted">Q 1,000-5,000/año</small>
+                                    </td>
+                                    <td>1,156</td>
+                                    <td>40.6%</td>
+                                    <td>Q 456</td>
+                                    <td>0.9x/mes</td>
+                                    <td><strong>Q 234,780</strong></td>
+                                    <td>21.9%</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Nuevo</strong><br>
+                                        <small class="text-muted"><Q 1,000/año</small>
+                                    </td>
+                                    <td>1,368</td>
+                                    <td>48.1%</td>
+                                    <td>Q 189</td>
+                                    <td>0.3x/mes</td>
+                                    <td><strong>Q 93,240</strong></td>
+                                    <td>8.8%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análisis Demográfico -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <!-- Por Tipo de Cliente -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Distribución por Tipo</h3>
+                    </div>
+                    <div class="card-content">
+                        <div style="space-y: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <span>Consumidor Final</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 200px; height: 12px; background: var(--gray-200); border-radius: 6px;">
+                                        <div style="width: 65%; height: 100%; background: var(--primary-blue); border-radius: 6px;"></div>
+                                    </div>
+                                    <span><strong>1,850</strong> (65%)</span>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <span>Contratista</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 200px; height: 12px; background: var(--gray-200); border-radius: 6px;">
+                                        <div style="width: 20%; height: 100%; background: var(--success-green); border-radius: 6px;"></div>
+                                    </div>
+                                    <span><strong>569</strong> (20%)</span>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <span>Empresa</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 200px; height: 12px; background: var(--gray-200); border-radius: 6px;">
+                                        <div style="width: 12%; height: 100%; background: var(--warning-yellow); border-radius: 6px;"></div>
+                                    </div>
+                                    <span><strong>341</strong> (12%)</span>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Distribuidor</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 200px; height: 12px; background: var(--gray-200); border-radius: 6px;">
+                                        <div style="width: 3%; height: 100%; background: var(--info-color); border-radius: 6px;"></div>
+                                    </div>
+                                    <span><strong>87</strong> (3%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Por Sucursal -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Clientes por Sucursal</h3>
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Sucursal</th>
+                                        <th>Clientes</th>
+                                        <th>Nuevos (30d)</th>
+                                        <th>% Activos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Pradera Chimaltenango</strong></td>
+                                        <td>892</td>
+                                        <td>28</td>
+                                        <td>68%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Pradera Escuintla</strong></td>
+                                        <td>567</td>
+                                        <td>15</td>
+                                        <td>72%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Miraflores Ciudad</strong></td>
+                                        <td>498</td>
+                                        <td>21</td>
+                                        <td>65%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Las Américas</strong></td>
+                                        <td>456</td>
+                                        <td>12</td>
+                                        <td>59%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Pradera Xela</strong></td>
+                                        <td>289</td>
+                                        <td>8</td>
+                                        <td>61%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>La Trinidad</strong></td>
+                                        <td>145</td>
+                                        <td>5</td>
+                                        <td>56%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listado Detallado -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Listado Detallado de Clientes</h3>
+                    <div>
+                        <span class="text-muted">Mostrando 10 de 2,847 clientes</span>
+                    </div>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Tipo</th>
+                                    <th>Registro</th>
+                                    <th>Compras (30d)</th>
+                                    <th>Total (30d)</th>
+                                    <th>Última Compra</th>
+                                    <th>Segmento</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Constructora Maya S.A.</strong><br>
+                                        <small class="text-muted">NIT: 1234567-8</small>
+                                    </td>
+                                    <td>Empresa</td>
+                                    <td>15/03/2023</td>
+                                    <td>23</td>
+                                    <td><strong>Q 45,670</strong></td>
+                                    <td>Hoy</td>
+                                    <td><span class="status-badge" style="background: gold; color: white;">VIP</span></td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Juan Carlos Méndez</strong><br>
+                                        <small class="text-muted">NIT: 7654321-0</small>
+                                    </td>
+                                    <td>Contratista</td>
+                                    <td>22/08/2023</td>
+                                    <td>18</td>
+                                    <td><strong>Q 32,450</strong></td>
+                                    <td>Ayer</td>
+                                    <td><span class="status-badge" style="background: silver; color: white;">Premium</span></td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>María Elena García</strong><br>
+                                        <small class="text-muted">NIT: 9876543-2</small>
+                                    </td>
+                                    <td>Consumidor Final</td>
+                                    <td>05/01/2024</td>
+                                    <td>8</td>
+                                    <td><strong>Q 12,340</strong></td>
+                                    <td>3 días</td>
+                                    <td><span class="status-badge" style="background: var(--info-color); color: white;">Regular</span></td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Carlos Alberto Morales</strong><br>
+                                        <small class="text-muted">NIT: 5432167-9</small>
+                                    </td>
+                                    <td>Consumidor Final</td>
+                                    <td>18/10/2024</td>
+                                    <td>2</td>
+                                    <td><strong>Q 890</strong></td>
+                                    <td>5 días</td>
+                                    <td><span class="status-badge" style="background: var(--gray-400); color: white;">Nuevo</span></td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico</p>
+        </div>
+    </footer>
+
+    <script>
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+
+    <style>
+        .text-muted {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+    </style>
+</body>
+</html>

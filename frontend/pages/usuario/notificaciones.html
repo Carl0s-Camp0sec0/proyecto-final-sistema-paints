@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .notificaciones-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .notificaciones-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .notificaciones-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid var(--primary-color);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .filtros-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .notificaciones-list {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .notificacion-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .notificacion-item:hover {
+            background: var(--gray-50);
+        }
+        .notificacion-item.no-leida {
+            background: var(--primary-50);
+            border-left: 4px solid var(--primary-color);
+        }
+        .notificacion-item.importante {
+            border-left: 4px solid var(--error-color);
+        }
+        .notificacion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .notificacion-tipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .tipo-promocion {
+            background: var(--success-100);
+            color: var(--success-700);
+        }
+        .tipo-factura {
+            background: var(--info-100);
+            color: var(--info-700);
+        }
+        .tipo-inventario {
+            background: var(--warning-100);
+            color: var(--warning-700);
+        }
+        .tipo-sistema {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+        .tipo-urgente {
+            background: var(--error-100);
+            color: var(--error-700);
+        }
+        .notificacion-fecha {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+        }
+        .notificacion-contenido {
+            margin: 1rem 0;
+        }
+        .notificacion-titulo {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-800);
+        }
+        .notificacion-mensaje {
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+        .notificacion-acciones {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .btn-accion {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .btn-marcar-leida {
+            background: var(--primary-color);
+            color: white;
+        }
+        .btn-eliminar {
+            background: var(--error-color);
+            color: white;
+        }
+        .btn-ver-detalle {
+            background: var(--info-color);
+            color: white;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 0.5rem;
+        }
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-300);
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .page-btn:hover,
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        .floating-actions {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .fab:hover {
+            transform: scale(1.1);
+        }
+        .fab.fab-refresh {
+            background: var(--success-color);
+        }
+        .fab.fab-settings {
+            background: var(--warning-color);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-500);
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+        }
+        .badge-no-leidas {
+            background: var(--error-color);
+            color: white;
+            border-radius: 50%;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <button onclick="history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <h1><i class="fas fa-bell"></i> Notificaciones</h1>
+            </div>
+        </header>
+
+        <div class="notificaciones-container">
+            <!-- Header de Notificaciones -->
+            <div class="notificaciones-header">
+                <div>
+                    <h2>Centro de Notificaciones</h2>
+                    <p class="text-muted">Administra todas tus notificaciones del sistema</p>
+                </div>
+                <div class="header-actions">
+                    <button id="btnMarcarTodasLeidas" class="btn btn-primary">
+                        <i class="fas fa-check-double"></i> Marcar Todas como Leídas
+                    </button>
+                    <button id="btnConfiguracion" class="btn btn-secondary">
+                        <i class="fas fa-cog"></i> Configuración
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="notificaciones-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalNotificaciones">0</div>
+                    <div>Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="noLeidas">0</div>
+                    <div>No Leídas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="importantes">0</div>
+                    <div>Importantes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="hoy">0</div>
+                    <div>Hoy</div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filtros-section">
+                <h4><i class="fas fa-filter"></i> Filtrar Notificaciones</h4>
+                <div class="filtros-grid">
+                    <select id="filtroTipo" class="form-select">
+                        <option value="">Todos los tipos</option>
+                        <option value="promocion">Promociones</option>
+                        <option value="factura">Facturas</option>
+                        <option value="inventario">Inventario</option>
+                        <option value="sistema">Sistema</option>
+                        <option value="urgente">Urgentes</option>
+                    </select>
+                    
+                    <select id="filtroEstado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="no-leida">No leídas</option>
+                        <option value="leida">Leídas</option>
+                        <option value="importante">Importantes</option>
+                    </select>
+                    
+                    <select id="filtroFecha" class="form-select">
+                        <option value="">Todas las fechas</option>
+                        <option value="hoy">Hoy</option>
+                        <option value="ayer">Ayer</option>
+                        <option value="semana">Esta semana</option>
+                        <option value="mes">Este mes</option>
+                    </select>
+
+                    <button id="btnAplicarFiltros" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de Notificaciones -->
+            <div class="notificaciones-list" id="notificacionesList">
+                <!-- Las notificaciones se cargarán dinámicamente -->
+            </div>
+
+            <!-- Paginación -->
+            <div class="pagination" id="paginacion">
+                <!-- La paginación se generará dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Botones flotantes -->
+        <div class="floating-actions">
+            <button class="fab fab-refresh" onclick="actualizarNotificaciones()" title="Actualizar">
+                <i class="fas fa-sync"></i>
+            </button>
+            <button class="fab fab-settings" onclick="abrirConfiguracion()" title="Configuración">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Configuración -->
+    <div id="modalConfiguracion" class="modal">
+        <div class="modal-content">
+            <h3>Configuración de Notificaciones</h3>
+            <form id="formConfiguracion">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notifPromociones" checked> Promociones y ofertas
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notifFacturas" checked> Facturas y pagos
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notifInventario" checked> Alertas de inventario
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notifSistema" checked> Notificaciones del sistema
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="frecuenciaEmail">Frecuencia de emails:</label>
+                    <select id="frecuenciaEmail" class="form-select">
+                        <option value="inmediato">Inmediato</option>
+                        <option value="diario">Resumen diario</option>
+                        <option value="semanal">Resumen semanal</option>
+                        <option value="nunca">Nunca</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" onclick="guardarConfiguracion()">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarConfiguracion()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    <script>
+        // Estado global
+        let notificaciones = [];
+        let notificacionesFiltradas = [];
+        let paginaActual = 1;
+        const notificacionesPorPagina = 10;
+
+        // Notificaciones de ejemplo
+        const notificacionesEjemplo = [
+            {
+                id: 1,
+                tipo: 'promocion',
+                titulo: 'Nueva Promoción: 20% de descuento',
+                mensaje: 'Aprovecha nuestra promoción especial en pinturas base agua. Válida hasta fin de mes.',
+                fecha: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 horas atrás
+                leida: false,
+                importante: true,
+                icono: 'fas fa-percentage'
+            },
+            {
+                id: 2,
+                tipo: 'factura',
+                titulo: 'Factura generada',
+                mensaje: 'Se ha generado la factura #FAC-001234 por un monto de Q 1,250.00',
+                fecha: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 día atrás
+                leida: true,
+                importante: false,
+                icono: 'fas fa-file-invoice-dollar'
+            },
+            {
+                id: 3,
+                tipo: 'inventario',
+                titulo: 'Stock bajo: Pintura Blanca',
+                mensaje: 'El producto "Pintura Base Agua Blanca" tiene stock bajo en la sucursal de Miraflores (5 unidades restantes).',
+                fecha: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 horas atrás
+                leida: false,
+                importante: true,
+                icono: 'fas fa-exclamation-triangle'
+            },
+            {
+                id: 4,
+                tipo: 'sistema',
+                titulo: 'Actualización del sistema',
+                mensaje: 'Se ha realizado una actualización del sistema. Nuevas funcionalidades disponibles.',
+                fecha: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 días atrás
+                leida: true,
+                importante: false,
+                icono: 'fas fa-sync-alt'
+            },
+            {
+                id: 5,
+                tipo: 'urgente',
+                titulo: 'Problema de conectividad',
+                mensaje: 'Se detectó un problema temporal de conectividad en la sucursal de Chimaltenango. El equipo técnico ya está trabajando.',
+                fecha: new Date(Date.now() - 30 * 60 * 1000), // 30 minutos atrás
+                leida: false,
+                importante: true,
+                icono: 'fas fa-wifi'
+            },
+            {
+                id: 6,
+                tipo: 'promocion',
+                titulo: 'Nuevo producto disponible',
+                mensaje: 'Ya tenemos disponible la nueva línea de barnices acrílicos. ¡Consúltalos en nuestro catálogo!',
+                fecha: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 horas atrás
+                leida: false,
+                importante: false,
+                icono: 'fas fa-star'
+            }
+        ];
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            notificaciones = [...notificacionesEjemplo];
+            aplicarFiltros();
+            configurarEventos();
+            actualizarEstadisticas();
+        });
+
+        function configurarEventos() {
+            document.getElementById('btnMarcarTodasLeidas').addEventListener('click', marcarTodasComoLeidas);
+            document.getElementById('btnConfiguracion').addEventListener('click', abrirConfiguracion);
+            document.getElementById('btnAplicarFiltros').addEventListener('click', aplicarFiltros);
+
+            // Filtros en tiempo real
+            document.getElementById('filtroTipo').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroEstado').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroFecha').addEventListener('change', aplicarFiltros);
+        }
+
+        function aplicarFiltros() {
+            const filtroTipo = document.getElementById('filtroTipo').value;
+            const filtroEstado = document.getElementById('filtroEstado').value;
+            const filtroFecha = document.getElementById('filtroFecha').value;
+
+            notificacionesFiltradas = notificaciones.filter(notif => {
+                // Filtro por tipo
+                if (filtroTipo && notif.tipo !== filtroTipo) return false;
+
+                // Filtro por estado
+                if (filtroEstado === 'no-leida' && notif.leida) return false;
+                if (filtroEstado === 'leida' && !notif.leida) return false;
+                if (filtroEstado === 'importante' && !notif.importante) return false;
+
+                // Filtro por fecha
+                if (filtroFecha) {
+                    const ahora = new Date();
+                    const fechaNotif = new Date(notif.fecha);
+                    
+                    switch(filtroFecha) {
+                        case 'hoy':
+                            if (!esMismaFecha(fechaNotif, ahora)) return false;
+                            break;
+                        case 'ayer':
+                            const ayer = new Date(ahora);
+                            ayer.setDate(ayer.getDate() - 1);
+                            if (!esMismaFecha(fechaNotif, ayer)) return false;
+                            break;
+                        case 'semana':
+                            const inicioSemana = new Date(ahora);
+                            inicioSemana.setDate(ahora.getDate() - 7);
+                            if (fechaNotif < inicioSemana) return false;
+                            break;
+                        case 'mes':
+                            const inicioMes = new Date(ahora);
+                            inicioMes.setDate(ahora.getDate() - 30);
+                            if (fechaNotif < inicioMes) return false;
+                            break;
+                    }
+                }
+
+                return true;
+            });
+
+            paginaActual = 1;
+            mostrarNotificaciones();
+            generarPaginacion();
+        }
+
+        function esMismaFecha(fecha1, fecha2) {
+            return fecha1.toDateString() === fecha2.toDateString();
+        }
+
+        function mostrarNotificaciones() {
+            const lista = document.getElementById('notificacionesList');
+            
+            if (notificacionesFiltradas.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>No hay notificaciones</h3>
+                        <p>No se encontraron notificaciones que coincidan con los filtros aplicados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calcular índices para paginación
+            const inicio = (paginaActual - 1) * notificacionesPorPagina;
+            const fin = inicio + notificacionesPorPagina;
+            const notificacionesPagina = notificacionesFiltradas.slice(inicio, fin);
+
+            lista.innerHTML = notificacionesPagina.map(notif => `
+                <div class="notificacion-item ${!notif.leida ? 'no-leida' : ''} ${notif.importante ? 'importante' : ''}" 
+                     data-id="${notif.id}">
+                    <div class="notificacion-header">
+                        <span class="notificacion-tipo tipo-${notif.tipo}">
+                            <i class="${notif.icono}"></i>
+                            ${obtenerNombreTipo(notif.tipo)}
+                        </span>
+                        <span class="notificacion-fecha">${formatearFecha(notif.fecha)}</span>
+                    </div>
+                    
+                    <div class="notificacion-contenido">
+                        <div class="notificacion-titulo">${notif.titulo}</div>
+                        <div class="notificacion-mensaje">${notif.mensaje}</div>
+                    </div>
+
+                    <div class="notificacion-acciones">
+                        ${!notif.leida ? 
+                            `<button class="btn-accion btn-marcar-leida" onclick="marcarComoLeida(${notif.id})">
+                                <i class="fas fa-check"></i> Marcar como leída
+                            </button>` : 
+                            `<span style="color: var(--success-color);"><i class="fas fa-check-circle"></i> Leída</span>`
+                        }
+                        <button class="btn-accion btn-ver-detalle" onclick="verDetalle(${notif.id})">
+                            <i class="fas fa-eye"></i> Ver detalle
+                        </button>
+                        <button class="btn-accion btn-eliminar" onclick="eliminarNotificacion(${notif.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function obtenerNombreTipo(tipo) {
+            const tipos = {
+                promocion: 'Promoción',
+                factura: 'Factura',
+                inventario: 'Inventario',
+                sistema: 'Sistema',
+                urgente: 'Urgente'
+            };
+            return tipos[tipo] || tipo;
+        }
+
+        function formatearFecha(fecha) {
+            const ahora = new Date();
+            const diff = ahora - new Date(fecha);
+            const minutos = Math.floor(diff / (1000 * 60));
+            const horas = Math.floor(diff / (1000 * 60 * 60));
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (minutos < 1) return 'Ahora';
+            if (minutos < 60) return `Hace ${minutos} min`;
+            if (horas < 24) return `Hace ${horas} h`;
+            if (dias < 7) return `Hace ${dias} días`;
+            
+            return new Date(fecha).toLocaleDateString('es-GT');
+        }
+
+        function generarPaginacion() {
+            const paginacion = document.getElementById('paginacion');
+            const totalPaginas = Math.ceil(notificacionesFiltradas.length / notificacionesPorPagina);
+
+            if (totalPaginas <= 1) {
+                paginacion.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            
+            // Botón anterior
+            if (paginaActual > 1) {
+                html += `<button class="page-btn" onclick="cambiarPagina(${paginaActual - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>`;
+            }
+
+            // Números de página
+            for (let i = 1; i <= totalPaginas; i++) {
+                html += `<button class="page-btn ${i === paginaActual ? 'active' : ''}" 
+                         onclick="cambiarPagina(${i})">${i}</button>`;
+            }
+
+            // Botón siguiente
+            if (paginaActual < totalPaginas) {
+                html += `<button class="page-btn" onclick="cambiarPagina(${paginaActual + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>`;
+            }
+
+            paginacion.innerHTML = html;
+        }
+
+        function cambiarPagina(nuevaPagina) {
+            paginaActual = nuevaPagina;
+            mostrarNotificaciones();
+            generarPaginacion();
+        }
+
+        function actualizarEstadisticas() {
+            const total = notificaciones.length;
+            const noLeidas = notificaciones.filter(n => !n.leida).length;
+            const importantes = notificaciones.filter(n => n.importante).length;
+            const hoy = notificaciones.filter(n => esMismaFecha(new Date(n.fecha), new Date())).length;
+
+            document.getElementById('totalNotificaciones').textContent = total;
+            document.getElementById('noLeidas').textContent = noLeidas;
+            document.getElementById('importantes').textContent = importantes;
+            document.getElementById('hoy').textContent = hoy;
+        }
+
+        function marcarComoLeida(id) {
+            const notif = notificaciones.find(n => n.id === id);
+            if (notif) {
+                notif.leida = true;
+                aplicarFiltros();
+                actualizarEstadisticas();
+                mostrarMensaje('Notificación marcada como leída', 'success');
+            }
+        }
+
+        function marcarTodasComoLeidas() {
+            if (confirm('¿Marcar todas las notificaciones como leídas?')) {
+                notificaciones.forEach(notif => notif.leida = true);
+                aplicarFiltros();
+                actualizarEstadisticas();
+                mostrarMensaje('Todas las notificaciones fueron marcadas como leídas', 'success');
+            }
+        }
+
+        function eliminarNotificacion(id) {
+            if (confirm('¿Eliminar esta notificación?')) {
+                const index = notificaciones.findIndex(n => n.id === id);
+                if (index > -1) {
+                    notificaciones.splice(index, 1);
+                    aplicarFiltros();
+                    actualizarEstadisticas();
+                    mostrarMensaje('Notificación eliminada', 'success');
+                }
+            }
+        }
+
+        function verDetalle(id) {
+            const notif = notificaciones.find(n => n.id === id);
+            if (notif) {
+                alert(`Título: ${notif.titulo}\n\nMensaje: ${notif.mensaje}\n\nFecha: ${formatearFecha(notif.fecha)}\n\nTipo: ${obtenerNombreTipo(notif.tipo)}`);
+            }
+        }
+
+        function actualizarNotificaciones() {
+            // Simular actualización
+            mostrarMensaje('Notificaciones actualizadas', 'info');
+            aplicarFiltros();
+        }
+
+        function abrirConfiguracion() {
+            document.getElementById('modalConfiguracion').style.display = 'block';
+        }
+
+        function cerrarConfiguracion() {
+            document.getElementById('modalConfiguracion').style.display = 'none';
+        }
+
+        function guardarConfiguracion() {
+            const config = {
+                promociones: document.getElementById('notifPromociones').checked,
+                facturas: document.getElementById('notifFacturas').checked,
+                inventario: document.getElementById('notifInventario').checked,
+                sistema: document.getElementById('notifSistema').checked,
+                frecuenciaEmail: document.getElementById('frecuenciaEmail').value
+            };
+
+            // Guardar en localStorage
+            localStorage.setItem('notificacionesConfig', JSON.stringify(config));
+            mostrarMensaje('Configuración guardada', 'success');
+            cerrarConfiguracion();
+        }
+
+        function mostrarMensaje(mensaje, tipo = 'info') {
+            // Implementación simple de toast
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 2rem;
+                right: 2rem;
+                padding: 1rem 2rem;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideInRight 0.3s ease-out;
+                background: ${tipo === 'success' ? 'var(--success-color)' : 
+                           tipo === 'error' ? 'var(--error-color)' : 'var(--info-color)'};
+            `;
+            toast.textContent = mensaje;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modalConfiguracion').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarConfiguracion();
+            }
+        });
+
+        // Cargar configuración guardada al inicializar
+        window.addEventListener('load', function() {
+            const configGuardada = localStorage.getItem('notificacionesConfig');
+            if (configGuardada) {
+                const config = JSON.parse(configGuardada);
+                document.getElementById('notifPromociones').checked = config.promociones;
+                document.getElementById('notifFacturas').checked = config.facturas;
+                document.getElementById('notifInventario').checked = config.inventario;
+                document.getElementById('notifSistema').checked = config.sistema;
+                document.getElementById('frecuenciaEmail').value = config.frecuenciaEmail;
+            }
+        });
+    </script>
+
+    <style>
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+</html>

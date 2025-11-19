@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .checkout-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .checkout-progress {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: var(--gray-300);
+            z-index: 1;
+        }
+        
+        .progress-step.completed:not(:last-child)::after {
+            background: var(--success-green);
+        }
+        
+        .progress-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gray-300);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .progress-step.completed .progress-circle {
+            background: var(--success-green);
+        }
+        
+        .progress-step.active .progress-circle {
+            background: var(--primary-blue);
+        }
+        
+        .progress-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            text-align: center;
+        }
+        
+        .progress-step.completed .progress-label,
+        .progress-step.active .progress-label {
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+        
+        .checkout-main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .checkout-form {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .step-content {
+            display: none;
+            padding: 2rem;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        .step-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkout-sidebar {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .sidebar-header {
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .sidebar-content {
+            padding: 1.5rem;
+        }
+        
+        .order-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-image {
+            width: 60px;
+            height: 60px;
+            background: var(--gray-100);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--gray-500);
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 500;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+        
+        .item-specs {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .item-price {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .order-summary {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-row.total {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--primary-blue);
+            border-top: 1px solid var(--gray-300);
+            padding-top: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .form-section {
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            margin-bottom: 1rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+        
+        .delivery-options {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .delivery-option {
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .delivery-option.selected {
+            border-color: var(--primary-blue);
+            background: var(--primary-50);
+        }
+        
+        .option-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .option-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+        
+        .delivery-option.selected .option-icon {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .option-title {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .option-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .option-price {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-top: 0.5rem;
+        }
+        
+        .payment-methods {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-method {
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .payment-method.selected {
+            border-color: var(--primary-blue);
+            background: var(--primary-50);
+        }
+        
+        .method-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .method-icon.cash { background: var(--success-100); color: var(--success-green); }
+        .method-icon.card { background: var(--primary-50); color: var(--primary-blue); }
+        .method-icon.check { background: var(--warning-100); color: var(--warning-yellow); }
+        
+        .method-title {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .method-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .card-form {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .card-form.active {
+            display: block;
+        }
+        
+        .step-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 1.5rem;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .processing-content {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .processing-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--success-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .checkout-main {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-sidebar {
+                order: -1;
+                position: static;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-progress {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .progress-step:not(:last-child)::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/public/carrito.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Paints
+            </a>
+            <div class="user-menu">
+                <button class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i> Volver al Carrito
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="checkout-container">
+            <!-- Header de Checkout -->
+            <div class="checkout-header">
+                <h1><i class="fas fa-credit-card"></i> Finalizar Compra</h1>
+                <p>Completa tu información para procesar el pedido</p>
+            </div>
+
+            <!-- Progreso del Checkout -->
+            <div class="checkout-progress">
+                <div class="progress-step active" id="step-shipping">
+                    <div class="progress-circle">1</div>
+                    <div class="progress-label">Información<br>de Entrega</div>
+                </div>
+                <div class="progress-step" id="step-payment">
+                    <div class="progress-circle">2</div>
+                    <div class="progress-label">Método<br>de Pago</div>
+                </div>
+                <div class="progress-step" id="step-review">
+                    <div class="progress-circle">3</div>
+                    <div class="progress-label">Revisar<br>Pedido</div>
+                </div>
+                <div class="progress-step" id="step-confirmation">
+                    <div class="progress-circle">4</div>
+                    <div class="progress-label">Confirmación</div>
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="checkout-main">
+                <!-- Formulario de Checkout -->
+                <div class="checkout-form">
+                    <!-- Paso 1: Información de Entrega -->
+                    <div class="step-content active" id="content-shipping">
+                        <div class="step-header">
+                            <div class="step-icon"><i class="fas fa-truck"></i></div>
+                            <div>
+                                <h2>Información de Entrega</h2>
+                                <p>Completa tus datos para el envío</p>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 2rem;">
+                            <!-- Datos del cliente autenticado -->
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-user"></i> Información Personal
+                                </h4>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Nombre Completo</label>
+                                        <input type="text" class="form-input" id="fullName" required 
+                                               placeholder="Juan Carlos García">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-input" id="phone" required 
+                                               placeholder="+502 1234-5678">
+                                    </div>
+                                    
+                                    <div class="form-group form-group-full">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-input" id="email" required 
+                                               placeholder="correo@ejemplo.com">
+                                    </div>
+                                </div>
+                            </div>
+                                
+                            <!-- Opciones de entrega -->
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-map-marker-alt"></i> Método de Entrega
+                                </h4>
+                                
+                                <div class="delivery-options">
+                                    <div class="delivery-option selected" data-type="pickup" onclick="selectDelivery('pickup')">
+                                        <div class="option-header">
+                                            <div class="option-icon">
+                                                <i class="fas fa-store"></i>
+                                            </div>
+                                            <div>
+                                                <div class="option-title">Recoger en Tienda</div>
+                                                <div class="option-description">Retira tu pedido en cualquiera de nuestras 6 sucursales</div>
+                                                <div class="option-price">Gratis</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="delivery-option" data-type="delivery" onclick="selectDelivery('delivery')">
+                                        <div class="option-header">
+                                            <div class="option-icon">
+                                                <i class="fas fa-truck"></i>
+                                            </div>
+                                            <div>
+                                                <div class="option-title">Entrega a Domicilio</div>
+                                                <div class="option-description">Enviamos tu pedido directamente a tu dirección</div>
+                                                <div class="option-price">Q 25.00</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Sección de recogida en tienda -->
+                                <div id="storePickup">
+                                    <div class="form-group">
+                                        <label class="form-label">Selecciona la Sucursal</label>
+                                        <select class="form-select" id="storeLocation">
+                                            <option value="guatemala">Guatemala - Centro Comercial Miraflores</option>
+                                            <option value="quetzaltenango">Quetzaltenango - Pradera Xela</option>
+                                            <option value="escuintla">Escuintla - Pradera Escuintla</option>
+                                            <option value="chimaltenango">Chimaltenango - Pradera Chimaltenango</option>
+                                            <option value="mazatenango">Mazatenango - Las Américas</option>
+                                            <option value="coatepeque">Coatepeque - La Trinidad</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div style="background: var(--info-100); padding: 1rem; border-radius: var(--border-radius); color: var(--info-color);">
+                                        <strong><i class="fas fa-info-circle"></i> Información importante:</strong><br>
+                                        • Horarios: Lunes a Domingo 8:00 AM - 8:00 PM<br>
+                                        • Tu pedido estará listo en 2-4 horas<br>
+                                        • Recuerda traer tu DPI al recoger
+                                    </div>
+                                </div>
+                                
+                                <!-- Sección de entrega a domicilio -->
+                                <div id="homeDelivery" style="display: none;">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label">Departamento</label>
+                                            <select class="form-select" id="department">
+                                                <option value="guatemala">Guatemala</option>
+                                                <option value="quetzaltenango">Quetzaltenango</option>
+                                                <option value="escuintla">Escuintla</option>
+                                                <option value="sacatepequez">Sacatepéquez</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">Municipio</label>
+                                            <input type="text" class="form-input" id="municipality" 
+                                                   placeholder="Ej: Guatemala">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group form-group-full">
+                                        <label class="form-label">Dirección Completa</label>
+                                        <textarea class="form-input" id="address" rows="3" 
+                                                  placeholder="Ej: 15 Avenida 14-20 Zona 10, Guatemala"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group form-group-full">
+                                        <label class="form-label">Referencia (Opcional)</label>
+                                        <input type="text" class="form-input" id="reference" 
+                                               placeholder="Ej: Casa color azul con portón negro">
+                                    </div>
+                                    
+                                    <div style="background: var(--warning-100); padding: 1rem; border-radius: var(--border-radius); color: var(--warning-yellow);">
+                                        <strong><i class="fas fa-clock"></i> Tiempo de entrega:</strong><br>
+                                        • Guatemala: 4-6 horas<br>
+                                        • Otros departamentos: 1-2 días hábiles
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2: Método de Pago -->
+                    <div class="step-content" id="content-payment">
+                        <div class="step-header">
+                            <div class="step-icon"><i class="fas fa-credit-card"></i></div>
+                            <div>
+                                <h2>Método de Pago</h2>
+                                <p>Selecciona cómo deseas pagar</p>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 2rem;">
+                            <div class="payment-methods">
+                                <!-- Efectivo -->
+                                <div class="payment-method selected" data-method="cash" onclick="selectPaymentMethod('cash')">
+                                    <div class="method-header">
+                                        <div class="method-icon cash">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </div>
+                                        <div>
+                                            <div class="method-title">Efectivo</div>
+                                            <div class="method-description">Pago en efectivo al recibir el pedido</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tarjeta -->
+                                <div class="payment-method" data-method="card" onclick="selectPaymentMethod('card')">
+                                    <div class="method-header">
+                                        <div class="method-icon card">
+                                            <i class="fas fa-credit-card"></i>
+                                        </div>
+                                        <div>
+                                            <div class="method-title">Tarjeta de Crédito/Débito</div>
+                                            <div class="method-description">Visa, MasterCard, American Express</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card-form" id="cardForm">
+                                        <div class="form-grid">
+                                            <div class="form-group form-group-full">
+                                                <label class="form-label">Número de Tarjeta</label>
+                                                <input type="text" class="form-input" id="cardNumber" 
+                                                       placeholder="1234 5678 9012 3456" maxlength="19">
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label class="form-label">Fecha de Vencimiento</label>
+                                                <input type="text" class="form-input" id="expiryDate" 
+                                                       placeholder="MM/AA" maxlength="5">
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label class="form-label">CVV</label>
+                                                <input type="text" class="form-input" id="cvv" 
+                                                       placeholder="123" maxlength="4">
+                                            </div>
+                                            
+                                            <div class="form-group form-group-full">
+                                                <label class="form-label">Nombre del Titular</label>
+                                                <input type="text" class="form-input" id="cardHolder" 
+                                                       placeholder="Como aparece en la tarjeta">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Cheque -->
+                                <div class="payment-method" data-method="check" onclick="selectPaymentMethod('check')">
+                                    <div class="method-header">
+                                        <div class="method-icon check">
+                                            <i class="fas fa-money-check"></i>
+                                        </div>
+                                        <div>
+                                            <div class="method-title">Cheque</div>
+                                            <div class="method-description">Pago con cheque al recibir el pedido</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Revisar Pedido -->
+                    <div class="step-content" id="content-review">
+                        <div class="step-header">
+                            <div class="step-icon"><i class="fas fa-clipboard-check"></i></div>
+                            <div>
+                                <h2>Revisar Pedido</h2>
+                                <p>Confirma los detalles antes de procesar</p>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 2rem;">
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-user"></i> Información del Cliente
+                                </h4>
+                                <div id="customerReview"></div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-truck"></i> Información de Entrega
+                                </h4>
+                                <div id="deliveryReview"></div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-credit-card"></i> Método de Pago
+                                </h4>
+                                <div id="paymentReview"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 4: Confirmación -->
+                    <div class="step-content" id="content-confirmation">
+                        <div style="text-align: center; padding: 3rem 2rem;">
+                            <div class="success-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h2 style="color: var(--success-green); margin-bottom: 1rem;">
+                                ¡Pedido Confirmado!
+                            </h2>
+                            <p style="color: var(--gray-600); margin-bottom: 2rem;">
+                                Tu pedido ha sido procesado exitosamente. Recibirás un email de confirmación.
+                            </p>
+                            
+                            <div style="background: var(--gray-50); padding: 1.5rem; border-radius: var(--border-radius); margin-bottom: 2rem;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: left;">
+                                    <div>
+                                        <strong>Número de Pedido:</strong><br>
+                                        <span id="orderNumber">#PNT-2024-001</span>
+                                    </div>
+                                    <div>
+                                        <strong>Fecha de Entrega Estimada:</strong><br>
+                                        <span id="deliveryDate">25 de Noviembre, 2024</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                                <button class="btn btn-primary" onclick="downloadInvoice()">
+                                    <i class="fas fa-download"></i> Descargar Comprobante
+                                </button>
+                                <button class="btn btn-secondary" onclick="trackOrder()">
+                                    <i class="fas fa-search"></i> Seguir Pedido
+                                </button>
+                                <button class="btn btn-secondary" onclick="goToHome()">
+                                    <i class="fas fa-home"></i> Ir a Inicio
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones de Paso -->
+                    <div class="step-actions">
+                        <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                            Continuar <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sidebar - Resumen del Pedido -->
+                <div class="checkout-sidebar">
+                    <div class="sidebar-header">
+                        <h3><i class="fas fa-shopping-bag"></i> Resumen del Pedido</h3>
+                    </div>
+                    
+                    <div class="sidebar-content">
+                        <div id="orderItems">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+                        
+                        <div class="order-summary">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">Q 0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Envío:</span>
+                                <span id="shipping">Gratis</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>IVA (12%):</span>
+                                <span id="tax">Q 0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="total">Q 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay de Procesamiento -->
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-content">
+            <div class="processing-spinner"></div>
+            <h3 id="processingTitle">Procesando Pedido...</h3>
+            <p id="processingMessage">Por favor espera mientras procesamos tu orden</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    
+    <script>
+        // Variables globales
+        let currentStep = 1;
+        let orderData = {};
+        let selectedDeliveryType = 'pickup';
+        let selectedPaymentMethod = 'cash';
+        let shippingCost = 0;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticación
+            if (!auth.isAuthenticated()) {
+                Utils.showToast('Debes iniciar sesión para continuar', 'error');
+                window.location.href = '/frontend/pages/public/login.html';
+                return;
+            }
+
+            loadOrderData();
+            loadUserData();
+            updateOrderSummary();
+            updateStepDisplay();
+            formatCardInputs();
+        });
+
+        // Cargar datos del usuario autenticado
+        function loadUserData() {
+            if (auth.user) {
+                document.getElementById('fullName').value = auth.user.nombre_completo || '';
+                document.getElementById('email').value = auth.user.email || '';
+                document.getElementById('phone').value = auth.user.telefono || '';
+            }
+        }
+
+        // Cargar datos del carrito
+        function loadOrderData() {
+            const checkoutData = localStorage.getItem('paints_checkout_data');
+            if (checkoutData) {
+                orderData = JSON.parse(checkoutData);
+                console.log('Datos del pedido cargados:', orderData);
+            } else {
+                // Si no hay datos específicos de checkout, cargar del carrito
+                const cartData = localStorage.getItem('paints_cart');
+                if (cartData) {
+                    const cart = JSON.parse(cartData);
+                    orderData = {
+                        items: cart,
+                        shipping: 'pickup',
+                        shipping_cost: 0,
+                        discount: 0
+                    };
+                } else {
+                    Utils.showToast('No hay productos en el carrito', 'error');
+                    window.location.href = '/frontend/pages/public/carrito.html';
+                    return;
+                }
+            }
+        }
+
+        // Actualizar resumen del pedido
+        function updateOrderSummary() {
+            if (!orderData.items || orderData.items.length === 0) {
+                Utils.showToast('No hay productos para procesar', 'error');
+                return;
+            }
+
+            // Mostrar productos
+            const orderItemsHtml = orderData.items.map(item => `
+                <div class="order-item">
+                    <div class="item-image">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name">${item.name || item.nombre || 'Producto'}</div>
+                        <div class="item-specs">Cantidad: ${item.quantity || item.cantidad || 1}</div>
+                        <div class="item-price">Q ${((item.price || item.precio || 0) * (item.quantity || item.cantidad || 1)).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('orderItems').innerHTML = orderItemsHtml;
+
+            // Calcular totales
+            const subtotal = orderData.items.reduce((sum, item) => {
+                const price = item.price || item.precio || 0;
+                const quantity = item.quantity || item.cantidad || 1;
+                return sum + (price * quantity);
+            }, 0);
+            
+            const tax = subtotal * 0.12;
+            const total = subtotal + shippingCost + tax;
+
+            document.getElementById('subtotal').textContent = Utils.formatCurrency(subtotal);
+            document.getElementById('shipping').textContent = shippingCost > 0 ? Utils.formatCurrency(shippingCost) : 'Gratis';
+            document.getElementById('tax').textContent = Utils.formatCurrency(tax);
+            document.getElementById('total').textContent = Utils.formatCurrency(total);
+        }
+
+        // Seleccionar tipo de entrega
+        function selectDelivery(type) {
+            selectedDeliveryType = type;
+            
+            // Actualizar UI
+            document.querySelectorAll('.delivery-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+
+            // Mostrar/ocultar secciones
+            const storePickup = document.getElementById('storePickup');
+            const homeDelivery = document.getElementById('homeDelivery');
+
+            if (type === 'pickup') {
+                storePickup.style.display = 'block';
+                homeDelivery.style.display = 'none';
+                shippingCost = 0;
+            } else {
+                storePickup.style.display = 'none';
+                homeDelivery.style.display = 'block';
+                shippingCost = 25.00;
+            }
+
+            updateOrderSummary();
+        }
+
+        // Seleccionar método de pago
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // Actualizar UI
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`[data-method="${method}"]`).classList.add('selected');
+            
+            // Mostrar/ocultar formulario de tarjeta
+            const cardForm = document.getElementById('cardForm');
+            if (method === 'card') {
+                cardForm.classList.add('active');
+            } else {
+                cardForm.classList.remove('active');
+            }
+        }
+
+        // Siguiente paso
+        function nextStep() {
+            if (validateCurrentStep()) {
+                if (currentStep === 3) {
+                    processOrder();
+                } else {
+                    currentStep++;
+                    updateStepDisplay();
+                }
+            }
+        }
+
+        // Paso anterior
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+
+        // Actualizar visualización del paso
+        function updateStepDisplay() {
+            // Actualizar indicadores de progreso
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Mostrar contenido del paso actual
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            const stepNames = ['', 'shipping', 'payment', 'review', 'confirmation'];
+            const currentContent = document.getElementById(`content-${stepNames[currentStep]}`);
+            if (currentContent) {
+                currentContent.classList.add('active');
+            }
+
+            // Actualizar botones
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+            
+            if (currentStep === 3) {
+                nextBtn.innerHTML = '<i class="fas fa-credit-card"></i> Procesar Pedido';
+                nextBtn.className = 'btn btn-success';
+            } else if (currentStep === 4) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.innerHTML = 'Continuar <i class="fas fa-arrow-right"></i>';
+                nextBtn.className = 'btn btn-primary';
+            }
+
+            // Llenar revisión en el paso 3
+            if (currentStep === 3) {
+                populateReview();
+            }
+        }
+
+        // Validar paso actual
+        function validateCurrentStep() {
+            switch (currentStep) {
+                case 1:
+                    return validateShippingInfo();
+                case 2:
+                    return validatePaymentMethod();
+                case 3:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Validar información de envío
+        function validateShippingInfo() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!fullName || !phone || !email) {
+                Utils.showToast('Completa toda la información personal', 'error');
+                return false;
+            }
+
+            if (selectedDeliveryType === 'delivery') {
+                const municipality = document.getElementById('municipality').value.trim();
+                const address = document.getElementById('address').value.trim();
+
+                if (!municipality || !address) {
+                    Utils.showToast('Completa la información de dirección', 'error');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Validar método de pago
+        function validatePaymentMethod() {
+            if (selectedPaymentMethod === 'card') {
+                const cardNumber = document.getElementById('cardNumber').value.trim();
+                const expiryDate = document.getElementById('expiryDate').value.trim();
+                const cvv = document.getElementById('cvv').value.trim();
+                const cardHolder = document.getElementById('cardHolder').value.trim();
+
+                if (!cardNumber || !expiryDate || !cvv || !cardHolder) {
+                    Utils.showToast('Completa toda la información de la tarjeta', 'error');
+                    return false;
+                }
+
+                if (cardNumber.replace(/\s/g, '').length < 13) {
+                    Utils.showToast('Número de tarjeta inválido', 'error');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Llenar revisión
+        function populateReview() {
+            // Información del cliente
+            const fullName = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+
+            document.getElementById('customerReview').innerHTML = `
+                <p><strong>Nombre:</strong> ${fullName}</p>
+                <p><strong>Teléfono:</strong> ${phone}</p>
+                <p><strong>Email:</strong> ${email}</p>
+            `;
+
+            // Información de entrega
+            let deliveryInfo = '';
+            if (selectedDeliveryType === 'pickup') {
+                const store = document.getElementById('storeLocation').selectedOptions[0].text;
+                deliveryInfo = `
+                    <p><strong>Método:</strong> Recoger en tienda</p>
+                    <p><strong>Sucursal:</strong> ${store}</p>
+                    <p><strong>Costo:</strong> Gratis</p>
+                `;
+            } else {
+                const department = document.getElementById('department').selectedOptions[0].text;
+                const municipality = document.getElementById('municipality').value;
+                const address = document.getElementById('address').value;
+                deliveryInfo = `
+                    <p><strong>Método:</strong> Entrega a domicilio</p>
+                    <p><strong>Dirección:</strong> ${address}, ${municipality}, ${department}</p>
+                    <p><strong>Costo:</strong> Q 25.00</p>
+                `;
+            }
+
+            document.getElementById('deliveryReview').innerHTML = deliveryInfo;
+
+            // Método de pago
+            let paymentInfo = '';
+            switch (selectedPaymentMethod) {
+                case 'cash':
+                    paymentInfo = '<p><strong>Efectivo</strong> - Pago al recibir el pedido</p>';
+                    break;
+                case 'card':
+                    const cardNumber = document.getElementById('cardNumber').value;
+                    const maskedCard = '**** **** **** ' + cardNumber.slice(-4);
+                    paymentInfo = `<p><strong>Tarjeta</strong> - ${maskedCard}</p>`;
+                    break;
+                case 'check':
+                    paymentInfo = '<p><strong>Cheque</strong> - Cheque al recibir el pedido</p>';
+                    break;
+            }
+
+            document.getElementById('paymentReview').innerHTML = paymentInfo;
+        }
+
+        // Procesar pedido
+        function processOrder() {
+            document.getElementById('processingOverlay').style.display = 'flex';
+
+            // Preparar datos del pedido
+            const orderPayload = {
+                customer: {
+                    name: document.getElementById('fullName').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value
+                },
+                delivery: {
+                    type: selectedDeliveryType,
+                    store: selectedDeliveryType === 'pickup' ? document.getElementById('storeLocation').value : null,
+                    address: selectedDeliveryType === 'delivery' ? {
+                        department: document.getElementById('department').value,
+                        municipality: document.getElementById('municipality').value,
+                        address: document.getElementById('address').value,
+                        reference: document.getElementById('reference').value
+                    } : null,
+                    cost: shippingCost
+                },
+                payment: {
+                    method: selectedPaymentMethod,
+                    details: selectedPaymentMethod === 'card' ? {
+                        cardNumber: document.getElementById('cardNumber').value,
+                        expiryDate: document.getElementById('expiryDate').value,
+                        cardHolder: document.getElementById('cardHolder').value
+                    } : null
+                },
+                items: orderData.items,
+                totals: {
+                    subtotal: parseFloat(document.getElementById('subtotal').textContent.replace('Q ', '')),
+                    shipping: shippingCost,
+                    tax: parseFloat(document.getElementById('tax').textContent.replace('Q ', '')),
+                    total: parseFloat(document.getElementById('total').textContent.replace('Q ', ''))
+                }
+            };
+
+            // Simular procesamiento
+            setTimeout(() => {
+                document.getElementById('processingTitle').textContent = 'Confirmando Pedido...';
+                document.getElementById('processingMessage').textContent = 'Guardando información del pedido';
+
+                setTimeout(() => {
+                    // Simular API call exitosa
+                    const orderNumber = 'PNT-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                    
+                    // Calcular fecha de entrega
+                    const deliveryDate = new Date();
+                    if (selectedDeliveryType === 'pickup') {
+                        deliveryDate.setHours(deliveryDate.getHours() + 4); // 4 horas
+                    } else {
+                        deliveryDate.setDate(deliveryDate.getDate() + 2); // 2 días
+                    }
+                    
+                    document.getElementById('orderNumber').textContent = '#' + orderNumber;
+                    document.getElementById('deliveryDate').textContent = deliveryDate.toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    // Limpiar datos del carrito
+                    localStorage.removeItem('paints_cart');
+                    localStorage.removeItem('paints_checkout_data');
+
+                    // Guardar información del pedido para seguimiento
+                    localStorage.setItem('paints_last_order', JSON.stringify({
+                        orderNumber: orderNumber,
+                        customer: orderPayload.customer,
+                        delivery: orderPayload.delivery,
+                        payment: orderPayload.payment,
+                        total: orderPayload.totals.total,
+                        date: new Date().toISOString(),
+                        status: 'confirmed'
+                    }));
+
+                    // Ocultar overlay y mostrar confirmación
+                    document.getElementById('processingOverlay').style.display = 'none';
+                    currentStep = 4;
+                    updateStepDisplay();
+
+                    Utils.showToast('¡Pedido procesado exitosamente!', 'success');
+
+                }, 2000);
+            }, 3000);
+        }
+
+        // Descargar comprobante
+        function downloadInvoice() {
+            const lastOrder = localStorage.getItem('paints_last_order');
+            if (lastOrder) {
+                const order = JSON.parse(lastOrder);
+                
+                // En un sistema real, aquí se generaría y descargaría el PDF
+                Utils.showToast('📄 Generando comprobante de compra...', 'info');
+                
+                setTimeout(() => {
+                    Utils.showToast('✅ Comprobante descargado exitosamente', 'success');
+                }, 1500);
+            } else {
+                Utils.showToast('No se encontró información del pedido', 'error');
+            }
+        }
+
+        // Seguir pedido
+        function trackOrder() {
+            const orderNumber = document.getElementById('orderNumber').textContent;
+            Utils.showToast(`🔍 Redirigiendo al seguimiento del pedido ${orderNumber}...`, 'info');
+            
+            setTimeout(() => {
+                // En un sistema real, aquí se redirigiría a la página de seguimiento
+                window.location.href = '/frontend/pages/public/seguimiento.html';
+            }, 1500);
+        }
+
+        // Ir a inicio
+        function goToHome() {
+            window.location.href = '/frontend/pages/public/index.html';
+        }
+
+        // Formatear inputs de tarjeta
+        function formatCardInputs() {
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                    let matches = value.match(/\d{4,16}/g);
+                    let match = matches && matches[0] || '';
+                    let parts = [];
+                    for (let i = 0, len = match.length; i < len; i += 4) {
+                        parts.push(match.substring(i, i + 4));
+                    }
+                    if (parts.length) {
+                        e.target.value = parts.join(' ');
+                    } else {
+                        e.target.value = value;
+                    }
+                });
+            }
+
+            const expiryInput = document.getElementById('expiryDate');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            const cvvInput = document.getElementById('cvv');
+            if (cvvInput) {
+                cvvInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                });
+            }
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.selectDelivery = selectDelivery;
+        window.selectPaymentMethod = selectPaymentMethod;
+        window.nextStep = nextStep;
+        window.previousStep = previousStep;
+        window.downloadInvoice = downloadInvoice;
+        window.trackOrder = trackOrder;
+        window.goToHome = goToHome;
+    </script>
+</body>
+</html>

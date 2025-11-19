@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Promociones - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Estilos específicos adicionales para promociones */
+        .promociones-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+            transition: transform 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+        
+        .content-tabs {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .tab-headers {
+            display: flex;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .tab-header {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray-600);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .tab-header.active {
+            color: var(--primary-blue);
+            background: white;
+            border-bottom-color: var(--primary-blue);
+        }
+        
+        .tab-content {
+            padding: 2rem;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .form-section {
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-blue);
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .content-type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-type {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .content-type.selected {
+            border-color: var(--primary-blue);
+            background: var(--primary-50);
+            color: var(--primary-blue);
+        }
+        
+        .file-upload-area {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .file-upload-area:hover,
+        .file-upload-area.dragover {
+            border-color: var(--primary-blue);
+            background: var(--primary-50);
+        }
+        
+        .recipient-selector {
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .recipient-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            transition: background-color 0.2s ease;
+        }
+        
+        .recipient-item:last-child {
+            border-bottom: none;
+        }
+        
+        .recipient-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .modal-large {
+            background: white;
+            border-radius: var(--border-radius);
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .modal-footer {
+            padding: 1rem 2rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .preview-container {
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            background: var(--gray-50);
+        }
+        
+        .preview-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin: -1.5rem -1.5rem 1rem -1.5rem;
+        }
+        
+        .email-preview {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        @media (max-width: 768px) {
+            .promociones-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-type-selector {
+                flex-direction: column;
+            }
+            
+            .tab-header {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <button onclick="history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <h1><i class="fas fa-bullhorn"></i> Sistema de Promociones</h1>
+            </div>
+        </header>
+
+        <div style="max-width: 1400px; margin: 0 auto; padding: 2rem;">
+            <!-- Header de Promociones -->
+            <div class="promociones-header">
+                <div>
+                    <h1>Sistema de Promociones</h1>
+                    <p>Envío masivo de información a clientes registrados (mensaje, imagen o PDF)</p>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="showPreview()" style="margin-right: 1rem;">
+                        <i class="fas fa-eye"></i> Vista Previa
+                    </button>
+                    <button class="btn btn-success" onclick="switchTab('nueva')">
+                        <i class="fas fa-plus"></i> Nueva Promoción
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: var(--primary-50); color: var(--primary-blue);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value" id="totalClientes">8</div>
+                    <div class="stat-label">Clientes Suscritos</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: var(--success-100); color: var(--success-green);">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <div class="stat-value" id="promocionesEnviadas">1</div>
+                    <div class="stat-label">Promociones Enviadas</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: var(--warning-100); color: var(--warning-yellow);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value" id="promocionesProgramadas">1</div>
+                    <div class="stat-label">Programadas</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: var(--info-100); color: var(--info-color);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value" id="tasaExito">97%</div>
+                    <div class="stat-label">Tasa de Éxito</div>
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="content-tabs">
+                <div class="tab-headers">
+                    <button class="tab-header active" onclick="switchTab('lista')">
+                        <i class="fas fa-list"></i> Lista de Promociones
+                    </button>
+                    <button class="tab-header" onclick="switchTab('nueva')">
+                        <i class="fas fa-plus-circle"></i> Nueva Promoción
+                    </button>
+                    <button class="tab-header" onclick="switchTab('plantillas')">
+                        <i class="fas fa-file-alt"></i> Plantillas
+                    </button>
+                    <button class="tab-header" onclick="switchTab('reportes')">
+                        <i class="fas fa-chart-bar"></i> Reportes
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Tab: Lista de Promociones -->
+                    <div class="tab-pane active" id="tab-lista">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3>Historial de Promociones</h3>
+                            <div>
+                                <select class="form-select" id="filterStatus" onchange="filterPromotions()">
+                                    <option value="">Todos los estados</option>
+                                    <option value="borrador">Borradores</option>
+                                    <option value="enviado">Enviadas</option>
+                                    <option value="programado">Programadas</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Estado</th>
+                                        <th>Destinatarios</th>
+                                        <th>Éxito</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Descuento del 20% en Pinturas</td>
+                                        <td><i class="fas fa-comment"></i> mensaje</td>
+                                        <td><span class="badge badge-success">enviado</span></td>
+                                        <td>156</td>
+                                        <td>152/156</td>
+                                        <td>15/11/2024 10:30</td>
+                                        <td>
+                                            <button class="btn-action btn-view">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nueva Colección de Colores</td>
+                                        <td><i class="fas fa-image"></i> imagen</td>
+                                        <td><span class="badge badge-warning">programado</span></td>
+                                        <td>203</td>
+                                        <td>0/203</td>
+                                        <td>20/11/2024 08:00</td>
+                                        <td>
+                                            <button class="btn-action btn-view">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Catálogo de Accesorios 2024</td>
+                                        <td><i class="fas fa-file-pdf"></i> pdf</td>
+                                        <td><span class="badge badge-error">borrador</span></td>
+                                        <td>0</td>
+                                        <td>0/0</td>
+                                        <td>17/11/2024 11:45</td>
+                                        <td>
+                                            <button class="btn-action btn-view">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Nueva Promoción -->
+                    <div class="tab-pane" id="tab-nueva">
+                        <form id="promotionForm">
+                            <!-- Información Básica -->
+                            <div class="form-section">
+                                <h4><i class="fas fa-info-circle"></i> Información Básica</h4>
+                                <div class="form-group">
+                                    <label class="form-label">Título de la Promoción</label>
+                                    <input type="text" class="form-input" id="promotionTitle" required
+                                           placeholder="Ej: Descuento del 30% en todas las pinturas">
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Fecha de Envío</label>
+                                        <input type="datetime-local" class="form-input" id="sendDate">
+                                        <small class="text-muted">Dejar vacío para envío inmediato</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Prioridad</label>
+                                        <select class="form-select" id="priority">
+                                            <option value="normal">Normal</option>
+                                            <option value="alta">Alta</option>
+                                            <option value="urgente">Urgente</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tipo de Contenido -->
+                            <div class="form-section">
+                                <h4><i class="fas fa-file-alt"></i> Tipo de Contenido (Cumple Requisito del PDF)</h4>
+                                <div class="content-type-selector">
+                                    <div class="content-type selected" onclick="selectContentType('mensaje')" id="type-mensaje">
+                                        <div><i class="fas fa-comment-alt" style="font-size: 2rem; margin-bottom: 0.5rem;"></i></div>
+                                        <div><strong>Mensaje</strong></div>
+                                        <div class="text-muted">Texto promocional</div>
+                                    </div>
+                                    <div class="content-type" onclick="selectContentType('imagen')" id="type-imagen">
+                                        <div><i class="fas fa-image" style="font-size: 2rem; margin-bottom: 0.5rem;"></i></div>
+                                        <div><strong>Imagen</strong></div>
+                                        <div class="text-muted">JPG, PNG, GIF</div>
+                                    </div>
+                                    <div class="content-type" onclick="selectContentType('pdf')" id="type-pdf">
+                                        <div><i class="fas fa-file-pdf" style="font-size: 2rem; margin-bottom: 0.5rem;"></i></div>
+                                        <div><strong>PDF</strong></div>
+                                        <div class="text-muted">Catálogos, folletos</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contenido Mensaje -->
+                                <div id="content-mensaje" class="content-editor">
+                                    <div class="form-group">
+                                        <label class="form-label">Mensaje Promocional</label>
+                                        <textarea class="form-input" id="messageContent" rows="8" 
+                                                  placeholder="🎨 ¡Gran promoción en Sistema Paints! 
+
+🏆 Descuento del 30% en todas las pinturas premium
+🎯 Válido hasta el 30 de noviembre
+📍 Disponible en todas nuestras 6 sucursales
+
+¡No te pierdas esta oportunidad única!"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <input type="checkbox" id="includeLogo" checked>
+                                            Incluir logo de la empresa
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Contenido Imagen -->
+                                <div id="content-imagen" class="content-editor" style="display: none;">
+                                    <div class="form-group">
+                                        <label class="form-label">Subir Imagen Promocional</label>
+                                        <div class="file-upload-area" onclick="document.getElementById('imageFile').click()">
+                                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                                            <div>Haz clic aquí o arrastra una imagen</div>
+                                            <small class="text-muted">Formatos: JPG, PNG, GIF (máx. 5MB)</small>
+                                        </div>
+                                        <input type="file" id="imageFile" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+                                    </div>
+                                    <div id="imagePreview" style="margin-top: 1rem; display: none;">
+                                        <img id="previewImg" style="max-width: 100%; height: auto; border-radius: var(--border-radius);">
+                                    </div>
+                                </div>
+
+                                <!-- Contenido PDF -->
+                                <div id="content-pdf" class="content-editor" style="display: none;">
+                                    <div class="form-group">
+                                        <label class="form-label">Subir Archivo PDF</label>
+                                        <div class="file-upload-area" onclick="document.getElementById('pdfFile').click()">
+                                            <i class="fas fa-file-pdf" style="font-size: 3rem; color: var(--error-red); margin-bottom: 1rem;"></i>
+                                            <div>Haz clic aquí o arrastra un archivo PDF</div>
+                                            <small class="text-muted">Archivo PDF (máx. 10MB)</small>
+                                        </div>
+                                        <input type="file" id="pdfFile" accept=".pdf" style="display: none;" onchange="handlePdfUpload(this)">
+                                    </div>
+                                    <div id="pdfPreview" style="margin-top: 1rem; display: none;">
+                                        <div style="padding: 1rem; background: var(--gray-100); border-radius: var(--border-radius);">
+                                            <i class="fas fa-file-pdf" style="color: var(--error-red); margin-right: 0.5rem;"></i>
+                                            <span id="pdfFileName">Archivo seleccionado</span>
+                                            <span id="pdfFileSize" class="text-muted" style="margin-left: 1rem;"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Destinatarios -->
+                            <div class="form-section">
+                                <h4><i class="fas fa-users"></i> Clientes Registrados</h4>
+                                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllClients()">
+                                        <i class="fas fa-check-double"></i> Seleccionar Todos
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="clearSelection()">
+                                        <i class="fas fa-times"></i> Limpiar
+                                    </button>
+                                </div>
+                                
+                                <div class="recipient-selector" id="clientList">
+                                    <!-- Clientes simulados de Guatemala -->
+                                    <div class="recipient-item">
+                                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                                            <input type="checkbox" value="1" onchange="updateSelectedClients()">
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 500;">María García</div>
+                                                <div class="text-muted">maria.garcia@email.com</div>
+                                            </div>
+                                            <div class="text-muted">Guatemala</div>
+                                        </label>
+                                    </div>
+                                    <div class="recipient-item">
+                                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                                            <input type="checkbox" value="2" onchange="updateSelectedClients()">
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 500;">Carlos López</div>
+                                                <div class="text-muted">carlos.lopez@email.com</div>
+                                            </div>
+                                            <div class="text-muted">Quetzaltenango</div>
+                                        </label>
+                                    </div>
+                                    <div class="recipient-item">
+                                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                                            <input type="checkbox" value="3" onchange="updateSelectedClients()">
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 500;">Ana Rodríguez</div>
+                                                <div class="text-muted">ana.rodriguez@email.com</div>
+                                            </div>
+                                            <div class="text-muted">Escuintla</div>
+                                        </label>
+                                    </div>
+                                    <div class="recipient-item">
+                                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                                            <input type="checkbox" value="4" onchange="updateSelectedClients()">
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 500;">Roberto Silva</div>
+                                                <div class="text-muted">roberto.silva@email.com</div>
+                                            </div>
+                                            <div class="text-muted">Chimaltenango</div>
+                                        </label>
+                                    </div>
+                                    <div class="recipient-item">
+                                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                                            <input type="checkbox" value="5" onchange="updateSelectedClients()">
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 500;">Patricia López</div>
+                                                <div class="text-muted">patricia.lopez@email.com</div>
+                                            </div>
+                                            <div class="text-muted">Mazatenango</div>
+                                        </label>
+                                    </div>
+                                    <div class="recipient-item">
+                                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                                            <input type="checkbox" value="6" onchange="updateSelectedClients()">
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 500;">Luis Morales</div>
+                                                <div class="text-muted">luis.morales@email.com</div>
+                                            </div>
+                                            <div class="text-muted">Coatepeque</div>
+                                        </label>
+                                    </div>
+                                    <div class="recipient-item">
+                                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                                            <input type="checkbox" value="7" onchange="updateSelectedClients()">
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 500;">Carmen Flores</div>
+                                                <div class="text-muted">carmen.flores@email.com</div>
+                                            </div>
+                                            <div class="text-muted">Guatemala</div>
+                                        </label>
+                                    </div>
+                                    <div class="recipient-item">
+                                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                                            <input type="checkbox" value="8" onchange="updateSelectedClients()">
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 500;">Diego Méndez</div>
+                                                <div class="text-muted">diego.mendez@email.com</div>
+                                            </div>
+                                            <div class="text-muted">Quetzaltenango</div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 1rem; padding: 1rem; background: var(--info-100); border-radius: var(--border-radius); color: var(--info-color);">
+                                    <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
+                                    <span id="selectedCount">0 clientes seleccionados</span>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                                <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                                    <i class="fas fa-save"></i> Guardar Borrador
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="showPreview()">
+                                    <i class="fas fa-eye"></i> Vista Previa
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Enviar Promoción
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tab: Plantillas -->
+                    <div class="tab-pane" id="tab-plantillas">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3>Plantillas Predefinidas</h3>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4>🎨 Promoción de Pinturas</h4>
+                                    <p class="text-muted">Plantilla para descuentos en pinturas y colores</p>
+                                    <button class="btn btn-primary btn-sm" style="margin-top: 1rem;">Usar Plantilla</button>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4>🛠️ Accesorios y Herramientas</h4>
+                                    <p class="text-muted">Plantilla para promociones de accesorios</p>
+                                    <button class="btn btn-primary btn-sm" style="margin-top: 1rem;">Usar Plantilla</button>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4>📘 Catálogo PDF</h4>
+                                    <p class="text-muted">Plantilla para envío de catálogos</p>
+                                    <button class="btn btn-primary btn-sm" style="margin-top: 1rem;">Usar Plantilla</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Reportes -->
+                    <div class="tab-pane" id="tab-reportes">
+                        <h3>Estadísticas de Campañas</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                            <div class="card">
+                                <div class="card-content" style="text-align: center;">
+                                    <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--success-green); margin-bottom: 1rem;"></i>
+                                    <h4>Tasa de Apertura</h4>
+                                    <p style="font-size: 2rem; font-weight: bold; color: var(--success-green);">85%</p>
+                                    <p class="text-muted">Emails abiertos vs enviados</p>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content" style="text-align: center;">
+                                    <i class="fas fa-mouse-pointer" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 1rem;"></i>
+                                    <h4>Tasa de Clic</h4>
+                                    <p style="font-size: 2rem; font-weight: bold; color: var(--primary-blue);">12%</p>
+                                    <p class="text-muted">Enlaces clickeados</p>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content" style="text-align: center;">
+                                    <i class="fas fa-user-minus" style="font-size: 3rem; color: var(--warning-yellow); margin-bottom: 1rem;"></i>
+                                    <h4>Desuscripciones</h4>
+                                    <p style="font-size: 2rem; font-weight: bold; color: var(--warning-yellow);">2</p>
+                                    <p class="text-muted">En el último mes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Vista Previa -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-large">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> Vista Previa de la Promoción</h3>
+                <button type="button" onclick="closePreview()" class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-container">
+                    <div class="preview-header">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i class="fas fa-paint-brush" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong>Sistema Paints</strong>
+                                <div style="font-size: 0.9rem; opacity: 0.9;">info@sistempaints.com</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="email-preview" id="emailPreview">
+                        <h2 style="color: var(--primary-blue); margin-bottom: 1rem;">Vista Previa</h2>
+                        <p>Selecciona contenido para ver la vista previa</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closePreview()">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="sendFromPreview()">
+                    <i class="fas fa-paper-plane"></i> Enviar Ahora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentContentType = 'mensaje';
+        let selectedClients = new Set();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('promotionForm').addEventListener('submit', handleFormSubmit);
+            updateSelectedCount();
+        });
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-header').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            
+            document.querySelector(`#tab-${tabName}`).classList.add('active');
+            
+            const tabHeaders = document.querySelectorAll('.tab-header');
+            const tabNames = ['lista', 'nueva', 'plantillas', 'reportes'];
+            const index = tabNames.indexOf(tabName);
+            if (index !== -1) {
+                tabHeaders[index].classList.add('active');
+            }
+        }
+
+        function selectContentType(type) {
+            currentContentType = type;
+            
+            document.querySelectorAll('.content-type').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`#type-${type}`).classList.add('selected');
+            
+            document.querySelectorAll('.content-editor').forEach(el => el.style.display = 'none');
+            if (document.querySelector(`#content-${type}`)) {
+                document.querySelector(`#content-${type}`).style.display = 'block';
+            }
+        }
+
+        function updateSelectedClients() {
+            selectedClients.clear();
+            document.querySelectorAll('#clientList input[type="checkbox"]:checked').forEach(cb => {
+                selectedClients.add(parseInt(cb.value));
+            });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            document.getElementById('selectedCount').textContent = `${selectedClients.size} clientes seleccionados`;
+        }
+
+        function selectAllClients() {
+            document.querySelectorAll('#clientList input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+            });
+            updateSelectedClients();
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('#clientList input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            updateSelectedClients();
+        }
+
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('La imagen es demasiado grande (máx. 5MB)');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handlePdfUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('El archivo PDF es demasiado grande (máx. 10MB)');
+                return;
+            }
+
+            document.getElementById('pdfFileName').textContent = file.name;
+            document.getElementById('pdfFileSize').textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            document.getElementById('pdfPreview').style.display = 'block';
+        }
+
+        function showPreview() {
+            const titulo = document.getElementById('promotionTitle').value || 'Promoción sin título';
+            const tipo = currentContentType;
+            let contenido = '';
+
+            switch(tipo) {
+                case 'mensaje':
+                    const mensaje = document.getElementById('messageContent').value || 'Sin mensaje';
+                    contenido = `<div style="line-height: 1.6; color: var(--gray-700);">${mensaje.replace(/\n/g, '<br>')}</div>`;
+                    break;
+                case 'imagen':
+                    const img = document.getElementById('previewImg');
+                    if (img.src && img.src !== window.location.href) {
+                        contenido = `
+                            <div style="text-align: center; margin-bottom: 1rem;">
+                                <img src="${img.src}" style="max-width: 100%; height: auto; border-radius: var(--border-radius);">
+                            </div>
+                        `;
+                    } else {
+                        contenido = '<div style="text-align: center; padding: 2rem; color: var(--gray-500);">No se ha seleccionado imagen</div>';
+                    }
+                    break;
+                case 'pdf':
+                    const pdfName = document.getElementById('pdfFileName').textContent;
+                    if (pdfName !== 'Archivo seleccionado') {
+                        contenido = `
+                            <div style="background: var(--gray-50); padding: 2rem; border-radius: var(--border-radius); text-align: center;">
+                                <i class="fas fa-file-pdf" style="font-size: 4rem; color: var(--error-red); margin-bottom: 1rem;"></i>
+                                <h4>${pdfName}</h4>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-download"></i> Descargar PDF
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        contenido = '<div style="text-align: center; padding: 2rem; color: var(--gray-500);">No se ha seleccionado PDF</div>';
+                    }
+                    break;
+            }
+
+            document.getElementById('emailPreview').innerHTML = `
+                <h2 style="color: var(--primary-blue); margin-bottom: 1rem; text-align: center;">
+                    <i class="fas fa-paint-brush"></i> ${titulo}
+                </h2>
+                <div style="margin-bottom: 2rem;">${contenido}</div>
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--gray-200);">
+                <div style="font-size: 0.875rem; color: var(--gray-600); text-align: center;">
+                    <p>Sistema Paints - Tu tienda de pinturas de confianza</p>
+                    <p><a href="#" style="color: var(--primary-blue);">Ver en navegador</a> | <a href="#" style="color: var(--gray-500);">Cancelar suscripción</a></p>
+                </div>
+            `;
+
+            document.getElementById('previewModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function sendFromPreview() {
+            closePreview();
+            handleFormSubmit(new Event('submit'));
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            if (selectedClients.size === 0) {
+                alert('Debe seleccionar al menos un destinatario');
+                return;
+            }
+
+            const titulo = document.getElementById('promotionTitle').value;
+            if (!titulo.trim()) {
+                alert('El título es obligatorio');
+                return;
+            }
+
+            alert('Simulando envío de promoción...');
+            
+            setTimeout(() => {
+                alert(`✅ Promoción enviada exitosamente a ${selectedClients.size} clientes`);
+                
+                const enviadasElement = document.getElementById('promocionesEnviadas');
+                enviadasElement.textContent = parseInt(enviadasElement.textContent) + 1;
+                
+                resetForm();
+                setTimeout(() => switchTab('lista'), 1000);
+            }, 2000);
+        }
+
+        function resetForm() {
+            document.getElementById('promotionForm').reset();
+            clearSelection();
+            selectContentType('mensaje');
+            
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('pdfPreview').style.display = 'none';
+            document.getElementById('previewImg').src = '';
+            document.getElementById('pdfFileName').textContent = 'Archivo seleccionado';
+        }
+
+        function saveDraft() {
+            const titulo = document.getElementById('promotionTitle').value;
+            if (!titulo.trim()) {
+                alert('El título es obligatorio para guardar');
+                return;
+            }
+            alert('💾 Borrador guardado exitosamente');
+        }
+
+        function filterPromotions() {
+            alert('Filtros aplicados');
+        }
+    </script>
+</body>
+</html>

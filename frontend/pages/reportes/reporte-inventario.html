@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Inventario - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Reportes</h2>
+                <p class="sidebar-subtitle">Inventario</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Panel de Reportes
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-ventas.html">
+                        <i class="fas fa-chart-line"></i>
+                        Reporte de Ventas
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-inventario.html" class="active">
+                        <i class="fas fa-boxes"></i>
+                        Reporte de Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-productos.html">
+                        <i class="fas fa-box"></i>
+                        Reporte de Productos
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-clientes.html">
+                        <i class="fas fa-users"></i>
+                        Reporte de Clientes
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div style="margin-bottom: 2rem;">
+                <h1><i class="fas fa-boxes"></i> Reporte de Inventario</h1>
+                <p style="color: var(--gray-600);">Estado actual del inventario por sucursal</p>
+            </div>
+
+            <!-- Estadísticas de Inventario -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Productos</p>
+                                <h2 style="color: var(--primary-blue);">234</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-box" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Valor Total</p>
+                                <h2 style="color: var(--success-green);">Q 456,750</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-dollar-sign" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Stock Bajo</p>
+                                <h2 style="color: var(--warning-yellow);">18</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Agotados</p>
+                                <h2 style="color: var(--error-red);">3</h2>
+                            </div>
+                            <div style="background: var(--error-100); padding: 1rem; border-radius: 50%; color: var(--error-red);">
+                                <i class="fas fa-times-circle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Filtros de Inventario</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Sucursal</label>
+                            <select class="form-select">
+                                <option>Todas las Sucursales</option>
+                                <option>Pradera Chimaltenango</option>
+                                <option>Pradera Escuintla</option>
+                                <option>Las Américas Mazatenango</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Categoría</label>
+                            <select class="form-select">
+                                <option>Todas las Categorías</option>
+                                <option>Pinturas</option>
+                                <option>Accesorios</option>
+                                <option>Solventes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Estado de Stock</label>
+                            <select class="form-select">
+                                <option>Todos los Estados</option>
+                                <option>Normal</option>
+                                <option>Stock Bajo</option>
+                                <option>Agotado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Marca</label>
+                            <select class="form-select">
+                                <option>Todas las Marcas</option>
+                                <option>Sherwin-Williams</option>
+                                <option>Comex</option>
+                                <option>Benjamin Moore</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-filter"></i>
+                            Aplicar Filtros
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Exportar Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas Críticas -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header" style="background: var(--error-100); border-bottom: 1px solid var(--error-200);">
+                    <h3 style="color: var(--error-700);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Alertas Críticas de Stock
+                    </h3>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Sucursal</th>
+                                    <th>Stock Actual</th>
+                                    <th>Stock Mínimo</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Pintura Látex Blanca 1 Galón</strong></td>
+                                    <td>Pradera Chimaltenango</td>
+                                    <td style="color: var(--error-red); font-weight: bold;">0</td>
+                                    <td>10</td>
+                                    <td><span class="status-badge status-inactivo">Agotado</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-plus"></i>
+                                            Reabastecer
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Brocha Premium 3"</strong></td>
+                                    <td>Pradera Escuintla</td>
+                                    <td style="color: var(--warning-yellow); font-weight: bold;">2</td>
+                                    <td>15</td>
+                                    <td><span class="status-badge status-pendiente">Crítico</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Urgente
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventario Detallado -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Inventario Detallado por Producto</h3>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Stock Actual</th>
+                                    <th>Stock Mínimo</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Valor Total</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Pintura Comex Vinimex 1 Galón</strong><br>
+                                        <small class="text-muted">Sherwin-Williams</small>
+                                    </td>
+                                    <td>Pinturas</td>
+                                    <td><strong>45</strong></td>
+                                    <td>10</td>
+                                    <td>Q 360.00</td>
+                                    <td><strong>Q 16,200.00</strong></td>
+                                    <td><span class="status-badge status-activo">Normal</span></td>
+                                    <td>
+                                        <button class="btn-action btn-view" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Benjamin Moore Eco Advance</strong><br>
+                                        <small class="text-muted">Benjamin Moore</small>
+                                    </td>
+                                    <td>Pinturas</td>
+                                    <td><strong>28</strong></td>
+                                    <td>8</td>
+                                    <td>Q 712.00</td>
+                                    <td><strong>Q 19,936.00</strong></td>
+                                    <td><span class="status-badge status-activo">Normal</span></td>
+                                    <td>
+                                        <button class="btn-action btn-view" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Rodillo Antichorreo 9"</strong><br>
+                                        <small class="text-muted">Professional</small>
+                                    </td>
+                                    <td>Accesorios</td>
+                                    <td><strong>67</strong></td>
+                                    <td>20</td>
+                                    <td>Q 53.00</td>
+                                    <td><strong>Q 3,551.00</strong></td>
+                                    <td><span class="status-badge status-activo">Normal</span></td>
+                                    <td>
+                                        <button class="btn-action btn-view" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Espátula Ancha 6"</strong><br>
+                                        <small class="text-muted">ProTools</small>
+                                    </td>
+                                    <td>Herramientas</td>
+                                    <td style="color: var(--warning-yellow); font-weight: bold;">3</td>
+                                    <td>15</td>
+                                    <td>Q 45.00</td>
+                                    <td><strong>Q 135.00</strong></td>
+                                    <td><span class="status-badge status-pendiente">Bajo</span></td>
+                                    <td>
+                                        <button class="btn-action btn-view" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico</p>
+        </div>
+    </footer>
+
+    <script>
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+
+    <style>
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        .text-muted {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+    </style>
+</body>
+</html>

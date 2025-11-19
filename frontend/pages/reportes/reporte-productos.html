@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Productos - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Reportes</h2>
+                <p class="sidebar-subtitle">Productos</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Panel de Reportes
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-ventas.html">
+                        <i class="fas fa-chart-line"></i>
+                        Reporte de Ventas
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-inventario.html">
+                        <i class="fas fa-boxes"></i>
+                        Reporte de Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-productos.html" class="active">
+                        <i class="fas fa-box"></i>
+                        Reporte de Productos
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-clientes.html">
+                        <i class="fas fa-users"></i>
+                        Reporte de Clientes
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div style="margin-bottom: 2rem;">
+                <h1><i class="fas fa-box"></i> Reporte de Productos</h1>
+                <p style="color: var(--gray-600);">Análisis de rendimiento y rotación de productos</p>
+            </div>
+
+            <!-- Estadísticas de Productos -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Productos</p>
+                                <h2 style="color: var(--primary-blue);">1,247</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-box" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Más Vendido</p>
+                                <h2 style="color: var(--success-green);">145</h2>
+                                <small class="text-muted">Pintura Látex Blanca</small>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-trophy" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Productos Activos</p>
+                                <h2 style="color: var(--info-color);">1,156</h2>
+                            </div>
+                            <div style="background: var(--info-100); padding: 1rem; border-radius: 50%; color: var(--info-700);">
+                                <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Sin Movimiento (30d)</p>
+                                <h2 style="color: var(--warning-yellow);">91</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-pause-circle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Filtros de Productos</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Categoría</label>
+                            <select class="form-select">
+                                <option>Todas las Categorías</option>
+                                <option>Pinturas</option>
+                                <option>Accesorios</option>
+                                <option>Solventes</option>
+                                <option>Herramientas</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Marca</label>
+                            <select class="form-select">
+                                <option>Todas las Marcas</option>
+                                <option>Sherwin-Williams</option>
+                                <option>Comex</option>
+                                <option>Benjamin Moore</option>
+                                <option>Pintuco</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select">
+                                <option>Todos los Estados</option>
+                                <option>Activo</option>
+                                <option>Inactivo</option>
+                                <option>Descontinuado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Rotación</label>
+                            <select class="form-select">
+                                <option>Todas las Rotaciones</option>
+                                <option>Alta (>20 ventas/mes)</option>
+                                <option>Media (5-20 ventas/mes)</option>
+                                <option>Baja (<5 ventas/mes)</option>
+                                <option>Sin movimiento</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Rango de Precio</label>
+                            <select class="form-select">
+                                <option>Todos los Precios</option>
+                                <option>Alto (>Q 500)</option>
+                                <option>Medio (Q 100-500)</option>
+                                <option>Bajo (<Q 100)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Búsqueda</label>
+                            <input type="text" class="form-input" placeholder="Nombre del producto...">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-filter"></i>
+                            Aplicar Filtros
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Productos -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <!-- Más Vendidos -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Top 5 Más Vendidos (30 días)</h3>
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Producto</th>
+                                        <th>Vendidos</th>
+                                        <th>Ingresos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>🥇</td>
+                                        <td>
+                                            <strong>Pintura Látex Blanca</strong><br>
+                                            <small class="text-muted">Sherwin-Williams</small>
+                                        </td>
+                                        <td><strong>145</strong></td>
+                                        <td><strong>Q 52,200</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>🥈</td>
+                                        <td>
+                                            <strong>Brocha Premium 3"</strong><br>
+                                            <small class="text-muted">Professional</small>
+                                        </td>
+                                        <td><strong>89</strong></td>
+                                        <td><strong>Q 8,010</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>🥉</td>
+                                        <td>
+                                            <strong>Aguarrás 1/2 Galón</strong><br>
+                                            <small class="text-muted">Industrial</small>
+                                        </td>
+                                        <td><strong>76</strong></td>
+                                        <td><strong>Q 6,840</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>
+                                            <strong>Rodillo 9"</strong><br>
+                                            <small class="text-muted">Premium</small>
+                                        </td>
+                                        <td><strong>65</strong></td>
+                                        <td><strong>Q 3,445</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>
+                                            <strong>Comex Vinimex</strong><br>
+                                            <small class="text-muted">1 Galón</small>
+                                        </td>
+                                        <td><strong>52</strong></td>
+                                        <td><strong>Q 18,720</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menos Vendidos -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Top 5 Menos Vendidos (30 días)</h3>
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Producto</th>
+                                        <th>Vendidos</th>
+                                        <th>Días sin venta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="color: var(--error-red);">⚠️</td>
+                                        <td>
+                                            <strong>Barniz Premium Mate</strong><br>
+                                            <small class="text-muted">Speciality</small>
+                                        </td>
+                                        <td style="color: var(--error-red);">0</td>
+                                        <td>45 días</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: var(--warning-yellow);">⚠️</td>
+                                        <td>
+                                            <strong>Pincel Artístico #8</strong><br>
+                                            <small class="text-muted">ProArte</small>
+                                        </td>
+                                        <td style="color: var(--warning-yellow);">1</td>
+                                        <td>23 días</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>
+                                            <strong>Sellador Acrílico</strong><br>
+                                            <small class="text-muted">Base Agua</small>
+                                        </td>
+                                        <td>2</td>
+                                        <td>18 días</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>
+                                            <strong>Masilla Plástica</strong><br>
+                                            <small class="text-muted">1 Libra</small>
+                                        </td>
+                                        <td>3</td>
+                                        <td>15 días</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>
+                                            <strong>Thinner Especial</strong><br>
+                                            <small class="text-muted">1/4 Galón</small>
+                                        </td>
+                                        <td>4</td>
+                                        <td>12 días</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análisis por Categoría -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Análisis por Categoría</h3>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Categoría</th>
+                                    <th>Total Productos</th>
+                                    <th>Productos Activos</th>
+                                    <th>Ventas (30d)</th>
+                                    <th>Ingresos (30d)</th>
+                                    <th>Rotación Promedio</th>
+                                    <th>% del Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Pinturas</strong></td>
+                                    <td>456</td>
+                                    <td>432</td>
+                                    <td>1,247</td>
+                                    <td><strong>Q 456,890</strong></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 100px; height: 8px; background: var(--gray-200); border-radius: 4px;">
+                                                <div style="width: 85%; height: 100%; background: var(--success-green); border-radius: 4px;"></div>
+                                            </div>
+                                            <span>Alta</span>
+                                        </div>
+                                    </td>
+                                    <td>68.5%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Accesorios</strong></td>
+                                    <td>389</td>
+                                    <td>367</td>
+                                    <td>567</td>
+                                    <td><strong>Q 123,450</strong></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 100px; height: 8px; background: var(--gray-200); border-radius: 4px;">
+                                                <div style="width: 65%; height: 100%; background: var(--warning-yellow); border-radius: 4px;"></div>
+                                            </div>
+                                            <span>Media</span>
+                                        </div>
+                                    </td>
+                                    <td>18.5%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Solventes</strong></td>
+                                    <td>234</td>
+                                    <td>201</td>
+                                    <td>189</td>
+                                    <td><strong>Q 67,230</strong></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 100px; height: 8px; background: var(--gray-200); border-radius: 4px;">
+                                                <div style="width: 45%; height: 100%; background: var(--info-color); border-radius: 4px;"></div>
+                                            </div>
+                                            <span>Media</span>
+                                        </div>
+                                    </td>
+                                    <td>10.1%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Herramientas</strong></td>
+                                    <td>168</td>
+                                    <td>156</td>
+                                    <td>78</td>
+                                    <td><strong>Q 18,940</strong></td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 100px; height: 8px; background: var(--gray-200); border-radius: 4px;">
+                                                <div style="width: 25%; height: 100%; background: var(--error-red); border-radius: 4px;"></div>
+                                            </div>
+                                            <span>Baja</span>
+                                        </div>
+                                    </td>
+                                    <td>2.9%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listado Completo -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Listado Completo de Productos</h3>
+                    <div>
+                        <span class="text-muted">Mostrando 10 de 1,247 productos</span>
+                    </div>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Stock Total</th>
+                                    <th>Ventas (30d)</th>
+                                    <th>Última Venta</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Pintura Látex Premium Blanca</strong><br>
+                                        <small class="text-muted">Sherwin-Williams - 1 Galón</small>
+                                    </td>
+                                    <td>Pinturas</td>
+                                    <td><strong>Q 360.00</strong></td>
+                                    <td>145</td>
+                                    <td><span style="color: var(--success-green); font-weight: bold;">48</span></td>
+                                    <td>Hoy</td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                    <td>
+                                        <button class="btn-action btn-view" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Comex Vinimex Color Base</strong><br>
+                                        <small class="text-muted">Comex - 1 Galón</small>
+                                    </td>
+                                    <td>Pinturas</td>
+                                    <td><strong>Q 280.00</strong></td>
+                                    <td>89</td>
+                                    <td><span style="color: var(--success-green); font-weight: bold;">32</span></td>
+                                    <td>Ayer</td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                    <td>
+                                        <button class="btn-action btn-view" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Brocha Professional 3"</strong><br>
+                                        <small class="text-muted">Premium Tools</small>
+                                    </td>
+                                    <td>Accesorios</td>
+                                    <td><strong>Q 90.00</strong></td>
+                                    <td>267</td>
+                                    <td><span style="color: var(--warning-yellow); font-weight: bold;">18</span></td>
+                                    <td>2 días</td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                    <td>
+                                        <button class="btn-action btn-view" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Barniz Marina Transparente</strong><br>
+                                        <small class="text-muted">Speciality - 1/4 Galón</small>
+                                    </td>
+                                    <td>Barnices</td>
+                                    <td><strong>Q 168.00</strong></td>
+                                    <td>12</td>
+                                    <td style="color: var(--error-red);">0</td>
+                                    <td>45 días</td>
+                                    <td><span class="status-badge status-pendiente">Revisar</span></td>
+                                    <td>
+                                        <button class="btn-action btn-view" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico</p>
+        </div>
+    </footer>
+
+    <script>
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+
+    <style>
+        .text-muted {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+    </style>
+</body>
+</html>

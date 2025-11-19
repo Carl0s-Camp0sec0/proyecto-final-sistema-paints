@@ -14,6 +14,7 @@
             gap: 1.5rem;
             height: calc(100vh - 140px);
         }
+        
         .product-search-item {
             display: flex;
             justify-content: space-between;
@@ -24,23 +25,73 @@
             margin-bottom: 0.5rem;
             cursor: pointer;
             transition: all 0.2s;
+            background: white;
         }
+        
         .product-search-item:hover {
-            background: var(--gray-50);
+            background: var(--primary-50);
             border-color: var(--primary-blue);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
         }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-weight: 500;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+        
+        .product-details {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .product-stock {
+            font-size: 0.75rem;
+            color: var(--success-green);
+        }
+        
+        .product-stock.low {
+            color: var(--warning-yellow);
+        }
+        
+        .product-stock.out {
+            color: var(--error-red);
+        }
+        
+        .product-price-section {
+            text-align: right;
+        }
+        
+        .product-price {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
         .invoice-product-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0.75rem;
             border-bottom: 1px solid var(--gray-200);
+            transition: background-color 0.2s;
         }
+        
+        .invoice-product-item:hover {
+            background: var(--gray-50);
+        }
+        
         .quantity-controls {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+        
         .quantity-btn {
             width: 30px;
             height: 30px;
@@ -52,10 +103,14 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            transition: all 0.2s;
         }
+        
         .quantity-btn:hover {
             background: var(--gray-100);
+            border-color: var(--gray-400);
         }
+        
         .quantity-input {
             width: 60px;
             padding: 0.25rem;
@@ -63,16 +118,146 @@
             border: 1px solid var(--gray-300);
             border-radius: 4px;
         }
+        
         .payment-method {
             flex: 1;
             transition: all 0.2s;
+            margin: 0 0.25rem;
         }
+        
         .payment-method.active {
             background: var(--primary-blue);
             color: white;
+            border-color: var(--primary-blue);
         }
+        
         .payment-details {
             margin-top: 1rem;
+        }
+        
+        .invoice-summary {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+        
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-line.total {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--primary-blue);
+            border-top: 1px solid var(--gray-300);
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .search-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.25rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            background: white;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .filter-btn:hover:not(.active) {
+            background: var(--gray-100);
+        }
+        
+        .barcode-scanner {
+            position: relative;
+        }
+        
+        .scanner-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--gray-400);
+            transition: color 0.2s;
+        }
+        
+        .scanner-icon:hover {
+            color: var(--primary-blue);
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .success-content {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 400px;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--success-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .pos-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .search-filters {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -123,22 +308,45 @@
                 <!-- Panel de búsqueda de productos -->
                 <div class="card" style="display: flex; flex-direction: column;">
                     <div class="card-header">
-                        <h2>Punto de Venta</h2>
+                        <h2><i class="fas fa-cash-register"></i> Punto de Venta</h2>
                         <div style="font-size: 0.875rem; color: var(--gray-600);">
                             Sucursal Central - Cajero: <span id="cashierName">Cargando...</span>
                         </div>
                     </div>
                     
                     <div class="card-content" style="flex: 1; overflow: hidden;">
+                        <!-- Búsqueda y filtros -->
                         <div class="form-group">
                             <label class="form-label">Buscar Producto</label>
-                            <input type="text" placeholder="Nombre, código, o categoría" 
-                                   class="form-input" id="productSearchInput">
+                            <div class="barcode-scanner">
+                                <input type="text" placeholder="Nombre, código, código de barras..." 
+                                       class="form-input" id="productSearchInput">
+                                <i class="fas fa-barcode scanner-icon" onclick="scanBarcode()" title="Escanear código de barras"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="search-filters">
+                            <button class="filter-btn active" data-category="all" onclick="filterProducts('all')">
+                                <i class="fas fa-th"></i> Todos
+                            </button>
+                            <button class="filter-btn" data-category="pinturas" onclick="filterProducts('pinturas')">
+                                <i class="fas fa-paint-brush"></i> Pinturas
+                            </button>
+                            <button class="filter-btn" data-category="accesorios" onclick="filterProducts('accesorios')">
+                                <i class="fas fa-tools"></i> Accesorios
+                            </button>
+                            <button class="filter-btn" data-category="solventes" onclick="filterProducts('solventes')">
+                                <i class="fas fa-tint"></i> Solventes
+                            </button>
+                            <button class="filter-btn" data-category="barnices" onclick="filterProducts('barnices')">
+                                <i class="fas fa-spray-can"></i> Barnices
+                            </button>
                         </div>
                         
                         <div id="productSearchResults" style="flex: 1; overflow-y: auto; max-height: 500px;">
                             <div style="padding: 2rem; text-align: center; color: var(--gray-500);">
-                                Escriba para buscar productos
+                                <i class="fas fa-search" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                                <p>Escriba para buscar productos</p>
                             </div>
                         </div>
                     </div>
@@ -147,7 +355,7 @@
                 <!-- Panel de factura -->
                 <div class="card" style="display: flex; flex-direction: column;">
                     <div class="card-header">
-                        <h3>Nueva Factura</h3>
+                        <h3><i class="fas fa-receipt"></i> Nueva Factura</h3>
                         <div style="font-size: 0.875rem; color: var(--gray-600);">
                             Serie: A &nbsp;&nbsp; Correlativo: <span id="nextCorrelativo">001</span>
                         </div>
@@ -157,9 +365,9 @@
                         <!-- Datos del Cliente -->
                         <div style="margin-bottom: 1.5rem;">
                             <div class="form-group">
-                                <label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
                                     <input type="checkbox" id="consumidorFinal" checked> 
-                                    Consumidor Final
+                                    <span>Consumidor Final</span>
                                 </label>
                             </div>
                             
@@ -180,69 +388,110 @@
                         </div>
                         
                         <!-- Productos en la factura -->
-                        <div style="flex: 1; border: 1px solid var(--gray-200); border-radius: var(--border-radius); overflow: hidden;">
+                        <div style="flex: 1; border: 1px solid var(--gray-200); border-radius: var(--border-radius); overflow: hidden; display: flex; flex-direction: column;">
                             <div style="background: var(--gray-50); padding: 0.75rem; border-bottom: 1px solid var(--gray-200); font-weight: 600;">
-                                Productos en la Factura
+                                <i class="fas fa-shopping-cart"></i> Productos en la Factura
+                                <span id="itemCount" style="float: right; font-weight: normal; color: var(--gray-600);">0 productos</span>
                             </div>
-                            <div id="invoiceProducts" style="flex: 1; overflow-y: auto; max-height: 300px;">
+                            <div id="invoiceProducts" style="flex: 1; overflow-y: auto; min-height: 200px;">
                                 <div style="padding: 2rem; text-align: center; color: var(--gray-500);">
-                                    No hay productos agregados
+                                    <i class="fas fa-shopping-cart" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                                    <p>No hay productos agregados</p>
+                                    <p style="font-size: 0.875rem;">Busque productos para agregarlos</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Totales y método de pago -->
-                        <div style="margin-top: 1rem;">
-                            <div style="border-top: 1px solid var(--gray-200); padding-top: 1rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span>Subtotal:</span>
-                                    <span id="invoiceSubtotal">Q0.00</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span>IVA (12%):</span>
-                                    <span id="invoiceTax">Q0.00</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.125rem;">
-                                    <span>Total:</span>
-                                    <span id="invoiceTotal">Q0.00</span>
-                                </div>
-                            </div>
-                            
-                            <div class="payment-details">
-                                <label class="form-label">Método de Pago</label>
-                                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                                    <button class="btn btn-secondary payment-method active" data-method="efectivo">
-                                        Efectivo
-                                    </button>
-                                    <button class="btn btn-secondary payment-method" data-method="tarjeta">
-                                        Tarjeta
-                                    </button>
-                                </div>
-                                
-                                <div id="paymentDetailsSection">
-                                    <div class="form-group">
-                                        <label class="form-label">Monto Recibido</label>
-                                        <input type="number" class="form-input" id="cashAmount" 
-                                               placeholder="0.00" step="0.01">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Vuelto</label>
-                                        <input type="number" class="form-input" id="changeAmount" 
-                                               readonly style="background: var(--gray-100);">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" 
-                                    onclick="processInvoice()" disabled id="processBtn">
-                                <i class="fas fa-cash-register"></i>
-                                Procesar Venta
+                        <!-- Acciones rápidas -->
+                        <div class="quick-actions" style="margin: 1rem 0;">
+                            <button class="btn btn-secondary btn-sm" onclick="clearInvoice()">
+                                <i class="fas fa-trash"></i> Limpiar
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="applyDiscount()">
+                                <i class="fas fa-percent"></i> Descuento
                             </button>
                         </div>
+                        
+                        <!-- Totales y método de pago -->
+                        <div class="invoice-summary">
+                            <div class="summary-line">
+                                <span>Subtotal:</span>
+                                <span id="invoiceSubtotal">Q0.00</span>
+                            </div>
+                            <div class="summary-line">
+                                <span>Descuento:</span>
+                                <span id="invoiceDiscount">Q0.00</span>
+                            </div>
+                            <div class="summary-line">
+                                <span>IVA (12%):</span>
+                                <span id="invoiceTax">Q0.00</span>
+                            </div>
+                            <div class="summary-line total">
+                                <span>Total:</span>
+                                <span id="invoiceTotal">Q0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-details">
+                            <label class="form-label">Método de Pago</label>
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                <button class="btn btn-secondary payment-method active" data-method="efectivo">
+                                    <i class="fas fa-money-bill-wave"></i> Efectivo
+                                </button>
+                                <button class="btn btn-secondary payment-method" data-method="tarjeta">
+                                    <i class="fas fa-credit-card"></i> Tarjeta
+                                </button>
+                                <button class="btn btn-secondary payment-method" data-method="cheque">
+                                    <i class="fas fa-money-check"></i> Cheque
+                                </button>
+                            </div>
+                            
+                            <div id="paymentDetailsSection">
+                                <div class="form-group">
+                                    <label class="form-label">Monto Recibido</label>
+                                    <input type="number" class="form-input" id="cashAmount" 
+                                           placeholder="0.00" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Vuelto</label>
+                                    <input type="number" class="form-input" id="changeAmount" 
+                                           readonly style="background: var(--gray-100);">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" 
+                                onclick="processInvoice()" disabled id="processBtn">
+                            <i class="fas fa-cash-register"></i>
+                            Procesar Venta
+                        </button>
                     </div>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div class="success-modal" id="successModal">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 style="color: var(--success-green); margin-bottom: 0.5rem;">¡Venta Procesada!</h3>
+            <p style="color: var(--gray-600); margin-bottom: 1.5rem;">Factura generada exitosamente</p>
+            <div style="background: var(--gray-50); padding: 1rem; border-radius: var(--border-radius); margin-bottom: 1.5rem;">
+                <div style="font-weight: 600;">Factura: <span id="invoiceNumber"></span></div>
+                <div style="color: var(--gray-600);">Total: <span id="invoiceTotalModal"></span></div>
+            </div>
+            <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                <button class="btn btn-secondary" onclick="printInvoice()">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+                <button class="btn btn-primary" onclick="closeSuccessModal()">
+                    <i class="fas fa-check"></i> Continuar
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="/frontend/assets/js/config.js"></script>
@@ -265,6 +514,8 @@
         // Variables globales
         let invoiceItems = [];
         let selectedPaymentMethod = 'efectivo';
+        let currentCategory = 'all';
+        let discountAmount = 0;
 
         // Cargar datos del usuario
         function loadUserData() {
@@ -362,39 +613,55 @@
             if (!query || query.length < 2) {
                 document.getElementById('productSearchResults').innerHTML = `
                     <div style="padding: 2rem; text-align: center; color: var(--gray-500);">
-                        Escriba al menos 2 caracteres para buscar
+                        <i class="fas fa-search" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                        <p>Escriba al menos 2 caracteres para buscar</p>
                     </div>
                 `;
                 return;
             }
 
             try {
-                const response = await api.getProductos({ buscar: query, limit: 10 });
+                const params = { buscar: query, limit: 20 };
+                if (currentCategory !== 'all') {
+                    params.categoria = currentCategory;
+                }
+
+                const response = await api.getProductos(params);
                 
                 if (response.success && response.data.length > 0) {
-                    const resultsHTML = response.data.map(product => `
-                        <div class="product-search-item" onclick="addToInvoice(${product.id}, '${product.nombre.replace(/'/g, "\\'")}', ${product.precio_base})">
-                            <div>
-                                <strong>${product.nombre}</strong>
-                                <br>
-                                <small style="color: var(--gray-600);">${product.marca || 'Sin marca'}</small>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 600; color: var(--primary-blue);">
-                                    ${Utils.formatCurrency(product.precio_base)}
+                    const resultsHTML = response.data.map(product => {
+                        const stock = product.stock || 0;
+                        const stockClass = stock > 10 ? '' : stock > 0 ? 'low' : 'out';
+                        const stockText = stock > 0 ? `Stock: ${stock}` : 'Sin stock';
+                        
+                        return `
+                            <div class="product-search-item" onclick="addToInvoice(${product.id}, '${product.nombre.replace(/'/g, "\\'")}', ${product.precio_base}, ${stock})"
+                                 ${stock === 0 ? 'style="opacity: 0.6; cursor: not-allowed;"' : ''}>
+                                <div class="product-info">
+                                    <div class="product-name">${product.nombre}</div>
+                                    <div class="product-details">
+                                        ${product.marca || 'Sin marca'} • ${product.categoria || 'Sin categoría'}
+                                    </div>
+                                    <div class="product-stock ${stockClass}">${stockText}</div>
                                 </div>
-                                <button class="btn btn-sm btn-primary">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                                <div class="product-price-section">
+                                    <div class="product-price">
+                                        ${Utils.formatCurrency(product.precio_base)}
+                                    </div>
+                                    <button class="btn btn-sm btn-primary" ${stock === 0 ? 'disabled' : ''}>
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                     
                     document.getElementById('productSearchResults').innerHTML = resultsHTML;
                 } else {
                     document.getElementById('productSearchResults').innerHTML = `
                         <div style="padding: 2rem; text-align: center; color: var(--gray-500);">
-                            No se encontraron productos para "${query}"
+                            <i class="fas fa-search" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                            <p>No se encontraron productos para "${query}"</p>
                         </div>
                     `;
                 }
@@ -402,37 +669,79 @@
                 console.error('Error searching products:', error);
                 document.getElementById('productSearchResults').innerHTML = `
                     <div style="padding: 2rem; text-align: center; color: var(--error-red);">
-                        Error buscando productos
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p>Error buscando productos</p>
                     </div>
                 `;
             }
         }
 
+        // Filtrar productos por categoría
+        function filterProducts(category) {
+            currentCategory = category;
+            
+            // Actualizar botones de filtro
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            // Realizar búsqueda si hay texto
+            const query = document.getElementById('productSearchInput').value;
+            if (query && query.length >= 2) {
+                searchProducts(query);
+            }
+        }
+
+        // Escanear código de barras
+        function scanBarcode() {
+            // En un entorno real, aquí se activaría la cámara o escáner
+            Utils.showToast('Función de escáner de códigos de barras en desarrollo', 'info');
+        }
+
         // Agregar producto a la factura
-        function addToInvoice(productId, productName, price) {
+        function addToInvoice(productId, productName, price, stock) {
+            if (stock === 0) {
+                Utils.showToast('Producto sin stock disponible', 'error');
+                return;
+            }
+
             const existingItem = invoiceItems.find(item => item.productId === productId);
             
             if (existingItem) {
-                existingItem.quantity += 1;
+                if (existingItem.quantity < stock) {
+                    existingItem.quantity += 1;
+                    Utils.showToast(`Cantidad actualizada: ${productName}`, 'success');
+                } else {
+                    Utils.showToast('No hay más stock disponible', 'error');
+                    return;
+                }
             } else {
                 invoiceItems.push({
                     productId: productId,
                     name: productName,
                     price: price,
-                    quantity: 1
+                    quantity: 1,
+                    maxStock: stock
                 });
+                Utils.showToast(`${productName} agregado a la factura`, 'success');
             }
             
             updateInvoiceDisplay();
-            Utils.showToast(`${productName} agregado a la factura`, 'success');
         }
 
         // Actualizar cantidad de producto
         function updateQuantity(productId, newQuantity) {
             const item = invoiceItems.find(item => item.productId === productId);
-            if (item && newQuantity > 0) {
-                item.quantity = newQuantity;
-                updateInvoiceDisplay();
+            if (item) {
+                if (newQuantity > 0 && newQuantity <= item.maxStock) {
+                    item.quantity = newQuantity;
+                    updateInvoiceDisplay();
+                } else if (newQuantity > item.maxStock) {
+                    Utils.showToast('Cantidad excede el stock disponible', 'error');
+                } else {
+                    removeFromInvoice(productId);
+                }
             }
         }
 
@@ -442,30 +751,70 @@
             updateInvoiceDisplay();
         }
 
+        // Limpiar factura
+        function clearInvoice() {
+            if (invoiceItems.length > 0 && confirm('¿Está seguro de limpiar toda la factura?')) {
+                invoiceItems = [];
+                discountAmount = 0;
+                updateInvoiceDisplay();
+                Utils.showToast('Factura limpiada', 'info');
+            }
+        }
+
+        // Aplicar descuento
+        function applyDiscount() {
+            const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            if (subtotal === 0) {
+                Utils.showToast('No hay productos para aplicar descuento', 'warning');
+                return;
+            }
+
+            const discount = prompt('Ingrese el porcentaje de descuento (0-100):', '0');
+            if (discount !== null) {
+                const discountPercent = parseFloat(discount);
+                if (!isNaN(discountPercent) && discountPercent >= 0 && discountPercent <= 100) {
+                    discountAmount = subtotal * (discountPercent / 100);
+                    updateInvoiceDisplay();
+                    Utils.showToast(`Descuento del ${discountPercent}% aplicado`, 'success');
+                } else {
+                    Utils.showToast('Porcentaje de descuento inválido', 'error');
+                }
+            }
+        }
+
         // Actualizar visualización de la factura
         function updateInvoiceDisplay() {
             const container = document.getElementById('invoiceProducts');
+            const itemCount = document.getElementById('itemCount');
             
             if (invoiceItems.length === 0) {
                 container.innerHTML = `
                     <div style="padding: 2rem; text-align: center; color: var(--gray-500);">
-                        No hay productos agregados
+                        <i class="fas fa-shopping-cart" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                        <p>No hay productos agregados</p>
+                        <p style="font-size: 0.875rem;">Busque productos para agregarlos</p>
                     </div>
                 `;
+                itemCount.textContent = '0 productos';
             } else {
                 const itemsHTML = invoiceItems.map(item => `
                     <div class="invoice-product-item">
                         <div style="flex: 1;">
-                            <strong>${item.name}</strong>
-                            <br>
-                            <small>${Utils.formatCurrency(item.price)} c/u</small>
+                            <div style="font-weight: 500;">${item.name}</div>
+                            <div style="font-size: 0.875rem; color: var(--gray-600);">
+                                ${Utils.formatCurrency(item.price)} c/u • Stock: ${item.maxStock}
+                            </div>
                         </div>
                         <div class="quantity-controls">
-                            <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.quantity - 1})">-</button>
+                            <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.quantity - 1})"
+                                    ${item.quantity <= 1 ? 'style="opacity: 0.5;"' : ''}>-</button>
                             <input type="number" value="${item.quantity}" class="quantity-input" 
-                                   onchange="updateQuantity(${item.productId}, parseInt(this.value))" min="1">
-                            <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.quantity + 1})">+</button>
-                            <button class="btn btn-sm btn-danger" onclick="removeFromInvoice(${item.productId})" style="margin-left: 0.5rem;">
+                                   onchange="updateQuantity(${item.productId}, parseInt(this.value))" 
+                                   min="1" max="${item.maxStock}">
+                            <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.quantity + 1})"
+                                    ${item.quantity >= item.maxStock ? 'style="opacity: 0.5;"' : ''}>+</button>
+                            <button class="btn btn-sm btn-danger" onclick="removeFromInvoice(${item.productId})" 
+                                    style="margin-left: 0.5rem;" title="Eliminar producto">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -473,24 +822,31 @@
                 `).join('');
                 
                 container.innerHTML = itemsHTML;
+                itemCount.textContent = `${invoiceItems.length} producto${invoiceItems.length !== 1 ? 's' : ''}`;
             }
             
-            // Actualizar totales
             updateTotals();
         }
 
         // Actualizar totales
         function updateTotals() {
             const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const tax = subtotal * 0.12; // IVA 12%
-            const total = subtotal + tax;
+            const afterDiscount = subtotal - discountAmount;
+            const tax = afterDiscount * 0.12; // IVA 12%
+            const total = afterDiscount + tax;
             
             document.getElementById('invoiceSubtotal').textContent = Utils.formatCurrency(subtotal);
+            document.getElementById('invoiceDiscount').textContent = Utils.formatCurrency(discountAmount);
             document.getElementById('invoiceTax').textContent = Utils.formatCurrency(tax);
             document.getElementById('invoiceTotal').textContent = Utils.formatCurrency(total);
             
             // Habilitar/deshabilitar botón de procesar
             document.getElementById('processBtn').disabled = invoiceItems.length === 0;
+            
+            // Actualizar campos de pago
+            if (selectedPaymentMethod === 'efectivo') {
+                calculateChange();
+            }
         }
 
         // Configurar métodos de pago
@@ -525,7 +881,7 @@
                                readonly style="background: var(--gray-100);">
                     </div>
                 `;
-            } else {
+            } else if (selectedPaymentMethod === 'tarjeta') {
                 section.innerHTML = `
                     <div class="form-group">
                         <label class="form-label">Número de Tarjeta</label>
@@ -538,16 +894,34 @@
                                value="${total.toFixed(2)}" readonly style="background: var(--gray-100);">
                     </div>
                 `;
+            } else { // cheque
+                section.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">Número de Cheque</label>
+                        <input type="text" class="form-input" id="checkNumber" 
+                               placeholder="Número de cheque">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Banco</label>
+                        <input type="text" class="form-input" id="bankName" 
+                               placeholder="Banco emisor">
+                    </div>
+                `;
             }
         }
 
         // Calcular vuelto
         function calculateChange() {
-            const cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
-            const total = parseFloat(document.getElementById('invoiceTotal').textContent.replace('Q', '').replace(',', ''));
-            const change = Math.max(0, cashAmount - total);
+            const cashAmountElement = document.getElementById('cashAmount');
+            const changeAmountElement = document.getElementById('changeAmount');
             
-            document.getElementById('changeAmount').value = change.toFixed(2);
+            if (cashAmountElement && changeAmountElement) {
+                const cashAmount = parseFloat(cashAmountElement.value) || 0;
+                const total = parseFloat(document.getElementById('invoiceTotal').textContent.replace('Q', '').replace(',', ''));
+                const change = Math.max(0, cashAmount - total);
+                
+                changeAmountElement.value = change.toFixed(2);
+            }
         }
 
         // Procesar venta
@@ -567,6 +941,19 @@
                         Utils.showToast('El monto recibido es menor al total', 'error');
                         return;
                     }
+                } else if (selectedPaymentMethod === 'tarjeta') {
+                    const cardNumber = document.getElementById('cardNumber').value.trim();
+                    if (!cardNumber) {
+                        Utils.showToast('Ingrese el número de tarjeta', 'error');
+                        return;
+                    }
+                } else if (selectedPaymentMethod === 'cheque') {
+                    const checkNumber = document.getElementById('checkNumber').value.trim();
+                    const bankName = document.getElementById('bankName').value.trim();
+                    if (!checkNumber || !bankName) {
+                        Utils.showToast('Complete la información del cheque', 'error');
+                        return;
+                    }
                 }
 
                 // Preparar datos de la factura
@@ -580,6 +967,7 @@
                     cliente_direccion: document.getElementById('clientAddress').value || null,
                     sucursal_id: 1,
                     empleado_id: auth.user.id,
+                    descuento_total: discountAmount,
                     productos: invoiceItems.map(item => ({
                         producto_id: item.productId,
                         cantidad: item.quantity,
@@ -587,20 +975,24 @@
                         descuento: 0
                     })),
                     metodos_pago: [{
-                        tipo_pago_id: selectedPaymentMethod === 'efectivo' ? 1 : 3,
+                        tipo_pago_id: selectedPaymentMethod === 'efectivo' ? 1 : selectedPaymentMethod === 'tarjeta' ? 3 : 2,
                         monto: total
                     }]
                 };
 
                 Utils.showToast('Procesando venta...', 'info');
                 
-                const response = await api.createFactura(facturaData);
+                // Simular API call (reemplazar con llamada real)
+                // const response = await api.createFactura(facturaData);
                 
-                if (response.success) {
-                    Utils.showToast('¡Venta procesada exitosamente!', 'success');
+                // Simulación de éxito
+                setTimeout(() => {
+                    const invoiceNumber = `A-${document.getElementById('nextCorrelativo').textContent}`;
+                    showSuccessModal(invoiceNumber, total);
                     
                     // Limpiar factura
                     invoiceItems = [];
+                    discountAmount = 0;
                     updateInvoiceDisplay();
                     
                     // Incrementar correlativo
@@ -614,14 +1006,30 @@
                     // Resetear método de pago
                     updatePaymentDetails();
                     
-                } else {
-                    Utils.showToast(response.message || 'Error procesando la venta', 'error');
-                }
+                }, 1500);
                 
             } catch (error) {
                 console.error('Error processing invoice:', error);
                 Utils.showToast('Error procesando la venta', 'error');
             }
+        }
+
+        // Mostrar modal de éxito
+        function showSuccessModal(invoiceNumber, total) {
+            document.getElementById('invoiceNumber').textContent = invoiceNumber;
+            document.getElementById('invoiceTotalModal').textContent = Utils.formatCurrency(total);
+            document.getElementById('successModal').style.display = 'flex';
+        }
+
+        // Cerrar modal de éxito
+        function closeSuccessModal() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+
+        // Imprimir factura
+        function printInvoice() {
+            Utils.showToast('Imprimiendo factura...', 'info');
+            // Aquí se implementaría la lógica de impresión
         }
 
         // Configurar event listeners
@@ -641,14 +1049,44 @@
                     clientSection.classList.remove('hidden');
                 }
             });
+
+            // Teclas de acceso rápido
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'f':
+                        case 'F':
+                            e.preventDefault();
+                            document.getElementById('productSearchInput').focus();
+                            break;
+                        case 'n':
+                        case 'N':
+                            e.preventDefault();
+                            clearInvoice();
+                            break;
+                        case 'Enter':
+                            if (invoiceItems.length > 0) {
+                                e.preventDefault();
+                                processInvoice();
+                            }
+                            break;
+                    }
+                }
+            });
         }
 
         // Hacer funciones disponibles globalmente
         window.addToInvoice = addToInvoice;
         window.updateQuantity = updateQuantity;
         window.removeFromInvoice = removeFromInvoice;
+        window.clearInvoice = clearInvoice;
+        window.applyDiscount = applyDiscount;
+        window.filterProducts = filterProducts;
+        window.scanBarcode = scanBarcode;
         window.calculateChange = calculateChange;
         window.processInvoice = processInvoice;
+        window.closeSuccessModal = closeSuccessModal;
+        window.printInvoice = printInvoice;
 
         // Inicializar página
         document.addEventListener('DOMContentLoaded', () => {

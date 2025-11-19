@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promociones - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/public/index.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="/frontend/pages/public/index.html">Inicio</a></li>
+                    <li><a href="/frontend/pages/public/catalogo.html">Catálogo</a></li>
+                    <li><a href="/frontend/pages/public/promociones.html" class="active">Promociones</a></li>
+                    <li><a href="/frontend/pages/public/tiendas.html">Tiendas</a></li>
+                    <li><a href="/frontend/pages/public/cotizacion.html">Cotizaciones</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-menu">
+                <button class="cart-icon" onclick="verCarrito()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge">3</span>
+                </button>
+                <a href="/frontend/pages/public/login.html" class="btn btn-primary">
+                    Iniciar Sesión
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%); color: white; padding: 4rem 0;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; text-align: center;">
+            <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 1rem;">
+                <i class="fas fa-gift"></i>
+                Promociones Especiales
+            </h1>
+            <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">
+                Descubre las mejores ofertas en pinturas y accesorios de alta calidad
+            </p>
+            <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 2rem;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;">50%</div>
+                    <div style="opacity: 0.8;">Descuento máximo</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;">15</div>
+                    <div style="opacity: 0.8;">Ofertas activas</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;">48h</div>
+                    <div style="opacity: 0.8;">Tiempo límite</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filtros -->
+    <section style="background: white; border-bottom: 1px solid var(--gray-200); padding: 2rem 0;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                <h3 style="margin: 0; color: var(--gray-700);">Filtrar promociones:</h3>
+                
+                <select class="form-select" id="filtroCategoria" style="max-width: 200px;" onchange="aplicarFiltros()">
+                    <option value="">Todas las categorías</option>
+                    <option value="pinturas">Pinturas</option>
+                    <option value="accesorios">Accesorios</option>
+                    <option value="solventes">Solventes</option>
+                    <option value="barnices">Barnices</option>
+                </select>
+
+                <select class="form-select" id="filtroDescuento" style="max-width: 200px;" onchange="aplicarFiltros()">
+                    <option value="">Todos los descuentos</option>
+                    <option value="10-20">10% - 20%</option>
+                    <option value="21-30">21% - 30%</option>
+                    <option value="31-40">31% - 40%</option>
+                    <option value="41-50">41% - 50%</option>
+                </select>
+
+                <button class="btn btn-secondary" onclick="limpiarFiltros()">
+                    <i class="fas fa-times"></i>
+                    Limpiar Filtros
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Promociones Destacadas -->
+    <section style="padding: 3rem 0;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <h2 style="text-align: center; margin-bottom: 1rem; color: var(--gray-800);">
+                <i class="fas fa-star" style="color: var(--warning-yellow);"></i>
+                Ofertas Destacadas
+            </h2>
+            <p style="text-align: center; margin-bottom: 3rem; color: var(--gray-600);">
+                Las mejores promociones disponibles por tiempo limitado
+            </p>
+
+            <!-- Grid de Promociones Destacadas -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+                <!-- Promoción 1 -->
+                <div class="card" style="overflow: hidden; border: 2px solid var(--error-red); position: relative;">
+                    <div style="background: var(--error-red); color: white; padding: 0.5rem 1rem; position: absolute; top: 0; right: 0; font-weight: 600; font-size: 0.9rem;">
+                        ¡50% OFF!
+                    </div>
+                    <div class="card-content">
+                        <div style="background: var(--gray-50); height: 200px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-paint-brush" style="font-size: 4rem; color: var(--primary-blue);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--gray-800);">Combo Pintura + Accesorios</h4>
+                        <p style="color: var(--gray-600); margin-bottom: 1rem; font-size: 0.9rem;">
+                            Pintura látex premium 1 galón + brocha profesional + rodillo
+                        </p>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <span style="text-decoration: line-through; color: var(--gray-500); font-size: 1.1rem;">Q 850</span>
+                            <span style="color: var(--error-red); font-size: 1.5rem; font-weight: 700;">Q 425</span>
+                        </div>
+                        <div style="background: var(--warning-100); padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--warning-700);">
+                                <i class="fas fa-clock"></i>
+                                <span style="font-weight: 600;">¡Solo por 2 días más!</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="agregarAlCarrito('combo1')">
+                            <i class="fas fa-shopping-cart"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Promoción 2 -->
+                <div class="card" style="overflow: hidden; border: 2px solid var(--success-green); position: relative;">
+                    <div style="background: var(--success-green); color: white; padding: 0.5rem 1rem; position: absolute; top: 0; right: 0; font-weight: 600; font-size: 0.9rem;">
+                        ¡35% OFF!
+                    </div>
+                    <div class="card-content">
+                        <div style="background: var(--gray-50); height: 200px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-palette" style="font-size: 4rem; color: var(--success-green);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--gray-800);">Sherwin-Williams Premium</h4>
+                        <p style="color: var(--gray-600); margin-bottom: 1rem; font-size: 0.9rem;">
+                            Pintura premium base agua, duración 15 años, cobertura 40m²
+                        </p>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <span style="text-decoration: line-through; color: var(--gray-500); font-size: 1.1rem;">Q 1,200</span>
+                            <span style="color: var(--success-green); font-size: 1.5rem; font-weight: 700;">Q 780</span>
+                        </div>
+                        <div style="background: var(--primary-50); padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary-blue);">
+                                <i class="fas fa-gift"></i>
+                                <span style="font-weight: 600;">Incluye brocha gratis</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" style="width: 100%;" onclick="agregarAlCarrito('sherwin1')">
+                            <i class="fas fa-shopping-cart"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Promoción 3 -->
+                <div class="card" style="overflow: hidden; border: 2px solid var(--warning-yellow); position: relative;">
+                    <div style="background: var(--warning-yellow); color: white; padding: 0.5rem 1rem; position: absolute; top: 0; right: 0; font-weight: 600; font-size: 0.9rem;">
+                        ¡25% OFF!
+                    </div>
+                    <div class="card-content">
+                        <div style="background: var(--gray-50); height: 200px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-toolbox" style="font-size: 4rem; color: var(--warning-yellow);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 0.5rem; color: var(--gray-800);">Kit Profesional Completo</h4>
+                        <p style="color: var(--gray-600); margin-bottom: 1rem; font-size: 0.9rem;">
+                            Brochas, rodillos, bandejas, espátulas y mantas de limpieza
+                        </p>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <span style="text-decoration: line-through; color: var(--gray-500); font-size: 1.1rem;">Q 350</span>
+                            <span style="color: var(--warning-700); font-size: 1.5rem; font-weight: 700;">Q 262</span>
+                        </div>
+                        <div style="background: var(--success-100); padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-700);">
+                                <i class="fas fa-check-circle"></i>
+                                <span style="font-weight: 600;">Calidad profesional garantizada</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-warning" style="width: 100%;" onclick="agregarAlCarrito('kit1')">
+                            <i class="fas fa-shopping-cart"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Todas las Promociones -->
+    <section style="background: var(--gray-50); padding: 3rem 0;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: var(--gray-800);">
+                Todas las Promociones
+            </h2>
+
+            <!-- Grid de Todas las Promociones -->
+            <div id="todasPromociones" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <!-- Promoción 4 -->
+                <div class="card promocion-item" data-categoria="pinturas" data-descuento="20">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h5 style="margin: 0; color: var(--gray-800);">Comex Vinimex</h5>
+                            <span style="background: var(--primary-blue); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">-20%</span>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem;">Pintura vinílica lavable</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="text-decoration: line-through; color: var(--gray-500);">Q 450</span>
+                                <span style="color: var(--primary-blue); font-weight: 700; margin-left: 0.5rem;">Q 360</span>
+                            </div>
+                            <button class="btn btn-sm btn-primary" onclick="agregarAlCarrito('comex1')">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promoción 5 -->
+                <div class="card promocion-item" data-categoria="accesorios" data-descuento="30">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h5 style="margin: 0; color: var(--gray-800);">Brocha Premium 4"</h5>
+                            <span style="background: var(--success-green); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">-30%</span>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem;">Cerdas naturales</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="text-decoration: line-through; color: var(--gray-500);">Q 120</span>
+                                <span style="color: var(--success-green); font-weight: 700; margin-left: 0.5rem;">Q 84</span>
+                            </div>
+                            <button class="btn btn-sm btn-success" onclick="agregarAlCarrito('brocha1')">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promoción 6 -->
+                <div class="card promocion-item" data-categoria="solventes" data-descuento="15">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h5 style="margin: 0; color: var(--gray-800);">Aguarrás 1/2 Galón</h5>
+                            <span style="background: var(--info-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">-15%</span>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem;">Solvente premium</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="text-decoration: line-through; color: var(--gray-500);">Q 85</span>
+                                <span style="color: var(--info-color); font-weight: 700; margin-left: 0.5rem;">Q 72</span>
+                            </div>
+                            <button class="btn btn-sm" style="background: var(--info-color); color: white;" onclick="agregarAlCarrito('aguarras1')">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promoción 7 -->
+                <div class="card promocion-item" data-categoria="barnices" data-descuento="40">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h5 style="margin: 0; color: var(--gray-800);">Barniz Marino 1/4 Galón</h5>
+                            <span style="background: var(--error-red); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">-40%</span>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem;">Resistente al agua</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="text-decoration: line-through; color: var(--gray-500);">Q 280</span>
+                                <span style="color: var(--error-red); font-weight: 700; margin-left: 0.5rem;">Q 168</span>
+                            </div>
+                            <button class="btn btn-sm btn-danger" onclick="agregarAlCarrito('barniz1')">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promoción 8 -->
+                <div class="card promocion-item" data-categoria="pinturas" data-descuento="25">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h5 style="margin: 0; color: var(--gray-800);">Benjamin Moore Eco</h5>
+                            <span style="background: var(--warning-yellow); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">-25%</span>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem;">Eco-friendly, bajo COV</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="text-decoration: line-through; color: var(--gray-500);">Q 950</span>
+                                <span style="color: var(--warning-700); font-weight: 700; margin-left: 0.5rem;">Q 712</span>
+                            </div>
+                            <button class="btn btn-sm btn-warning" onclick="agregarAlCarrito('benjamin1')">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promoción 9 -->
+                <div class="card promocion-item" data-categoria="accesorios" data-descuento="18">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h5 style="margin: 0; color: var(--gray-800);">Rodillo Antichorreo</h5>
+                            <span style="background: var(--gray-600); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">-18%</span>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem;">9" microfibra</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="text-decoration: line-through; color: var(--gray-500);">Q 65</span>
+                                <span style="color: var(--gray-700); font-weight: 700; margin-left: 0.5rem;">Q 53</span>
+                            </div>
+                            <button class="btn btn-sm btn-secondary" onclick="agregarAlCarrito('rodillo1')">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado vacío para filtros -->
+            <div id="estadoVacio" style="display: none; text-align: center; padding: 4rem 2rem;">
+                <i class="fas fa-search" style="font-size: 4rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                <h3 style="color: var(--gray-600);">No se encontraron promociones</h3>
+                <p style="color: var(--gray-500);">No hay promociones que coincidan con los filtros seleccionados.</p>
+                <button class="btn btn-primary" onclick="limpiarFiltros()">
+                    Ver todas las promociones
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Signup -->
+    <section style="background: var(--primary-blue); color: white; padding: 3rem 0;">
+        <div style="max-width: 800px; margin: 0 auto; padding: 0 2rem; text-align: center;">
+            <h2 style="margin-bottom: 1rem;">¡No te pierdas nuestras ofertas!</h2>
+            <p style="margin-bottom: 2rem; opacity: 0.9;">
+                Suscríbete a nuestro boletín y recibe las mejores promociones directamente en tu email
+            </p>
+            <form id="newsletterForm" style="display: flex; gap: 1rem; max-width: 400px; margin: 0 auto;">
+                <input type="email" class="form-input" placeholder="Tu email..." required style="flex: 1;">
+                <button type="submit" class="btn btn-secondary">
+                    <i class="fas fa-envelope"></i>
+                    Suscribirse
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer simplificado -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2024 Sistema Paints. Todos los derechos reservados.</p>
+            <div style="margin-top: 1rem;">
+                <a href="/frontend/pages/public/index.html" style="color: var(--gray-300); text-decoration: none; margin: 0 1rem;">Inicio</a>
+                <a href="/frontend/pages/public/catalogo.html" style="color: var(--gray-300); text-decoration: none; margin: 0 1rem;">Catálogo</a>
+                <a href="/frontend/pages/public/tiendas.html" style="color: var(--gray-300); text-decoration: none; margin: 0 1rem;">Tiendas</a>
+                <a href="/frontend/pages/public/login.html" style="color: var(--gray-300); text-decoration: none; margin: 0 1rem;">Login</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Datos del carrito (simulado)
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de promociones cargada');
+            actualizarContadorCarrito();
+            
+            // Newsletter form
+            document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = e.target.querySelector('input[type="email"]').value;
+                alert(`¡Gracias! Te has suscrito con el email: ${email}`);
+                e.target.reset();
+            });
+        });
+
+        // Aplicar filtros
+        function aplicarFiltros() {
+            const categoria = document.getElementById('filtroCategoria').value;
+            const descuento = document.getElementById('filtroDescuento').value;
+            
+            const promociones = document.querySelectorAll('.promocion-item');
+            const estadoVacio = document.getElementById('estadoVacio');
+            let itemsVisibles = 0;
+            
+            promociones.forEach(promocion => {
+                let mostrar = true;
+                
+                // Filtrar por categoría
+                if (categoria && promocion.dataset.categoria !== categoria) {
+                    mostrar = false;
+                }
+                
+                // Filtrar por descuento
+                if (descuento && mostrar) {
+                    const [min, max] = descuento.split('-').map(Number);
+                    const descuentoPromocion = parseInt(promocion.dataset.descuento);
+                    if (descuentoPromocion < min || descuentoPromocion > max) {
+                        mostrar = false;
+                    }
+                }
+                
+                promocion.style.display = mostrar ? 'block' : 'none';
+                if (mostrar) itemsVisibles++;
+            });
+            
+            // Mostrar estado vacío si no hay items visibles
+            estadoVacio.style.display = itemsVisibles === 0 ? 'block' : 'none';
+        }
+
+        // Limpiar filtros
+        function limpiarFiltros() {
+            document.getElementById('filtroCategoria').value = '';
+            document.getElementById('filtroDescuento').value = '';
+            
+            document.querySelectorAll('.promocion-item').forEach(promocion => {
+                promocion.style.display = 'block';
+            });
+            
+            document.getElementById('estadoVacio').style.display = 'none';
+        }
+
+        // Agregar al carrito
+        function agregarAlCarrito(productoId) {
+            const productos = {
+                'combo1': { nombre: 'Combo Pintura + Accesorios', precio: 425, imagen: 'combo.jpg' },
+                'sherwin1': { nombre: 'Sherwin-Williams Premium', precio: 780, imagen: 'sherwin.jpg' },
+                'kit1': { nombre: 'Kit Profesional Completo', precio: 262, imagen: 'kit.jpg' },
+                'comex1': { nombre: 'Comex Vinimex', precio: 360, imagen: 'comex.jpg' },
+                'brocha1': { nombre: 'Brocha Premium 4"', precio: 84, imagen: 'brocha.jpg' },
+                'aguarras1': { nombre: 'Aguarrás 1/2 Galón', precio: 72, imagen: 'aguarras.jpg' },
+                'barniz1': { nombre: 'Barniz Marino 1/4 Galón', precio: 168, imagen: 'barniz.jpg' },
+                'benjamin1': { nombre: 'Benjamin Moore Eco', precio: 712, imagen: 'benjamin.jpg' },
+                'rodillo1': { nombre: 'Rodillo Antichorreo', precio: 53, imagen: 'rodillo.jpg' }
+            };
+
+            const producto = productos[productoId];
+            if (producto) {
+                // Buscar si ya existe en el carrito
+                const itemExistente = carrito.find(item => item.id === productoId);
+                
+                if (itemExistente) {
+                    itemExistente.cantidad += 1;
+                } else {
+                    carrito.push({
+                        id: productoId,
+                        ...producto,
+                        cantidad: 1
+                    });
+                }
+
+                // Guardar en localStorage
+                localStorage.setItem('carrito', JSON.stringify(carrito));
+                actualizarContadorCarrito();
+                
+                // Mostrar confirmación
+                mostrarNotificacion(`${producto.nombre} agregado al carrito`);
+            }
+        }
+
+        // Ver carrito
+        function verCarrito() {
+            if (carrito.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+            
+            let mensaje = 'Carrito de compras:\n\n';
+            let total = 0;
+            
+            carrito.forEach(item => {
+                mensaje += `${item.nombre} - Q${item.precio} x ${item.cantidad}\n`;
+                total += item.precio * item.cantidad;
+            });
+            
+            mensaje += `\nTotal: Q${total.toLocaleString()}`;
+            alert(mensaje);
+        }
+
+        // Actualizar contador del carrito
+        function actualizarContadorCarrito() {
+            const badge = document.querySelector('.cart-badge');
+            const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            badge.textContent = totalItems;
+            badge.style.display = totalItems > 0 ? 'block' : 'none';
+        }
+
+        // Mostrar notificación
+        function mostrarNotificacion(mensaje) {
+            // Crear notificación temporal
+            const notificacion = document.createElement('div');
+            notificacion.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--success-green);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            notificacion.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${mensaje}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notificacion);
+
+            // Remover después de 3 segundos
+            setTimeout(() => {
+                notificacion.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    document.body.removeChild(notificacion);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+
+    <!-- Estilos adicionales -->
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .cart-icon {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-700);
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-right: 1rem;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--error-red);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .nav-menu ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--primary-blue);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .promocion-item {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .promocion-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .header-content {
+                justify-content: space-between;
+            }
+
+            .cart-icon {
+                margin-right: 0;
+            }
+        }
+    </style>
+</body>
+</html>

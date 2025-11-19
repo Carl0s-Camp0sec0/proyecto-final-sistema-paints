@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medios de Pago - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar" id="userAvatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;" id="userName">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);" id="userRole">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Módulo Ventas</h2>
+                <p class="sidebar-subtitle">Medios de pago</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/pos.html">
+                        <i class="fas fa-cash-register"></i>
+                        Punto de Venta
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/facturas.html">
+                        <i class="fas fa-file-invoice"></i>
+                        Gestión Facturas
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/clientes.html">
+                        <i class="fas fa-users"></i>
+                        Clientes
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/anular-factura.html">
+                        <i class="fas fa-ban"></i>
+                        Anular Facturas
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/medios-pago.html" class="active">
+                        <i class="fas fa-credit-card"></i>
+                        Medios de Pago
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div style="margin-bottom: 2rem;">
+                <h1>
+                    <i class="fas fa-credit-card"></i>
+                    Medios de Pago
+                </h1>
+                <p style="color: var(--gray-600);">Configura y gestiona los métodos de pago disponibles</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="abrirModalMedioPago()">
+                    <i class="fas fa-plus"></i>
+                    Nuevo Medio de Pago
+                </button>
+                <button class="btn btn-secondary" onclick="generarReporte()">
+                    <i class="fas fa-chart-pie"></i>
+                    Reporte de Uso
+                </button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Medios Activos</p>
+                                <h2 style="color: var(--primary-blue);">6</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-credit-card" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Efectivo (Hoy)</p>
+                                <h2 style="color: var(--success-green);">Q 8,450</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-money-bills" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Tarjetas (Hoy)</p>
+                                <h2 style="color: var(--info-color);">Q 12,890</h2>
+                            </div>
+                            <div style="background: var(--info-100); padding: 1rem; border-radius: 50%; color: var(--info-700);">
+                                <i class="fas fa-credit-card" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Más Usado</p>
+                                <h2 style="color: var(--warning-yellow); font-size: 1.2rem;">Tarjeta Débito</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-trophy" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Methods Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <!-- Efectivo -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--success-100); border-bottom: 1px solid var(--success-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: var(--success-green); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-money-bills" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--success-700);">Efectivo</h3>
+                                <p style="color: var(--success-600); margin: 0; font-size: 0.9rem;">Pago en efectivo (GTQ)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Transacciones Hoy</p>
+                                <strong style="font-size: 1.1rem; color: var(--success-green);">18</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Comisión</p>
+                                <strong style="font-size: 1.1rem; color: var(--success-green);">0%</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span class="status-badge status-activo">Activo</span>
+                            <button class="btn-action btn-edit" onclick="configurarMedioPago('efectivo')" title="Configurar">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Débito -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--info-100); border-bottom: 1px solid var(--info-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: var(--info-color); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-credit-card" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--info-700);">Tarjeta Débito</h3>
+                                <p style="color: var(--info-600); margin: 0; font-size: 0.9rem;">Visa, MasterCard</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Transacciones Hoy</p>
+                                <strong style="font-size: 1.1rem; color: var(--info-color);">24</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Comisión</p>
+                                <strong style="font-size: 1.1rem; color: var(--info-color);">2.5%</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span class="status-badge status-activo">Activo</span>
+                            <button class="btn-action btn-edit" onclick="configurarMedioPago('debito')" title="Configurar">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Crédito -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--warning-100); border-bottom: 1px solid var(--warning-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: var(--warning-yellow); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-credit-card" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--warning-700);">Tarjeta Crédito</h3>
+                                <p style="color: var(--warning-600); margin: 0; font-size: 0.9rem;">Visa, MasterCard, AMEX</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Transacciones Hoy</p>
+                                <strong style="font-size: 1.1rem; color: var(--warning-yellow);">15</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Comisión</p>
+                                <strong style="font-size: 1.1rem; color: var(--warning-yellow);">3.2%</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span class="status-badge status-activo">Activo</span>
+                            <button class="btn-action btn-edit" onclick="configurarMedioPago('credito')" title="Configurar">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cheque -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--gray-100); border-bottom: 1px solid var(--gray-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: var(--gray-600); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-money-check" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--gray-700);">Cheque</h3>
+                                <p style="color: var(--gray-600); margin: 0; font-size: 0.9rem;">Cheques certificados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Transacciones Hoy</p>
+                                <strong style="font-size: 1.1rem; color: var(--gray-600);">3</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Comisión</p>
+                                <strong style="font-size: 1.1rem; color: var(--gray-600);">0%</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span class="status-badge status-activo">Activo</span>
+                            <button class="btn-action btn-edit" onclick="configurarMedioPago('cheque')" title="Configurar">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transferencia Bancaria -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--primary-50); border-bottom: 1px solid var(--primary-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: var(--primary-blue); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-university" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--primary-700);">Transferencia</h3>
+                                <p style="color: var(--primary-600); margin: 0; font-size: 0.9rem;">Transferencia bancaria</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Transacciones Hoy</p>
+                                <strong style="font-size: 1.1rem; color: var(--primary-blue);">5</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Comisión</p>
+                                <strong style="font-size: 1.1rem; color: var(--primary-blue);">1.5%</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span class="status-badge status-inactivo">Inactivo</span>
+                            <button class="btn-action btn-edit" onclick="configurarMedioPago('transferencia')" title="Configurar">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mixto -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--error-100); border-bottom: 1px solid var(--error-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: var(--error-red); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-layer-group" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--error-700);">Pago Mixto</h3>
+                                <p style="color: var(--error-600); margin: 0; font-size: 0.9rem;">Múltiples métodos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Transacciones Hoy</p>
+                                <strong style="font-size: 1.1rem; color: var(--error-red);">8</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Combinaciones</p>
+                                <strong style="font-size: 1.1rem; color: var(--error-red);">12</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span class="status-badge status-activo">Activo</span>
+                            <button class="btn-action btn-edit" onclick="configurarMedioPago('mixto')" title="Configurar">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Distribución de Pagos (Últimos 7 días)</h3>
+                </div>
+                <div class="card-content">
+                    <div style="background: var(--gray-50); padding: 2rem; border-radius: 8px; text-align: center; min-height: 300px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                        <i class="fas fa-chart-pie" style="font-size: 4rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--gray-600); margin: 0;">Gráfico de distribución de medios de pago</p>
+                        <p style="color: var(--gray-500); margin: 0.5rem 0 0 0; font-size: 0.9rem;">En desarrollo - Integrar con Chart.js</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Configurar Medio de Pago -->
+    <div id="modalMedioPago" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalMedioPagoTitle">Configurar Medio de Pago</h3>
+                <button class="close-modal" onclick="cerrarModal('modalMedioPago')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formMedioPago">
+                    <input type="hidden" id="medioPagoTipo" name="tipo">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nombre del Medio de Pago</label>
+                        <input type="text" class="form-input" id="medioPagoNombre" name="nombre" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Comisión (%)</label>
+                            <input type="number" class="form-input" id="medioPagoComision" name="comision" step="0.1" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" id="medioPagoEstado" name="activo">
+                                <option value="true">Activo</option>
+                                <option value="false">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-input" id="medioPagoDescripcion" name="descripcion" rows="3" 
+                            placeholder="Descripción del medio de pago..."></textarea>
+                    </div>
+
+                    <!-- Configuraciones específicas -->
+                    <div id="configuracionesEspecificas">
+                        <!-- Se llenan dinámicamente según el tipo -->
+                    </div>
+
+                    <!-- Botones -->
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalMedioPago')">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Guardar Configuración
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de medios de pago cargada correctamente');
+            configurarEventos();
+        });
+
+        // Configurar event listeners
+        function configurarEventos() {
+            document.getElementById('formMedioPago').addEventListener('submit', guardarMedioPago);
+        }
+
+        // Abrir modal para configurar medio de pago
+        function configurarMedioPago(tipo) {
+            document.getElementById('medioPagoTipo').value = tipo;
+            
+            // Configurar según el tipo
+            const configuraciones = {
+                'efectivo': {
+                    nombre: 'Efectivo',
+                    comision: 0,
+                    descripcion: 'Pago en efectivo en moneda nacional (GTQ)'
+                },
+                'debito': {
+                    nombre: 'Tarjeta de Débito',
+                    comision: 2.5,
+                    descripcion: 'Pagos con tarjetas de débito Visa y MasterCard'
+                },
+                'credito': {
+                    nombre: 'Tarjeta de Crédito',
+                    comision: 3.2,
+                    descripcion: 'Pagos con tarjetas de crédito Visa, MasterCard y AMEX'
+                },
+                'cheque': {
+                    nombre: 'Cheque',
+                    comision: 0,
+                    descripcion: 'Cheques certificados y de gerencia'
+                },
+                'transferencia': {
+                    nombre: 'Transferencia Bancaria',
+                    comision: 1.5,
+                    descripcion: 'Transferencias bancarias directas'
+                },
+                'mixto': {
+                    nombre: 'Pago Mixto',
+                    comision: 0,
+                    descripcion: 'Combinación de múltiples métodos de pago'
+                }
+            };
+
+            const config = configuraciones[tipo] || {};
+            
+            document.getElementById('modalMedioPagoTitle').textContent = `Configurar ${config.nombre}`;
+            document.getElementById('medioPagoNombre').value = config.nombre;
+            document.getElementById('medioPagoComision').value = config.comision;
+            document.getElementById('medioPagoDescripcion').value = config.descripcion;
+            document.getElementById('medioPagoEstado').value = 'true';
+            
+            // Configuraciones específicas
+            const configuracionesDiv = document.getElementById('configuracionesEspecificas');
+            configuracionesDiv.innerHTML = '';
+            
+            if (tipo === 'credito' || tipo === 'debito') {
+                configuracionesDiv.innerHTML = `
+                    <div style="border-top: 1px solid var(--gray-200); padding-top: 1.5rem; margin-top: 1.5rem;">
+                        <h5 style="margin-bottom: 1rem; color: var(--gray-700);">Configuración de Tarjetas</h5>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Procesador de Pagos</label>
+                                <select class="form-select" name="procesador">
+                                    <option value="credomatic">Credomatic</option>
+                                    <option value="banrural">Banrural</option>
+                                    <option value="bac">BAC</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Terminal ID</label>
+                                <input type="text" class="form-input" name="terminal_id" placeholder="ID del terminal">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modalMedioPago').style.display = 'block';
+        }
+
+        // Abrir modal para nuevo medio de pago
+        function abrirModalMedioPago() {
+            document.getElementById('modalMedioPagoTitle').textContent = 'Nuevo Medio de Pago';
+            document.getElementById('formMedioPago').reset();
+            document.getElementById('configuracionesEspecificas').innerHTML = '';
+            document.getElementById('modalMedioPago').style.display = 'block';
+        }
+
+        // Guardar configuración
+        function guardarMedioPago(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const medioPagoData = {
+                tipo: formData.get('tipo'),
+                nombre: formData.get('nombre'),
+                comision: parseFloat(formData.get('comision')),
+                descripcion: formData.get('descripcion'),
+                activo: formData.get('activo') === 'true'
+            };
+
+            console.log('Configuración del medio de pago:', medioPagoData);
+            alert('Configuración guardada correctamente');
+            cerrarModal('modalMedioPago');
+        }
+
+        // Generar reporte
+        function generarReporte() {
+            alert('Generando reporte de uso de medios de pago (en desarrollo)');
+        }
+
+        // Utilidades
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

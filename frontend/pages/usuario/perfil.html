@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .profile-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .avatar-upload {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--success-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-info h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+        
+        .user-role {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-tabs {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .tab-nav {
+            display: flex;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray-600);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary-blue);
+            background: white;
+            border-bottom-color: var(--primary-blue);
+        }
+        
+        .tab-content {
+            padding: 2rem;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            background: var(--gray-50);
+        }
+        
+        .strength-meter {
+            width: 100%;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .strength-weak { background: var(--error-red); width: 25%; }
+        .strength-fair { background: var(--warning-yellow); width: 50%; }
+        .strength-good { background: var(--success-green); width: 75%; }
+        .strength-strong { background: var(--success-green); width: 100%; }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+        }
+        
+        .activity-icon.login { background: var(--success-100); color: var(--success-green); }
+        .activity-icon.update { background: var(--primary-50); color: var(--primary-blue); }
+        .activity-icon.security { background: var(--warning-100); color: var(--warning-yellow); }
+        
+        .activity-details h4 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .activity-details small {
+            color: var(--gray-500);
+        }
+        
+        .preference-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .preference-item:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gray-300);
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background: var(--primary-blue);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-nav {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <button onclick="history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+            </div>
+        </header>
+
+        <div class="profile-container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="avatar-section">
+                    <div class="avatar-large" id="userAvatar">
+                        HG
+                        <button class="avatar-upload" onclick="uploadAvatar()">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-secondary btn-sm">Cambiar Foto</button>
+                </div>
+                
+                <div class="user-info">
+                    <h2 id="displayName">Hidan García</h2>
+                    <div class="user-role">Administrador</div>
+                    <p style="margin: 0; opacity: 0.9;">Miembro desde Octubre 2024</p>
+                    <p style="margin: 0.5rem 0 0 0; opacity: 0.8;">
+                        <i class="fas fa-envelope"></i> hidan.garcia@email.com
+                    </p>
+                </div>
+            </div>
+
+            <!-- Profile Tabs -->
+            <div class="profile-tabs">
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="switchTab('personal')">
+                        <i class="fas fa-user"></i> Información Personal
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('security')">
+                        <i class="fas fa-shield-alt"></i> Seguridad
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('preferences')">
+                        <i class="fas fa-cog"></i> Preferencias
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('activity')">
+                        <i class="fas fa-history"></i> Actividad
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Información Personal -->
+                    <div class="tab-pane active" id="tab-personal">
+                        <h3>Información Personal</h3>
+                        <form id="personalForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Nombre</label>
+                                    <input type="text" class="form-input" id="firstName" value="Hidan" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Apellido</label>
+                                    <input type="text" class="form-input" id="lastName" value="García" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-input" id="email" value="hidan.garcia@email.com" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-input" id="phone" value="+502 1234-5678">
+                                </div>
+                                
+                                <div class="form-group form-group-full">
+                                    <label class="form-label">Dirección</label>
+                                    <input type="text" class="form-input" id="address" value="Ciudad de Guatemala, Guatemala">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-input" id="birthDate" value="1995-03-15">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Cargo</label>
+                                    <input type="text" class="form-input" id="position" value="Administrador del Sistema" readonly>
+                                </div>
+                                
+                                <div class="form-group form-group-full">
+                                    <label class="form-label">Biografía</label>
+                                    <textarea class="form-input" id="bio" rows="4" placeholder="Cuéntanos un poco sobre ti...">Desarrollador de software especializado en sistemas ERP para pequeñas y medianas empresas.</textarea>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 2rem;">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar Cambios
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Seguridad -->
+                    <div class="tab-pane" id="tab-security">
+                        <h3>Seguridad de la Cuenta</h3>
+                        
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <div class="card-content">
+                                <h4>Cambiar Contraseña</h4>
+                                <form id="passwordForm">
+                                    <div class="form-group">
+                                        <label class="form-label">Contraseña Actual</label>
+                                        <div class="password-input-container">
+                                            <input type="password" class="form-input" id="currentPassword" required>
+                                            <button type="button" class="password-toggle" onclick="togglePassword('currentPassword')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Nueva Contraseña</label>
+                                        <div class="password-input-container">
+                                            <input type="password" class="form-input" id="newPassword" required oninput="checkPasswordStrength()">
+                                            <button type="button" class="password-toggle" onclick="togglePassword('newPassword')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="password-strength" id="passwordStrength" style="display: none;">
+                                            <div class="strength-meter">
+                                                <div class="strength-fill" id="strengthFill"></div>
+                                            </div>
+                                            <small id="strengthText">Ingresa una contraseña</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Confirmar Nueva Contraseña</label>
+                                        <div class="password-input-container">
+                                            <input type="password" class="form-input" id="confirmPassword" required>
+                                            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-key"></i> Cambiar Contraseña
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <div class="card-content">
+                                <h4>Autenticación de Dos Factores</h4>
+                                <p class="text-muted">Agrega una capa extra de seguridad a tu cuenta.</p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                                    <div>
+                                        <strong>Estado: </strong>
+                                        <span class="badge badge-error">Deshabilitado</span>
+                                    </div>
+                                    <button class="btn btn-success" onclick="setup2FA()">
+                                        <i class="fas fa-mobile-alt"></i> Configurar 2FA
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-content">
+                                <h4>Sesiones Activas</h4>
+                                <div class="activity-item">
+                                    <div class="activity-icon login">
+                                        <i class="fas fa-desktop"></i>
+                                    </div>
+                                    <div class="activity-details" style="flex: 1;">
+                                        <h4>Windows - Chrome</h4>
+                                        <small>IP: 192.168.1.100 • Guatemala City, Guatemala</small>
+                                    </div>
+                                    <span class="badge badge-success">Actual</span>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon login">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <div class="activity-details" style="flex: 1;">
+                                        <h4>iPhone - Safari</h4>
+                                        <small>IP: 192.168.1.150 • Hace 2 horas</small>
+                                    </div>
+                                    <button class="btn btn-danger btn-sm">Cerrar Sesión</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preferencias -->
+                    <div class="tab-pane" id="tab-preferences">
+                        <h3>Preferencias de la Cuenta</h3>
+                        
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <div class="card-content">
+                                <h4>Notificaciones</h4>
+                                
+                                <div class="preference-item">
+                                    <div>
+                                        <strong>Notificaciones por Email</strong>
+                                        <p class="text-muted">Recibir notificaciones importantes por correo</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="preference-item">
+                                    <div>
+                                        <strong>Notificaciones de Marketing</strong>
+                                        <p class="text-muted">Promociones y ofertas especiales</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="preference-item">
+                                    <div>
+                                        <strong>Notificaciones Push</strong>
+                                        <p class="text-muted">Alertas en tiempo real en el navegador</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <div class="card-content">
+                                <h4>Idioma y Región</h4>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Idioma</label>
+                                        <select class="form-select">
+                                            <option value="es" selected>Español</option>
+                                            <option value="en">English</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Zona Horaria</label>
+                                        <select class="form-select">
+                                            <option value="America/Guatemala" selected>Guatemala (GMT-6)</option>
+                                            <option value="America/Mexico_City">México (GMT-6)</option>
+                                            <option value="America/New_York">Nueva York (GMT-5)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-content">
+                                <h4>Privacidad</h4>
+                                
+                                <div class="preference-item">
+                                    <div>
+                                        <strong>Perfil Público</strong>
+                                        <p class="text-muted">Permitir que otros usuarios vean tu perfil</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="preference-item">
+                                    <div>
+                                        <strong>Análisis de Uso</strong>
+                                        <p class="text-muted">Ayudar a mejorar el sistema compartiendo datos de uso</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actividad -->
+                    <div class="tab-pane" id="tab-activity">
+                        <h3>Actividad Reciente</h3>
+                        
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="activity-item">
+                                    <div class="activity-icon login">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <h4>Inicio de Sesión</h4>
+                                        <small>Hace 5 minutos • IP: 192.168.1.100</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon update">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <h4>Perfil Actualizado</h4>
+                                        <small>Hace 2 horas • Información personal modificada</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon security">
+                                        <i class="fas fa-key"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <h4>Contraseña Cambiada</h4>
+                                        <small>Hace 1 día • Contraseña actualizada exitosamente</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon login">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <h4>Acceso desde Móvil</h4>
+                                        <small>Hace 2 días • iPhone - Safari</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon update">
+                                        <i class="fas fa-cog"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <h4>Configuración Actualizada</h4>
+                                        <small>Hace 3 días • Preferencias de notificación</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let originalData = {};
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            setupFormHandlers();
+        });
+
+        // Cambiar tabs
+        function switchTab(tabName) {
+            // Remover active de todos los tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Activar tab seleccionado
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // Cargar datos del usuario
+        function loadUserData() {
+            // Simular carga de datos del usuario
+            originalData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                birthDate: document.getElementById('birthDate').value,
+                bio: document.getElementById('bio').value
+            };
+        }
+
+        // Configurar manejadores de formularios
+        function setupFormHandlers() {
+            // Formulario de información personal
+            document.getElementById('personalForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                savePersonalInfo();
+            });
+
+            // Formulario de contraseña
+            document.getElementById('passwordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                changePassword();
+            });
+        }
+
+        // Guardar información personal
+        function savePersonalInfo() {
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                birthDate: document.getElementById('birthDate').value,
+                bio: document.getElementById('bio').value
+            };
+
+            // Simular guardado
+            setTimeout(() => {
+                alert('✅ Información personal actualizada correctamente');
+                
+                // Actualizar nombre en el header
+                const displayName = `${formData.firstName} ${formData.lastName}`;
+                document.getElementById('displayName').textContent = displayName;
+                
+                // Actualizar avatar
+                const initials = formData.firstName.charAt(0) + formData.lastName.charAt(0);
+                document.getElementById('userAvatar').innerHTML = initials + '<button class="avatar-upload" onclick="uploadAvatar()"><i class="fas fa-camera"></i></button>';
+                
+                originalData = { ...formData };
+            }, 1000);
+        }
+
+        // Cancelar edición
+        function cancelEdit() {
+            // Restaurar valores originales
+            Object.keys(originalData).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = originalData[key];
+                }
+            });
+        }
+
+        // Cambiar contraseña
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validaciones
+            if (newPassword !== confirmPassword) {
+                alert('❌ Las contraseñas no coinciden');
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                alert('❌ La contraseña debe tener al menos 8 caracteres');
+                return;
+            }
+
+            // Simular cambio de contraseña
+            setTimeout(() => {
+                alert('✅ Contraseña actualizada correctamente');
+                document.getElementById('passwordForm').reset();
+                document.getElementById('passwordStrength').style.display = 'none';
+            }, 1000);
+        }
+
+        // Verificar fortaleza de contraseña
+        function checkPasswordStrength() {
+            const password = document.getElementById('newPassword').value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            const fillDiv = document.getElementById('strengthFill');
+            const textDiv = document.getElementById('strengthText');
+
+            if (!password) {
+                strengthDiv.style.display = 'none';
+                return;
+            }
+
+            strengthDiv.style.display = 'block';
+
+            let score = 0;
+            let feedback = [];
+
+            // Criterios de validación
+            if (password.length >= 8) score++;
+            else feedback.push('al menos 8 caracteres');
+
+            if (/[A-Z]/.test(password)) score++;
+            else feedback.push('una mayúscula');
+
+            if (/[a-z]/.test(password)) score++;
+            else feedback.push('una minúscula');
+
+            if (/[0-9]/.test(password)) score++;
+            else feedback.push('un número');
+
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            else feedback.push('un símbolo');
+
+            // Actualizar visual
+            fillDiv.className = 'strength-fill';
+            if (score <= 2) {
+                fillDiv.classList.add('strength-weak');
+                textDiv.textContent = `Débil. Necesitas: ${feedback.join(', ')}`;
+            } else if (score === 3) {
+                fillDiv.classList.add('strength-fair');
+                textDiv.textContent = `Regular. Mejora agregando: ${feedback.join(', ')}`;
+            } else if (score === 4) {
+                fillDiv.classList.add('strength-good');
+                textDiv.textContent = 'Buena. ¡Casi perfecta!';
+            } else {
+                fillDiv.classList.add('strength-strong');
+                textDiv.textContent = '¡Excelente! Contraseña muy segura';
+            }
+        }
+
+        // Alternar visibilidad de contraseña
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = event.target;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        // Subir avatar
+        function uploadAvatar() {
+            alert('📷 Función de subir avatar en desarrollo');
+        }
+
+        // Configurar 2FA
+        function setup2FA() {
+            alert('🔐 Configuración de autenticación de dos factores en desarrollo');
+        }
+    </script>
+</body>
+</html>

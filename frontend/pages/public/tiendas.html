@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestras Tiendas - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .tiendas-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .mapa-container {
+            height: 500px;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .tiendas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        .tienda-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-blue);
+        }
+        .tienda-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .tienda-card.mas-cercana {
+            border-left-color: var(--success-green);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff8 100%);
+        }
+        .tienda-nombre {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        .distancia {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        .distancia.cercana {
+            background: var(--success-green);
+        }
+        .ubicacion-actual {
+            background: var(--info-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .controles-mapa {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .btn-ubicacion {
+            background: var(--success-green);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-ubicacion:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        .horario-info {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .contacto-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .contacto-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        .error-message {
+            background: var(--error-red);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+        .ruta-btn {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .ruta-btn:hover {
+            background: var(--secondary-blue);
+        }
+
+        /* Modal de Permisos */
+        .modal-permisos {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .permission-info {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .info-icon {
+            font-size: 3rem;
+            color: var(--success-green);
+            flex-shrink: 0;
+        }
+
+        .info-content h4 {
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+
+        .info-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0;
+        }
+
+        .info-content li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .info-content li i {
+            color: var(--success-green);
+            width: 16px;
+        }
+
+        .privacy-note {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--info-color);
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 0 2rem 2rem 2rem;
+            justify-content: center;
+        }
+
+        .btn-permitir {
+            background: var(--success-green);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .btn-permitir:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .btn-cancelar {
+            background: var(--gray-400);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .btn-cancelar:hover {
+            background: var(--gray-500);
+        }
+
+        .manual-instructions {
+            padding: 1.5rem 2rem;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .browser-instructions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .browser-option {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--warning-yellow);
+        }
+
+        .browser-option strong {
+            color: var(--primary-blue);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .browser-option ol {
+            margin: 0.5rem 0;
+            padding-left: 1.2rem;
+        }
+
+        .browser-option li {
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        /* Notification Banner */
+        .location-banner {
+            background: linear-gradient(135deg, var(--warning-yellow), #f39c12);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .location-banner.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .permission-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .browser-instructions {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .btn-permitir, .btn-cancelar {
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <button onclick="history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <h1><i class="fas fa-map-marker-alt"></i> Nuestras Tiendas</h1>
+            </div>
+        </header>
+
+        <div class="tiendas-container">
+            <!-- Banner de Ubicación -->
+            <div id="locationBanner" class="location-banner">
+                <i class="fas fa-map-marker-alt"></i>
+                <strong>¡Encuentra tu tienda más cercana!</strong>
+                Permite el acceso a tu ubicación para una mejor experiencia.
+                <button onclick="mostrarModalPermisos()" class="btn btn-light btn-sm" style="margin-left: 1rem;">
+                    <i class="fas fa-location-arrow"></i> Activar Ubicación
+                </button>
+            </div>
+
+            <!-- Controles del Mapa -->
+            <div class="controles-mapa">
+                <button id="btnUbicacion" class="btn-ubicacion">
+                    <i class="fas fa-location-arrow"></i> Encontrar Mi Ubicación
+                </button>
+                <button id="btnMostrarTodas" class="btn btn-primary">
+                    <i class="fas fa-store"></i> Mostrar Todas las Tiendas
+                </button>
+                <button id="btnMasCercana" class="btn btn-success">
+                    <i class="fas fa-route"></i> Ir a la Más Cercana
+                </button>
+            </div>
+
+            <!-- Información de Ubicación Actual -->
+            <div id="ubicacionActual" class="ubicacion-actual" style="display: none;">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="ubicacionTexto">Ubicación detectada</span>
+            </div>
+
+            <!-- Loading -->
+            <div id="loadingSpinner" class="loading-spinner">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Detectando ubicación...</p>
+            </div>
+
+            <!-- Error -->
+            <div id="errorMessage" class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="errorTexto">Error al detectar ubicación</span>
+            </div>
+
+            <!-- Mapa -->
+            <div id="mapa" class="mapa-container"></div>
+
+            <!-- Grid de Tiendas -->
+            <div id="tiendasGrid" class="tiendas-grid">
+                <!-- Las tiendas se cargarán dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Permisos de Ubicación -->
+    <div id="modalPermisos" class="modal-permisos" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-map-marker-alt"></i> Permitir Acceso a Ubicación</h3>
+            </div>
+            <div class="modal-body">
+                <div class="permission-info">
+                    <div class="info-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <h4>¿Por qué necesitamos tu ubicación?</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Encontrar la tienda más cercana a ti</li>
+                            <li><i class="fas fa-check"></i> Calcular distancias exactas</li>
+                            <li><i class="fas fa-check"></i> Darte direcciones precisas</li>
+                            <li><i class="fas fa-check"></i> Mejorar tu experiencia de compra</li>
+                        </ul>
+                        <p class="privacy-note">
+                            <i class="fas fa-lock"></i>
+                            Tu ubicación es privada y solo se usa para mostrarte las tiendas cercanas. 
+                            No guardamos ni compartimos esta información.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="btnPermitirUbicacion" class="btn-permitir">
+                    <i class="fas fa-location-arrow"></i>
+                    Permitir Ubicación
+                </button>
+                <button id="btnCancelarPermisos" class="btn-cancelar">
+                    <i class="fas fa-times"></i>
+                    Ahora No
+                </button>
+            </div>
+            <div class="manual-instructions" id="instruccionesManual" style="display: none;">
+                <h5><i class="fas fa-info-circle"></i> ¿Cómo habilitar la ubicación?</h5>
+                <div class="browser-instructions">
+                    <div class="browser-option">
+                        <strong><i class="fab fa-chrome"></i> Chrome/Edge:</strong>
+                        <ol>
+                            <li>Haz clic en el icono <i class="fas fa-lock"></i> junto a la URL</li>
+                            <li>Selecciona "Permitir" para la ubicación</li>
+                            <li>Recarga la página</li>
+                        </ol>
+                    </div>
+                    <div class="browser-option">
+                        <strong><i class="fab fa-firefox"></i> Firefox:</strong>
+                        <ol>
+                            <li>Haz clic en el icono <i class="fas fa-shield-alt"></i> en la barra de direcciones</li>
+                            <li>Selecciona "Permitir ubicación"</li>
+                            <li>Recarga la página</li>
+                        </ol>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Recargar Página
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Datos de las tiendas según el proyecto
+        const tiendas = [
+            {
+                id: 1,
+                nombre: "Paints Pradera Chimaltenango",
+                direccion: "Centro Comercial Pradera Chimaltenango, Local 205",
+                lat: 14.6579,
+                lng: -90.8172,
+                telefono: "7849-1234",
+                email: "chimaltenango@paints.com.gt",
+                horarios: {
+                    lunes_viernes: "8:00 AM - 8:00 PM",
+                    sabado: "8:00 AM - 6:00 PM",
+                    domingo: "9:00 AM - 5:00 PM"
+                },
+                gerente: "María González",
+                servicios: ["Ventas", "Asesoría", "Mezcla de colores", "Delivery"]
+            },
+            {
+                id: 2,
+                nombre: "Paints Pradera Escuintla",
+                direccion: "Centro Comercial Pradera Escuintla, Local 118",
+                lat: 14.2833,
+                lng: -90.7833,
+                telefono: "7886-5678",
+                email: "escuintla@paints.com.gt",
+                horarios: {
+                    lunes_viernes: "8:00 AM - 8:00 PM",
+                    sabado: "8:00 AM - 6:00 PM",
+                    domingo: "9:00 AM - 5:00 PM"
+                },
+                gerente: "Carlos Méndez",
+                servicios: ["Ventas", "Asesoría", "Mezcla de colores"]
+            },
+            {
+                id: 3,
+                nombre: "Paints Las Américas Mazatenango",
+                direccion: "Centro Comercial Las Américas, Mazatenango",
+                lat: 14.5342,
+                lng: -91.5031,
+                telefono: "7872-9012",
+                email: "mazatenango@paints.com.gt",
+                horarios: {
+                    lunes_viernes: "8:00 AM - 8:00 PM",
+                    sabado: "8:00 AM - 6:00 PM",
+                    domingo: "9:00 AM - 5:00 PM"
+                },
+                gerente: "Ana Rodríguez",
+                servicios: ["Ventas", "Asesoría", "Capacitación"]
+            },
+            {
+                id: 4,
+                nombre: "Paints La Trinidad Coatepeque",
+                direccion: "Centro Comercial La Trinidad, Coatepeque",
+                lat: 14.7044,
+                lng: -92.0425,
+                telefono: "7775-3456",
+                email: "coatepeque@paints.com.gt",
+                horarios: {
+                    lunes_viernes: "8:00 AM - 8:00 PM",
+                    sabado: "8:00 AM - 6:00 PM",
+                    domingo: "9:00 AM - 5:00 PM"
+                },
+                gerente: "Roberto Silva",
+                servicios: ["Ventas", "Asesoría", "Proyectos comerciales"]
+            },
+            {
+                id: 5,
+                nombre: "Paints Pradera Xela Quetzaltenango",
+                direccion: "Centro Comercial Pradera Xela, Quetzaltenango",
+                lat: 14.8353,
+                lng: -91.5183,
+                telefono: "7761-7890",
+                email: "xela@paints.com.gt",
+                horarios: {
+                    lunes_viernes: "8:00 AM - 8:00 PM",
+                    sabado: "8:00 AM - 6:00 PM",
+                    domingo: "9:00 AM - 5:00 PM"
+                },
+                gerente: "Patricia López",
+                servicios: ["Ventas", "Asesoría", "Mezcla de colores", "Capacitación"]
+            },
+            {
+                id: 6,
+                nombre: "Paints Miraflores Ciudad de Guatemala",
+                direccion: "Centro Comercial Miraflores, Ciudad de Guatemala",
+                lat: 14.6118,
+                lng: -90.5392,
+                telefono: "2234-5678",
+                email: "miraflores@paints.com.gt",
+                horarios: {
+                    lunes_viernes: "8:00 AM - 9:00 PM",
+                    sabado: "8:00 AM - 9:00 PM",
+                    domingo: "9:00 AM - 7:00 PM"
+                },
+                gerente: "Luis Morales",
+                servicios: ["Ventas", "Asesoría", "Mezcla de colores", "Delivery", "Servicio express"]
+            }
+        ];
+
+        // Variables globales
+        let mapa;
+        let ubicacionUsuario = null;
+        let marcadorUsuario = null;
+        let marcadoresTiendas = [];
+        let permisosUbicacionSolicitados = false;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarMapa();
+            mostrarTiendas();
+            configurarEventos();
+            
+            // Mostrar banner de ubicación después de un momento
+            setTimeout(() => {
+                if (!ubicacionUsuario && !permisosUbicacionSolicitados) {
+                    mostrarBannerUbicacion();
+                }
+            }, 2000);
+        });
+
+        function inicializarMapa() {
+            // Centrar el mapa en Guatemala
+            const centroGuatemala = [14.6349, -90.5069];
+            mapa = L.map('mapa').setView(centroGuatemala, 8);
+
+            // Agregar capa de tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(mapa);
+
+            // Agregar marcadores de tiendas
+            agregarMarcadoresTiendas();
+        }
+
+        function configurarEventos() {
+            document.getElementById('btnUbicacion').addEventListener('click', mostrarModalPermisos);
+            document.getElementById('btnMostrarTodas').addEventListener('click', mostrarTodasLasTiendas);
+            document.getElementById('btnMasCercana').addEventListener('click', irATiendaMasCercana);
+            
+            // Modal events
+            document.getElementById('btnPermitirUbicacion').addEventListener('click', obtenerUbicacion);
+            document.getElementById('btnCancelarPermisos').addEventListener('click', cerrarModalPermisos);
+            
+            // Cerrar modal al hacer clic fuera
+            document.getElementById('modalPermisos').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    cerrarModalPermisos();
+                }
+            });
+        }
+
+        function mostrarBannerUbicacion() {
+            document.getElementById('locationBanner').classList.add('show');
+        }
+
+        function ocultarBannerUbicacion() {
+            document.getElementById('locationBanner').classList.remove('show');
+        }
+
+        function mostrarModalPermisos() {
+            permisosUbicacionSolicitados = true;
+            ocultarBannerUbicacion();
+            
+            if (!navigator.geolocation) {
+                mostrarError('La geolocalización no es compatible con este navegador');
+                return;
+            }
+
+            document.getElementById('modalPermisos').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalPermisos() {
+            document.getElementById('modalPermisos').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('instruccionesManual').style.display = 'none';
+        }
+
+        function obtenerUbicacion() {
+            mostrarLoading(true);
+            ocultarError();
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    mostrarLoading(false);
+                    cerrarModalPermisos();
+                    
+                    ubicacionUsuario = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    
+                    mostrarUbicacionActual();
+                    calcularDistancias();
+                    centrarMapaEnUsuario();
+                    mostrarTiendas();
+                    
+                    showToast('¡Ubicación detectada correctamente!', 'success');
+                },
+                function(error) {
+                    mostrarLoading(false);
+                    let mensaje;
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            mensaje = "Permiso de geolocalización denegado";
+                            document.getElementById('instruccionesManual').style.display = 'block';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            mensaje = "Información de ubicación no disponible";
+                            break;
+                        case error.TIMEOUT:
+                            mensaje = "Tiempo de espera agotado. Intenta de nuevo.";
+                            break;
+                        default:
+                            mensaje = "Error desconocido al obtener ubicación";
+                            break;
+                    }
+                    
+                    showToast(mensaje, 'error');
+                    
+                    // No cerrar el modal en caso de error para que el usuario pueda ver las instrucciones
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 300000
+                }
+            );
+        }
+
+        function calcularDistancia(lat1, lng1, lat2, lng2) {
+            const R = 6371; // Radio de la Tierra en km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function calcularDistancias() {
+            if (!ubicacionUsuario) return;
+
+            tiendas.forEach(tienda => {
+                tienda.distancia = calcularDistancia(
+                    ubicacionUsuario.lat,
+                    ubicacionUsuario.lng,
+                    tienda.lat,
+                    tienda.lng
+                );
+            });
+
+            // Ordenar por distancia
+            tiendas.sort((a, b) => (a.distancia || Infinity) - (b.distancia || Infinity));
+        }
+
+        function mostrarUbicacionActual() {
+            const ubicacionDiv = document.getElementById('ubicacionActual');
+            const ubicacionTexto = document.getElementById('ubicacionTexto');
+            
+            ubicacionTexto.textContent = `Tu ubicación detectada correctamente`;
+            ubicacionDiv.style.display = 'block';
+        }
+
+        function centrarMapaEnUsuario() {
+            if (!ubicacionUsuario) return;
+
+            // Remover marcador anterior si existe
+            if (marcadorUsuario) {
+                mapa.removeLayer(marcadorUsuario);
+            }
+
+            // Crear icono personalizado para usuario
+            const iconoUsuario = L.divIcon({
+                className: 'custom-div-icon',
+                html: '<div style="background-color: #e74c3c; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><i class="fas fa-user"></i></div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            // Agregar nuevo marcador
+            marcadorUsuario = L.marker([ubicacionUsuario.lat, ubicacionUsuario.lng], { icon: iconoUsuario })
+                .addTo(mapa)
+                .bindPopup('<strong><i class="fas fa-user"></i> Tu ubicación actual</strong>')
+                .openPopup();
+
+            // Centrar mapa
+            mapa.setView([ubicacionUsuario.lat, ubicacionUsuario.lng], 10);
+        }
+
+        function agregarMarcadoresTiendas() {
+            // Limpiar marcadores existentes
+            marcadoresTiendas.forEach(marcador => mapa.removeLayer(marcador));
+            marcadoresTiendas = [];
+
+            tiendas.forEach((tienda, index) => {
+                const esMasCercana = ubicacionUsuario && index === 0;
+                const colorIcono = esMasCercana ? '#27ae60' : '#2980b9';
+                
+                const icono = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color: ${colorIcono}; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><i class="fas fa-store"></i></div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+
+                const marcador = L.marker([tienda.lat, tienda.lng], { icon: icono })
+                    .addTo(mapa)
+                    .bindPopup(`
+                        <div style="max-width: 280px;">
+                            <h4>${tienda.nombre} ${esMasCercana ? '<i class="fas fa-star" style="color: gold;"></i>' : ''}</h4>
+                            <p><i class="fas fa-map-marker-alt"></i> ${tienda.direccion}</p>
+                            <p><i class="fas fa-phone"></i> ${tienda.telefono}</p>
+                            <p><i class="fas fa-user-tie"></i> Gerente: ${tienda.gerente}</p>
+                            ${tienda.distancia ? `<p><i class="fas fa-route"></i> <strong>${tienda.distancia.toFixed(2)} km</strong> de tu ubicación</p>` : ''}
+                            <button onclick="abrirRuta(${tienda.lat}, ${tienda.lng})" class="ruta-btn">
+                                <i class="fas fa-directions"></i> Cómo llegar
+                            </button>
+                        </div>
+                    `);
+
+                marcadoresTiendas.push(marcador);
+            });
+        }
+
+        function mostrarTiendas() {
+            const grid = document.getElementById('tiendasGrid');
+            
+            grid.innerHTML = tiendas.map((tienda, index) => {
+                const esMasCercana = ubicacionUsuario && index === 0;
+                return `
+                    <div class="tienda-card ${esMasCercana ? 'mas-cercana' : ''}">
+                        <div class="tienda-nombre">
+                            ${tienda.nombre}
+                            ${esMasCercana ? '<i class="fas fa-star" style="color: gold; margin-left: 0.5rem;" title="Tienda más cercana"></i>' : ''}
+                        </div>
+                        
+                        ${tienda.distancia ? 
+                            `<div class="distancia ${tienda.distancia < 10 ? 'cercana' : ''}">
+                                <i class="fas fa-route"></i> ${tienda.distancia.toFixed(2)} km
+                                ${esMasCercana ? ' - ¡Más cercana!' : ''}
+                            </div>` : ''
+                        }
+                        
+                        <div class="contacto-info">
+                            <div class="contacto-item">
+                                <i class="fas fa-map-marker-alt" style="color: var(--primary-blue);"></i>
+                                <span>${tienda.direccion}</span>
+                            </div>
+                            <div class="contacto-item">
+                                <i class="fas fa-phone" style="color: var(--success-green);"></i>
+                                <span>${tienda.telefono}</span>
+                            </div>
+                            <div class="contacto-item">
+                                <i class="fas fa-envelope" style="color: var(--info-color);"></i>
+                                <span>${tienda.email}</span>
+                            </div>
+                            <div class="contacto-item">
+                                <i class="fas fa-user-tie" style="color: var(--warning-yellow);"></i>
+                                <span>Gerente: ${tienda.gerente}</span>
+                            </div>
+                        </div>
+
+                        <div class="horario-info">
+                            <h5><i class="fas fa-clock"></i> Horarios</h5>
+                            <div>Lunes a Viernes: ${tienda.horarios.lunes_viernes}</div>
+                            <div>Sábado: ${tienda.horarios.sabado}</div>
+                            <div>Domingo: ${tienda.horarios.domingo}</div>
+                        </div>
+
+                        <div style="margin: 1rem 0;">
+                            <h5><i class="fas fa-concierge-bell"></i> Servicios</h5>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                ${tienda.servicios.map(servicio => 
+                                    `<span style="background: var(--primary-100); color: var(--primary-700); padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${servicio}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                            <button onclick="centrarEnTienda(${tienda.lat}, ${tienda.lng})" class="btn btn-primary btn-sm">
+                                <i class="fas fa-map"></i> Ver en Mapa
+                            </button>
+                            <button onclick="abrirRuta(${tienda.lat}, ${tienda.lng})" class="btn btn-success btn-sm">
+                                <i class="fas fa-directions"></i> Cómo Llegar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Actualizar marcadores en el mapa
+            agregarMarcadoresTiendas();
+        }
+
+        function mostrarTodasLasTiendas() {
+            // Ajustar vista para mostrar todas las tiendas
+            const group = new L.featureGroup(marcadoresTiendas);
+            mapa.fitBounds(group.getBounds().pad(0.1));
+        }
+
+        function irATiendaMasCercana() {
+            if (!ubicacionUsuario) {
+                showToast('Primero debe permitir el acceso a su ubicación', 'warning');
+                setTimeout(() => {
+                    mostrarModalPermisos();
+                }, 1000);
+                return;
+            }
+
+            const tiendaMasCercana = tiendas[0];
+            centrarEnTienda(tiendaMasCercana.lat, tiendaMasCercana.lng);
+            
+            // Scroll al primer card
+            const primerCard = document.querySelector('.tienda-card');
+            primerCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            showToast(`Tienda más cercana: ${tiendaMasCercana.nombre} (${tiendaMasCercana.distancia.toFixed(2)} km)`, 'success');
+        }
+
+        function centrarEnTienda(lat, lng) {
+            mapa.setView([lat, lng], 15);
+            
+            // Encontrar el marcador correspondiente y abrir popup
+            marcadoresTiendas.forEach(marcador => {
+                const marcadorLat = marcador.getLatLng().lat;
+                const marcadorLng = marcador.getLatLng().lng;
+                if (Math.abs(marcadorLat - lat) < 0.001 && Math.abs(marcadorLng - lng) < 0.001) {
+                    marcador.openPopup();
+                }
+            });
+        }
+
+        function abrirRuta(lat, lng) {
+            // Abrir en Google Maps
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            window.open(url, '_blank');
+        }
+
+        function mostrarLoading(mostrar) {
+            document.getElementById('loadingSpinner').style.display = mostrar ? 'block' : 'none';
+        }
+
+        function mostrarError(mensaje) {
+            document.getElementById('errorTexto').textContent = mensaje;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        function ocultarError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#3498db'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+                max-width: 350px;
+                font-weight: 500;
+            `;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : type === 'warning' ? 'exclamation-triangle' : 'info'}"></i> ${message}`;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Agregar estilos de animación
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

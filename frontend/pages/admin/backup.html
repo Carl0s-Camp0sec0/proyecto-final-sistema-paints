@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Backup Automático - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .backup-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .backup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .status-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--success-green);
+        }
+        .status-online {
+            border-left-color: var(--success-green);
+        }
+        .status-offline {
+            border-left-color: var(--error-red);
+        }
+        .status-warning {
+            border-left-color: var(--warning-yellow);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .stat-success { color: var(--success-green); }
+        .stat-error { color: var(--error-red); }
+        .stat-warning { color: var(--warning-yellow); }
+        .stat-primary { color: var(--primary-blue); }
+        
+        .backup-controls {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        .control-section {
+            padding: 1.5rem;
+            background: var(--gray-50);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-blue);
+        }
+        .backup-history {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        .backup-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-completado {
+            background: rgb(16 185 129 / 0.1);
+            color: var(--success-green);
+        }
+        .status-fallido {
+            background: rgb(239 68 68 / 0.1);
+            color: var(--error-red);
+        }
+        .status-en-progreso {
+            background: rgb(245 158 11 / 0.1);
+            color: var(--warning-yellow);
+        }
+        .backup-type {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .type-completo {
+            background: rgb(37 99 235 / 0.1);
+            color: var(--primary-blue);
+        }
+        .type-incremental {
+            background: rgb(16 185 129 / 0.1);
+            color: var(--success-green);
+        }
+        .type-diferencial {
+            background: rgb(245 158 11 / 0.1);
+            color: var(--warning-yellow);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--gray-200);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--success-green));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        .btn-action {
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-backup-now {
+            background: var(--success-green);
+            color: white;
+        }
+        .btn-backup-now:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 0;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px 12px 0 0;
+        }
+        .modal-body {
+            padding: 2rem;
+        }
+        .close-modal {
+            float: right;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .log-section {
+            background: var(--gray-900);
+            color: var(--gray-100);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+        .floating-backup-status {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-blue);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            box-shadow: var(--shadow-md);
+            z-index: 999;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 8px 30px rgba(37, 99, 235, 0.5); }
+            100% { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="/frontend/pages/admin/dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                </a>
+                <h1><i class="fas fa-shield-alt"></i> Sistema de Backup Automático</h1>
+            </div>
+        </header>
+
+        <div class="backup-container">
+            <!-- Header del Backup -->
+            <div class="backup-header">
+                <div>
+                    <h2>Sistema de Respaldo de Datos</h2>
+                    <p class="text-muted">Administra y monitorea los respaldos automáticos del sistema</p>
+                </div>
+                <div class="header-actions">
+                    <button id="btnBackupNow" class="btn-action btn-backup-now">
+                        <i class="fas fa-play"></i> Ejecutar Backup
+                    </button>
+                    <button id="btnConfiguracion" class="btn btn-primary">
+                        <i class="fas fa-cog"></i> Configuración
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estado del Sistema -->
+            <div id="statusSection" class="status-section status-online">
+                <div class="status-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3><i class="fas fa-heartbeat"></i> Estado del Sistema</h3>
+                        <p id="estadoTexto">Sistema operativo - Último backup: Hace 2 horas</p>
+                    </div>
+                    <div id="statusIndicator" class="status-indicator" style="font-size: 2rem; color: var(--success-green);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                
+                <!-- Barra de progreso del backup actual -->
+                <div id="backupProgress" style="display: none;">
+                    <h4>Backup en progreso...</h4>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p id="progressText">Iniciando backup...</p>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number stat-success" id="backupsExitosos">12</div>
+                    <div>Backups Exitosos</div>
+                    <small class="text-muted">Este mes</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number stat-error" id="backupsFallidos">1</div>
+                    <div>Backups Fallidos</div>
+                    <small class="text-muted">Este mes</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number stat-primary" id="espacioUtilizado">2.4 GB</div>
+                    <div>Espacio Utilizado</div>
+                    <small class="text-muted">En almacenamiento</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number stat-warning" id="proximoBackup">6h 30m</div>
+                    <div>Próximo Backup</div>
+                    <small class="text-muted">Automático</small>
+                </div>
+            </div>
+
+            <!-- Controles de Backup -->
+            <div class="backup-controls">
+                <h3><i class="fas fa-tools"></i> Controles de Backup</h3>
+                <div class="controls-grid">
+                    <div class="control-section">
+                        <h4><i class="fas fa-database"></i> Backup Manual</h4>
+                        <p>Ejecutar backup inmediato de toda la base de datos</p>
+                        <div style="margin-top: 1rem;">
+                            <select id="tipoBackup" class="form-input" style="margin-bottom: 1rem;">
+                                <option value="completo">Backup Completo</option>
+                                <option value="incremental">Backup Incremental</option>
+                                <option value="diferencial">Backup Diferencial</option>
+                            </select>
+                            <button onclick="ejecutarBackupManual()" class="btn btn-primary">
+                                <i class="fas fa-play-circle"></i> Ejecutar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h4><i class="fas fa-clock"></i> Programación</h4>
+                        <p>Configurar backups automáticos programados</p>
+                        <div style="margin-top: 1rem;">
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong>Frecuencia actual:</strong> Cada 6 horas
+                            </div>
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong>Próximo backup:</strong> <span id="proximoBackupDetalle">Hoy 18:00</span>
+                            </div>
+                            <button onclick="abrirConfiguracion()" class="btn btn-secondary">
+                                <i class="fas fa-calendar-alt"></i> Configurar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h4><i class="fas fa-history"></i> Restauración</h4>
+                        <p>Restaurar datos desde backup anterior</p>
+                        <div style="margin-top: 1rem;">
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong>Último backup válido:</strong> Hace 2 horas
+                            </div>
+                            <button onclick="abrirRestauracion()" class="btn" style="background: var(--warning-yellow); color: white;">
+                                <i class="fas fa-undo"></i> Restaurar Datos
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h4><i class="fas fa-chart-line"></i> Monitoreo</h4>
+                        <p>Ver logs y estadísticas detalladas</p>
+                        <div style="margin-top: 1rem;">
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong>Estado:</strong> <span style="color: var(--success-green);">Operativo</span>
+                            </div>
+                            <button onclick="abrirLogs()" class="btn" style="background: #0ea5e9; color: white;">
+                                <i class="fas fa-file-alt"></i> Ver Logs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de Backups -->
+            <div class="backup-history">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3><i class="fas fa-history"></i> Historial de Backups</h3>
+                    <div>
+                        <button onclick="actualizarHistorial()" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-sync"></i> Actualizar
+                        </button>
+                        <button onclick="limpiarHistorialAntiguo()" class="btn" style="background: var(--warning-yellow); color: white; font-size: 0.875rem; padding: 0.5rem 1rem;">
+                            <i class="fas fa-trash-alt"></i> Limpiar Antiguos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table" id="tablaBackups">
+                        <thead>
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th>Tamaño</th>
+                                <th>Duración</th>
+                                <th>Ubicación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="backupsTableBody">
+                            <!-- Los datos se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado flotante del backup -->
+        <div id="floatingStatus" class="floating-backup-status">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Backup en progreso...</span>
+        </div>
+    </div>
+
+    <!-- Modal de Configuración -->
+    <div id="modalConfiguracion" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración de Backups</h3>
+                <button class="close-modal" onclick="cerrarModalConfiguracion()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formConfiguracion">
+                    <div class="form-group">
+                        <label class="form-label" for="frecuenciaBackup">Frecuencia de Backup Automático</label>
+                        <select id="frecuenciaBackup" class="form-input">
+                            <option value="1">Cada hora</option>
+                            <option value="6" selected>Cada 6 horas</option>
+                            <option value="12">Cada 12 horas</option>
+                            <option value="24">Una vez al día</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="retencionDias">Retención de Backups (días)</label>
+                        <input type="number" id="retencionDias" class="form-input" value="30" min="7" max="365">
+                    </div>
+
+                    <div style="margin-top: 2rem; text-align: right;">
+                        <button type="button" onclick="cerrarModalConfiguracion()" class="btn btn-secondary">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Logs -->
+    <div id="modalLogs" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Logs del Sistema de Backup</h3>
+                <button class="close-modal" onclick="cerrarModalLogs()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="log-section" id="logsContainer">
+                    <!-- Los logs se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    <script>
+        // Estado global del sistema de backup
+        let estadoBackup = {
+            activo: false,
+            ultimoBackup: new Date(Date.now() - 2 * 60 * 60 * 1000),
+            progreso: 0,
+            configuracion: {
+                frecuencia: 6,
+                retencion: 30
+            }
+        };
+
+        // Historial de backups de ejemplo
+        const historialBackups = [
+            {
+                id: 1,
+                fecha: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                tipo: 'incremental',
+                estado: 'completado',
+                tamaño: '45.2 MB',
+                duracion: '2m 15s',
+                ubicacion: 'Local + Nube'
+            },
+            {
+                id: 2,
+                fecha: new Date(Date.now() - 8 * 60 * 60 * 1000),
+                tipo: 'incremental',
+                estado: 'completado',
+                tamaño: '32.8 MB',
+                duracion: '1m 45s',
+                ubicacion: 'Local + Nube'
+            },
+            {
+                id: 3,
+                fecha: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                tipo: 'completo',
+                estado: 'completado',
+                tamaño: '2.4 GB',
+                duracion: '18m 45s',
+                ubicacion: 'Local + Nube'
+            }
+        ];
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarEstadoSistema();
+            cargarHistorialBackups();
+            configurarEventos();
+        });
+
+        function configurarEventos() {
+            document.getElementById('btnBackupNow').addEventListener('click', ejecutarBackupManual);
+            document.getElementById('btnConfiguracion').addEventListener('click', abrirConfiguracion);
+            document.getElementById('formConfiguracion').addEventListener('submit', guardarConfiguracion);
+        }
+
+        function actualizarEstadoSistema() {
+            const estadoTexto = document.getElementById('estadoTexto');
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusSection = document.getElementById('statusSection');
+
+            const tiempoTranscurrido = Date.now() - estadoBackup.ultimoBackup;
+            const horas = Math.floor(tiempoTranscurrido / (1000 * 60 * 60));
+
+            if (estadoBackup.activo) {
+                estadoTexto.textContent = 'Backup en progreso...';
+                statusIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                statusSection.className = 'status-section status-warning';
+            } else {
+                estadoTexto.textContent = `Sistema operativo - Último backup: Hace ${horas} horas`;
+                statusIndicator.innerHTML = '<i class="fas fa-check-circle"></i>';
+                statusSection.className = 'status-section status-online';
+            }
+        }
+
+        function cargarHistorialBackups() {
+            const tbody = document.getElementById('backupsTableBody');
+            
+            tbody.innerHTML = historialBackups.map(backup => `
+                <tr>
+                    <td>
+                        <div>${formatearFecha(backup.fecha)}</div>
+                        <small style="color: var(--gray-500);">${formatearHora(backup.fecha)}</small>
+                    </td>
+                    <td>
+                        <span class="backup-type type-${backup.tipo}">
+                            ${obtenerNombreTipo(backup.tipo)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="backup-status status-${backup.estado}">
+                            ${obtenerNombreEstado(backup.estado)}
+                        </span>
+                    </td>
+                    <td><code style="background: var(--gray-100); padding: 0.25rem; border-radius: 4px;">${backup.tamaño}</code></td>
+                    <td>${backup.duracion}</td>
+                    <td>${backup.ubicacion}</td>
+                    <td>
+                        <button onclick="descargarBackup(${backup.id})" class="btn btn-sm" style="background: #0ea5e9; color: white;">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function obtenerNombreTipo(tipo) {
+            const tipos = {
+                completo: 'Completo',
+                incremental: 'Incremental',
+                diferencial: 'Diferencial'
+            };
+            return tipos[tipo] || tipo;
+        }
+
+        function obtenerNombreEstado(estado) {
+            const estados = {
+                completado: 'Completado',
+                fallido: 'Fallido',
+                'en-progreso': 'En Progreso'
+            };
+            return estados[estado] || estado;
+        }
+
+        function formatearFecha(fecha) {
+            return new Date(fecha).toLocaleDateString('es-GT');
+        }
+
+        function formatearHora(fecha) {
+            return new Date(fecha).toLocaleTimeString('es-GT', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        function ejecutarBackupManual() {
+            if (estadoBackup.activo) {
+                alert('Ya hay un backup en progreso');
+                return;
+            }
+
+            const tipo = document.getElementById('tipoBackup').value;
+            iniciarBackup(tipo);
+        }
+
+        function iniciarBackup(tipo) {
+            estadoBackup.activo = true;
+            document.getElementById('backupProgress').style.display = 'block';
+            document.getElementById('floatingStatus').style.display = 'block';
+            
+            simularProgresoBackup(tipo);
+        }
+
+        function simularProgresoBackup(tipo) {
+            const pasos = [
+                'Inicializando backup...',
+                'Preparando base de datos...',
+                'Exportando tablas principales...',
+                'Comprimiendo archivos...',
+                'Backup completado'
+            ];
+
+            let paso = 0;
+            const intervalo = setInterval(() => {
+                if (paso < pasos.length) {
+                    const progreso = ((paso + 1) / pasos.length) * 100;
+                    document.getElementById('progressFill').style.width = progreso + '%';
+                    document.getElementById('progressText').textContent = pasos[paso];
+                    paso++;
+                } else {
+                    clearInterval(intervalo);
+                    finalizarBackup(tipo);
+                }
+            }, 1500);
+        }
+
+        function finalizarBackup(tipo) {
+            estadoBackup.activo = false;
+            estadoBackup.ultimoBackup = new Date();
+            
+            document.getElementById('backupProgress').style.display = 'none';
+            document.getElementById('floatingStatus').style.display = 'none';
+            
+            // Agregar al historial
+            const nuevoBackup = {
+                id: historialBackups.length + 1,
+                fecha: new Date(),
+                tipo: tipo,
+                estado: 'completado',
+                tamaño: '52.1 MB',
+                duracion: '2m 30s',
+                ubicacion: 'Local + Nube'
+            };
+            
+            historialBackups.unshift(nuevoBackup);
+            
+            actualizarEstadoSistema();
+            cargarHistorialBackups();
+            alert(`Backup ${tipo} completado exitosamente`);
+        }
+
+        function abrirConfiguracion() {
+            document.getElementById('modalConfiguracion').style.display = 'block';
+        }
+
+        function cerrarModalConfiguracion() {
+            document.getElementById('modalConfiguracion').style.display = 'none';
+        }
+
+        function guardarConfiguracion(e) {
+            e.preventDefault();
+            
+            estadoBackup.configuracion.frecuencia = parseInt(document.getElementById('frecuenciaBackup').value);
+            estadoBackup.configuracion.retencion = parseInt(document.getElementById('retencionDias').value);
+            
+            localStorage.setItem('backupConfig', JSON.stringify(estadoBackup.configuracion));
+            
+            cerrarModalConfiguracion();
+            alert('Configuración guardada correctamente');
+        }
+
+        function abrirLogs() {
+            const modal = document.getElementById('modalLogs');
+            const container = document.getElementById('logsContainer');
+            
+            container.innerHTML = `
+                <div style="color: var(--success-green);">[12:45:32] Backup incremental completado exitosamente</div>
+                <div style="color: #0ea5e9;">[12:45:30] Verificando integridad de archivos...</div>
+                <div style="color: #0ea5e9;">[12:44:15] Comprimiendo archivos de base de datos...</div>
+                <div style="color: #0ea5e9;">[12:43:01] Exportando tabla: productos (1,234 registros)</div>
+                <div style="color: #0ea5e9;">[12:42:58] Inicializando backup incremental</div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function cerrarModalLogs() {
+            document.getElementById('modalLogs').style.display = 'none';
+        }
+
+        function descargarBackup(id) {
+            alert('Descargando backup... Esta funcionalidad estará disponible en la versión de producción.');
+        }
+
+        function actualizarHistorial() {
+            cargarHistorialBackups();
+            alert('Historial actualizado');
+        }
+
+        function limpiarHistorialAntiguo() {
+            if (confirm('¿Eliminar backups anteriores a 30 días?')) {
+                alert('Backups antiguos eliminados');
+            }
+        }
+
+        function abrirRestauracion() {
+            alert('Módulo de restauración - Esta funcionalidad estará disponible en la versión de producción.');
+        }
+
+        // Cerrar modales al hacer clic fuera
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

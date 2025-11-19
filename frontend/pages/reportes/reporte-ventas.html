@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Ventas - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar" id="userAvatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;" id="userName">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);" id="userRole">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Reportes</h2>
+                <p class="sidebar-subtitle">Análisis de ventas</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Panel de Reportes
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-ventas.html" class="active">
+                        <i class="fas fa-chart-line"></i>
+                        Reporte de Ventas
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-inventario.html">
+                        <i class="fas fa-boxes"></i>
+                        Reporte de Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-productos.html">
+                        <i class="fas fa-box"></i>
+                        Reporte de Productos
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-clientes.html">
+                        <i class="fas fa-users"></i>
+                        Reporte de Clientes
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div style="margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1>
+                            <i class="fas fa-chart-line"></i>
+                            Reporte de Ventas
+                        </h1>
+                        <p style="color: var(--gray-600);">Análisis detallado de ventas y facturación</p>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="exportarReporte()">
+                            <i class="fas fa-download"></i>
+                            Exportar PDF
+                        </button>
+                        <button class="btn btn-info" onclick="imprimirReporte()">
+                            <i class="fas fa-print"></i>
+                            Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros Específicos -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Filtros de Ventas</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Período</label>
+                            <select class="form-select" id="periodoSelect" onchange="configurarFechas()">
+                                <option value="custom">Personalizado</option>
+                                <option value="today">Hoy</option>
+                                <option value="week">Esta Semana</option>
+                                <option value="month" selected>Este Mes</option>
+                                <option value="quarter">Este Trimestre</option>
+                                <option value="year">Este Año</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Fecha Inicio</label>
+                            <input type="date" class="form-input" id="fechaInicio">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Fecha Final</label>
+                            <input type="date" class="form-input" id="fechaFinal">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Sucursal</label>
+                            <select class="form-select" id="sucursalSelect">
+                                <option value="">Todas las Sucursales</option>
+                                <option value="1">Pradera Chimaltenango</option>
+                                <option value="2">Pradera Escuintla</option>
+                                <option value="3">Las Américas Mazatenango</option>
+                                <option value="4">La Trinidad Coatepeque</option>
+                                <option value="5">Pradera Xela</option>
+                                <option value="6">Miraflores Ciudad</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Método de Pago</label>
+                            <select class="form-select" id="metodoPagoSelect">
+                                <option value="">Todos los Métodos</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="tarjeta_debito">Tarjeta Débito</option>
+                                <option value="tarjeta_credito">Tarjeta Crédito</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="transferencia">Transferencia</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Usuario</label>
+                            <select class="form-select" id="usuarioSelect">
+                                <option value="">Todos los Usuarios</option>
+                                <option value="1">Ana García (Gerente)</option>
+                                <option value="2">Carlos López (Cajero)</option>
+                                <option value="3">María Pérez (Digitador)</option>
+                                <option value="4">Luis Morales (Cajero)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="generarReporte()">
+                            <i class="fas fa-chart-line"></i>
+                            Generar Reporte
+                        </button>
+                        <button class="btn btn-secondary" onclick="limpiarFiltros()">
+                            <i class="fas fa-times"></i>
+                            Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas Resumen -->
+            <div id="estadisticasResumen" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Facturado</p>
+                                <h2 style="color: var(--success-green);" id="totalFacturado">Q 0.00</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-dollar-sign" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Número de Facturas</p>
+                                <h2 style="color: var(--primary-blue);" id="numeroFacturas">0</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-file-invoice" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Venta Promedio</p>
+                                <h2 style="color: var(--warning-yellow);" id="ventaPromedio">Q 0.00</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-chart-bar" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Facturas Anuladas</p>
+                                <h2 style="color: var(--error-red);" id="facturasAnuladas">0</h2>
+                            </div>
+                            <div style="background: var(--error-100); padding: 1rem; border-radius: 50%; color: var(--error-red);">
+                                <i class="fas fa-ban" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos y Análisis -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <!-- Ventas por Método de Pago -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Ventas por Método de Pago</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="ventasPorMetodo" style="min-height: 300px;">
+                            <canvas id="chartMetodosPago" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ventas por Día -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Tendencia de Ventas Diarias</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="ventasPorDia" style="min-height: 300px;">
+                            <canvas id="chartVentasDiarias" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Productos Vendidos -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Top 10 Productos Más Vendidos</h3>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Cantidad Vendida</th>
+                                    <th>Total Vendido</th>
+                                    <th>% del Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topProductosVendidos">
+                                <tr>
+                                    <td>1</td>
+                                    <td><strong>Pintura Látex Blanca 1 Galón</strong><br><small class="text-muted">Sherwin-Williams</small></td>
+                                    <td>Pinturas</td>
+                                    <td>145 galones</td>
+                                    <td><strong>Q 52,200</strong></td>
+                                    <td>18.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td><strong>Brocha Premium 3"</strong><br><small class="text-muted">Professional</small></td>
+                                    <td>Accesorios</td>
+                                    <td>89 unidades</td>
+                                    <td><strong>Q 8,010</strong></td>
+                                    <td>12.2%</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td><strong>Aguarrás 1/2 Galón</strong><br><small class="text-muted">Industrial</small></td>
+                                    <td>Solventes</td>
+                                    <td>76 unidades</td>
+                                    <td><strong>Q 6,840</strong></td>
+                                    <td>10.8%</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td><strong>Rodillo 9" Antichorreo</strong><br><small class="text-muted">Premium</small></td>
+                                    <td>Accesorios</td>
+                                    <td>65 unidades</td>
+                                    <td><strong>Q 4,225</strong></td>
+                                    <td>8.9%</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td><strong>Pintura Comex Vinimex</strong><br><small class="text-muted">1 Galón</small></td>
+                                    <td>Pinturas</td>
+                                    <td>52 galones</td>
+                                    <td><strong>Q 18,720</strong></td>
+                                    <td>7.5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ventas por Sucursal -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Ventas por Sucursal</h3>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Sucursal</th>
+                                    <th>Facturas</th>
+                                    <th>Total Vendido</th>
+                                    <th>Venta Promedio</th>
+                                    <th>% del Total</th>
+                                    <th>Tendencia</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ventasPorSucursal">
+                                <tr>
+                                    <td>
+                                        <strong>Pradera Chimaltenango</strong><br>
+                                        <small class="text-muted">Sucursal Principal</small>
+                                    </td>
+                                    <td>127</td>
+                                    <td><strong>Q 89,450</strong></td>
+                                    <td>Q 704</td>
+                                    <td>28.5%</td>
+                                    <td><span style="color: var(--success-green);"><i class="fas fa-arrow-up"></i> +12%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Pradera Escuintla</strong><br>
+                                        <small class="text-muted">Regional</small>
+                                    </td>
+                                    <td>98</td>
+                                    <td><strong>Q 67,890</strong></td>
+                                    <td>Q 693</td>
+                                    <td>21.7%</td>
+                                    <td><span style="color: var(--success-green);"><i class="fas fa-arrow-up"></i> +8%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Las Américas Mazatenango</strong><br>
+                                        <small class="text-muted">Regional</small>
+                                    </td>
+                                    <td>85</td>
+                                    <td><strong>Q 59,200</strong></td>
+                                    <td>Q 697</td>
+                                    <td>18.9%</td>
+                                    <td><span style="color: var(--success-green);"><i class="fas fa-arrow-up"></i> +5%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Miraflores Ciudad</strong><br>
+                                        <small class="text-muted">Capital</small>
+                                    </td>
+                                    <td>76</td>
+                                    <td><strong>Q 52,340</strong></td>
+                                    <td>Q 689</td>
+                                    <td>16.7%</td>
+                                    <td><span style="color: var(--warning-yellow);"><i class="fas fa-minus"></i> 0%</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Datos de muestra para la demostración
+        const datosVentas = {
+            totalFacturado: 313650,
+            numeroFacturas: 386,
+            ventaPromedio: 812,
+            facturasAnuladas: 12
+        };
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de reporte de ventas cargada');
+            configurarFechasPorDefecto();
+            mostrarDatosMuestra();
+            crearGraficos();
+        });
+
+        // Configurar fechas por defecto
+        function configurarFechasPorDefecto() {
+            const hoy = new Date();
+            const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            
+            document.getElementById('fechaInicio').value = primerDiaMes.toISOString().split('T')[0];
+            document.getElementById('fechaFinal').value = hoy.toISOString().split('T')[0];
+        }
+
+        // Configurar fechas según período seleccionado
+        function configurarFechas() {
+            const periodo = document.getElementById('periodoSelect').value;
+            const hoy = new Date();
+            let fechaInicio, fechaFinal;
+
+            switch (periodo) {
+                case 'today':
+                    fechaInicio = fechaFinal = hoy;
+                    break;
+                case 'week':
+                    fechaInicio = new Date(hoy);
+                    fechaInicio.setDate(hoy.getDate() - 7);
+                    fechaFinal = hoy;
+                    break;
+                case 'month':
+                    fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+                    fechaFinal = hoy;
+                    break;
+                case 'quarter':
+                    const quarter = Math.floor(hoy.getMonth() / 3);
+                    fechaInicio = new Date(hoy.getFullYear(), quarter * 3, 1);
+                    fechaFinal = hoy;
+                    break;
+                case 'year':
+                    fechaInicio = new Date(hoy.getFullYear(), 0, 1);
+                    fechaFinal = hoy;
+                    break;
+                default:
+                    return; // Personalizado - no cambiar fechas
+            }
+
+            document.getElementById('fechaInicio').value = fechaInicio.toISOString().split('T')[0];
+            document.getElementById('fechaFinal').value = fechaFinal.toISOString().split('T')[0];
+        }
+
+        // Mostrar datos de muestra
+        function mostrarDatosMuestra() {
+            document.getElementById('totalFacturado').textContent = formatearMoneda(datosVentas.totalFacturado);
+            document.getElementById('numeroFacturas').textContent = datosVentas.numeroFacturas.toLocaleString();
+            document.getElementById('ventaPromedio').textContent = formatearMoneda(datosVentas.ventaPromedio);
+            document.getElementById('facturasAnuladas').textContent = datosVentas.facturasAnuladas.toString();
+        }
+
+        // Crear gráficos (simulados con canvas básico)
+        function crearGraficos() {
+            // Gráfico de métodos de pago
+            const canvasMetodos = document.getElementById('chartMetodosPago');
+            const ctxMetodos = canvasMetodos.getContext('2d');
+            
+            // Configurar canvas
+            ctxMetodos.fillStyle = '#f8f9fa';
+            ctxMetodos.fillRect(0, 0, canvasMetodos.width, canvasMetodos.height);
+            
+            // Dibujar texto placeholder
+            ctxMetodos.fillStyle = '#6b7280';
+            ctxMetodos.font = '16px Inter';
+            ctxMetodos.textAlign = 'center';
+            ctxMetodos.fillText('Gráfico de Métodos de Pago', canvasMetodos.width/2, canvasMetodos.height/2 - 20);
+            ctxMetodos.fillText('(Se implementará con Chart.js)', canvasMetodos.width/2, canvasMetodos.height/2 + 10);
+
+            // Gráfico de ventas diarias
+            const canvasVentas = document.getElementById('chartVentasDiarias');
+            const ctxVentas = canvasVentas.getContext('2d');
+            
+            ctxVentas.fillStyle = '#f8f9fa';
+            ctxVentas.fillRect(0, 0, canvasVentas.width, canvasVentas.height);
+            
+            ctxVentas.fillStyle = '#6b7280';
+            ctxVentas.font = '16px Inter';
+            ctxVentas.textAlign = 'center';
+            ctxVentas.fillText('Tendencia de Ventas', canvasVentas.width/2, canvasVentas.height/2 - 20);
+            ctxVentas.fillText('(Se implementará con Chart.js)', canvasVentas.width/2, canvasVentas.height/2 + 10);
+        }
+
+        // Generar reporte
+        function generarReporte() {
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            const fechaFinal = document.getElementById('fechaFinal').value;
+            
+            if (!fechaInicio || !fechaFinal) {
+                alert('Por favor seleccione las fechas de inicio y final');
+                return;
+            }
+
+            if (fechaInicio > fechaFinal) {
+                alert('La fecha de inicio no puede ser mayor a la fecha final');
+                return;
+            }
+
+            // Simular carga
+            const estadisticas = document.getElementById('estadisticasResumen');
+            estadisticas.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                estadisticas.style.opacity = '1';
+                mostrarDatosMuestra();
+                alert('Reporte generado exitosamente');
+            }, 1000);
+        }
+
+        // Limpiar filtros
+        function limpiarFiltros() {
+            document.getElementById('periodoSelect').value = 'month';
+            document.getElementById('sucursalSelect').value = '';
+            document.getElementById('metodoPagoSelect').value = '';
+            document.getElementById('usuarioSelect').value = '';
+            configurarFechasPorDefecto();
+        }
+
+        // Exportar reporte
+        function exportarReporte() {
+            alert('Función de exportar PDF en desarrollo');
+        }
+
+        // Imprimir reporte
+        function imprimirReporte() {
+            window.print();
+        }
+
+        // Formatear moneda
+        function formatearMoneda(cantidad) {
+            return `Q ${cantidad.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

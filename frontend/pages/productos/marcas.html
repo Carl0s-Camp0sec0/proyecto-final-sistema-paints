@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Marcas - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar" id="userAvatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;" id="userName">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);" id="userRole">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Módulo Productos</h2>
+                <p class="sidebar-subtitle">Gestión de marcas</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/productos/productos.html">
+                        <i class="fas fa-box"></i>
+                        Productos
+                    </a></li>
+                    <li><a href="/frontend/pages/productos/categorias.html">
+                        <i class="fas fa-tags"></i>
+                        Categorías
+                    </a></li>
+                    <li><a href="/frontend/pages/productos/marcas.html" class="active">
+                        <i class="fas fa-trademark"></i>
+                        Marcas
+                    </a></li>
+                    <li><a href="/frontend/pages/productos/proveedores.html">
+                        <i class="fas fa-truck"></i>
+                        Proveedores
+                    </a></li>
+                    <li><a href="/frontend/pages/productos/inventario.html">
+                        <i class="fas fa-boxes"></i>
+                        Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/pos.html">
+                        <i class="fas fa-cash-register"></i>
+                        Punto de Venta
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div style="margin-bottom: 2rem;">
+                <h1>
+                    <i class="fas fa-trademark"></i>
+                    Gestión de Marcas
+                </h1>
+                <p style="color: var(--gray-600);">Administra las marcas de productos de tu inventario</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="abrirModalMarca()">
+                    <i class="fas fa-plus"></i>
+                    Nueva Marca
+                </button>
+                <button class="btn btn-secondary" onclick="exportarMarcas()">
+                    <i class="fas fa-download"></i>
+                    Exportar
+                </button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Marcas</p>
+                                <h2 style="color: var(--primary-blue);">15</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-trademark" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Marcas Activas</p>
+                                <h2 style="color: var(--success-green);">13</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Productos Asociados</p>
+                                <h2 style="color: var(--warning-yellow);">89</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-box" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Marca Más Popular</p>
+                                <h2 style="color: var(--info-color); font-size: 1rem;">SHERWIN-WILLIAMS</h2>
+                            </div>
+                            <div style="background: var(--info-100); padding: 1rem; border-radius: 50%; color: var(--info-700);">
+                                <i class="fas fa-star" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Card -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Filtros de Búsqueda</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Buscar Marca</label>
+                            <input type="text" class="form-input" id="buscarMarca" placeholder="Nombre de marca...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" id="filtroEstado">
+                                <option value="">Todos los estados</option>
+                                <option value="activa">Activa</option>
+                                <option value="inactiva">Inactiva</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">País de Origen</label>
+                            <select class="form-select" id="filtroPais">
+                                <option value="">Todos los países</option>
+                                <option value="Estados Unidos">Estados Unidos</option>
+                                <option value="Guatemala">Guatemala</option>
+                                <option value="México">México</option>
+                                <option value="Colombia">Colombia</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="aplicarFiltros()">
+                            <i class="fas fa-search"></i>
+                            Buscar
+                        </button>
+                        <button class="btn btn-secondary" onclick="limpiarFiltros()">
+                            <i class="fas fa-times"></i>
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marcas Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Lista de Marcas</h3>
+                    <div>
+                        <span class="text-muted">Total: 15 registros</span>
+                    </div>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <!-- Table Container -->
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Marca</th>
+                                    <th>Descripción</th>
+                                    <th>País de Origen</th>
+                                    <th>Productos</th>
+                                    <th>Ventas Mensuales</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Registro</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div style="background: #e3f2fd; color: #1565c0; width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                                                SW
+                                            </div>
+                                            <div>
+                                                <strong>SHERWIN-WILLIAMS</strong>
+                                                <br><small class="text-muted">Marca Premium</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Pinturas y revestimientos de alta calidad para uso profesional y residencial</td>
+                                    <td>
+                                        <span style="display: flex; align-items: center; gap: 0.5rem;">
+                                            🇺🇸 Estados Unidos
+                                        </span>
+                                    </td>
+                                    <td><strong>23</strong> productos</td>
+                                    <td>Q 45,600</td>
+                                    <td><span class="status-badge status-activo">Activa</span></td>
+                                    <td>15 Ene 2024</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetallesMarca(1)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editarMarca(1)" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="cambiarEstadoMarca(1, false)" title="Desactivar">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div style="background: #f3e5f5; color: #7b1fa2; width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                                                CM
+                                            </div>
+                                            <div>
+                                                <strong>COMEX</strong>
+                                                <br><small class="text-muted">Marca Regional</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Pinturas arquitectónicas y decorativas de calidad superior</td>
+                                    <td>
+                                        <span style="display: flex; align-items: center; gap: 0.5rem;">
+                                            🇲🇽 México
+                                        </span>
+                                    </td>
+                                    <td><strong>18</strong> productos</td>
+                                    <td>Q 32,400</td>
+                                    <td><span class="status-badge status-activo">Activa</span></td>
+                                    <td>20 Feb 2024</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetallesMarca(2)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editarMarca(2)" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="cambiarEstadoMarca(2, false)" title="Desactivar">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div style="background: #e8f5e8; color: #2e7d32; width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                                                BE
+                                            </div>
+                                            <div>
+                                                <strong>BENJAMIN MOORE</strong>
+                                                <br><small class="text-muted">Marca Premium</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Pinturas de lujo con tecnología avanzada y colores exclusivos</td>
+                                    <td>
+                                        <span style="display: flex; align-items: center; gap: 0.5rem;">
+                                            🇺🇸 Estados Unidos
+                                        </span>
+                                    </td>
+                                    <td><strong>15</strong> productos</td>
+                                    <td>Q 28,900</td>
+                                    <td><span class="status-badge status-activo">Activa</span></td>
+                                    <td>10 Mar 2024</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetallesMarca(3)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editarMarca(3)" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="cambiarEstadoMarca(3, false)" title="Desactivar">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div style="background: #fff3e0; color: #ef6c00; width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                                                PC
+                                            </div>
+                                            <div>
+                                                <strong>PINTUCO</strong>
+                                                <br><small class="text-muted">Marca Regional</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Pinturas colombianas de alta calidad para el mercado centroamericano</td>
+                                    <td>
+                                        <span style="display: flex; align-items: center; gap: 0.5rem;">
+                                            🇨🇴 Colombia
+                                        </span>
+                                    </td>
+                                    <td><strong>12</strong> productos</td>
+                                    <td>Q 19,500</td>
+                                    <td><span class="status-badge status-activo">Activa</span></td>
+                                    <td>25 Apr 2024</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetallesMarca(4)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editarMarca(4)" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="cambiarEstadoMarca(4, false)" title="Desactivar">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div style="background: #fce4ec; color: #c2185b; width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                                                GT
+                                            </div>
+                                            <div>
+                                                <strong>GUATEMALA PAINT</strong>
+                                                <br><small class="text-muted">Marca Local</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Pinturas nacionales con precios competitivos y calidad garantizada</td>
+                                    <td>
+                                        <span style="display: flex; align-items: center; gap: 0.5rem;">
+                                            🇬🇹 Guatemala
+                                        </span>
+                                    </td>
+                                    <td><strong>8</strong> productos</td>
+                                    <td>Q 12,300</td>
+                                    <td><span class="status-badge status-inactivo">Inactiva</span></td>
+                                    <td>05 May 2024</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verDetallesMarca(5)" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editarMarca(5)" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-view" onclick="cambiarEstadoMarca(5, true)" title="Activar">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Marca -->
+    <div id="modalMarca" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalMarcaTitle">Nueva Marca</h3>
+                <button class="close-modal" onclick="cerrarModal('modalMarca')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formMarca">
+                    <input type="hidden" id="marcaId" name="id">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Nombre de la Marca *</label>
+                            <input type="text" class="form-input" id="marcaNombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">País de Origen</label>
+                            <select class="form-select" id="marcaPais" name="pais">
+                                <option value="">Seleccionar país</option>
+                                <option value="Estados Unidos">Estados Unidos</option>
+                                <option value="Guatemala">Guatemala</option>
+                                <option value="México">México</option>
+                                <option value="Colombia">Colombia</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-input" id="marcaDescripcion" name="descripcion" rows="3" 
+                            placeholder="Descripción de la marca, características principales..."></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Sitio Web</label>
+                            <input type="url" class="form-input" id="marcaWeb" name="sitio_web" placeholder="https://ejemplo.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" id="marcaEstado" name="activa">
+                                <option value="true">Activa</option>
+                                <option value="false">Inactiva</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalMarca')">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Guardar Marca
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let editandoMarca = null;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de marcas cargada correctamente');
+            configurarEventos();
+        });
+
+        // Configurar event listeners
+        function configurarEventos() {
+            document.getElementById('formMarca').addEventListener('submit', guardarMarca);
+            document.getElementById('buscarMarca').addEventListener('input', debounce(aplicarFiltros, 500));
+            
+            const filtros = ['filtroEstado', 'filtroPais'];
+            filtros.forEach(filtro => {
+                const elemento = document.getElementById(filtro);
+                if (elemento) {
+                    elemento.addEventListener('change', aplicarFiltros);
+                }
+            });
+        }
+
+        // Abrir modal marca
+        function abrirModalMarca() {
+            editandoMarca = null;
+            document.getElementById('modalMarcaTitle').textContent = 'Nueva Marca';
+            document.getElementById('formMarca').reset();
+            document.getElementById('marcaId').value = '';
+            document.getElementById('modalMarca').style.display = 'block';
+        }
+
+        // Aplicar filtros
+        function aplicarFiltros() {
+            console.log('Aplicando filtros...');
+            alert('Filtros aplicados (simulación)');
+        }
+
+        // Limpiar filtros
+        function limpiarFiltros() {
+            document.getElementById('buscarMarca').value = '';
+            document.getElementById('filtroEstado').value = '';
+            document.getElementById('filtroPais').value = '';
+            console.log('Filtros limpiados');
+        }
+
+        // Guardar marca
+        function guardarMarca(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const marcaData = {
+                nombre: formData.get('nombre'),
+                descripcion: formData.get('descripcion'),
+                pais: formData.get('pais'),
+                sitio_web: formData.get('sitio_web'),
+                activa: formData.get('activa') === 'true'
+            };
+
+            console.log('Datos de la marca:', marcaData);
+            alert(editandoMarca ? 'Marca actualizada correctamente' : 'Marca creada correctamente');
+            cerrarModal('modalMarca');
+        }
+
+        // Ver detalles de marca
+        function verDetallesMarca(marcaId) {
+            alert(`Ver detalles de marca ${marcaId} (en desarrollo)`);
+        }
+
+        // Editar marca
+        function editarMarca(marcaId) {
+            alert(`Editando marca ${marcaId} (en desarrollo)`);
+        }
+
+        // Cambiar estado de marca
+        function cambiarEstadoMarca(marcaId, nuevoEstado) {
+            const accion = nuevoEstado ? 'activar' : 'desactivar';
+            if (confirm(`¿Está seguro de que desea ${accion} esta marca?`)) {
+                alert(`Marca ${nuevoEstado ? 'activada' : 'desactivada'} correctamente`);
+            }
+        }
+
+        // Exportar marcas
+        function exportarMarcas() {
+            alert('Función de exportar en desarrollo');
+        }
+
+        // Utilidades
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

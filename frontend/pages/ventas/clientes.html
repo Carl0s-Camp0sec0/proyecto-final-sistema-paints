@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar" id="userAvatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;" id="userName">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);" id="userRole">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Módulo Ventas</h2>
+                <p class="sidebar-subtitle">Gestión de clientes</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/pos.html">
+                        <i class="fas fa-cash-register"></i>
+                        Punto de Venta
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/facturas.html">
+                        <i class="fas fa-file-invoice"></i>
+                        Gestión Facturas
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/clientes.html" class="active">
+                        <i class="fas fa-users"></i>
+                        Clientes
+                    </a></li>
+                    <li><a href="/frontend/pages/ventas/anular-factura.html">
+                        <i class="fas fa-ban"></i>
+                        Anular Facturas
+                    </a></li>
+                    <li><a href="/frontend/pages/productos/inventario.html">
+                        <i class="fas fa-boxes"></i>
+                        Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Reportes
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div style="margin-bottom: 2rem;">
+                <h1>
+                    <i class="fas fa-users"></i>
+                    Gestión de Clientes
+                </h1>
+                <p style="color: var(--gray-600);">Administra la información de tus clientes</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="abrirModalCliente()">
+                    <i class="fas fa-plus"></i>
+                    Nuevo Cliente
+                </button>
+                <button class="btn btn-secondary" onclick="exportarClientes()">
+                    <i class="fas fa-download"></i>
+                    Exportar
+                </button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Clientes</p>
+                                <h2 style="color: var(--primary-blue);">156</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-users" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Nuevos este Mes</p>
+                                <h2 style="color: var(--success-green);">12</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-user-plus" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Clientes Activos</p>
+                                <h2 style="color: var(--success-green);">142</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Compra Promedio</p>
+                                <h2 style="color: var(--warning-yellow);">Q 850</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-chart-bar" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Card -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Filtros de Búsqueda</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Buscar Cliente</label>
+                            <input type="text" class="form-input" id="buscarCliente" placeholder="Nombre, email o teléfono...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" id="filtroEstado">
+                                <option value="">Todos los estados</option>
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tipo Cliente</label>
+                            <select class="form-select" id="filtroTipo">
+                                <option value="">Todos los tipos</option>
+                                <option value="individual">Individual</option>
+                                <option value="empresa">Empresa</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Suscrito a Promociones</label>
+                            <select class="form-select" id="filtroPromociones">
+                                <option value="">Todos</option>
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="aplicarFiltros()">
+                            <i class="fas fa-search"></i>
+                            Buscar
+                        </button>
+                        <button class="btn btn-secondary" onclick="limpiarFiltros()">
+                            <i class="fas fa-times"></i>
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clientes Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Lista de Clientes</h3>
+                    <div>
+                        <span class="text-muted">Total: 156 registros</span>
+                    </div>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <!-- Table Container -->
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Tipo</th>
+                                    <th>Compras</th>
+                                    <th>Total Gastado</th>
+                                    <th>Estado</th>
+                                    <th>Registro</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="background: var(--primary-100); color: var(--primary-700); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                                M
+                                            </div>
+                                            <div>
+                                                <strong>María García</strong>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        maria.garcia@email.com
+                                        <br><small style="color: var(--success-green);"><i class="fas fa-envelope"></i> Promociones</small>
+                                    </td>
+                                    <td>+502 1234 5678</td>
+                                    <td>
+                                        <span class="badge badge-success">Individual</span>
+                                    </td>
+                                    <td><strong>8</strong></td>
+                                    <td><strong>Q 6,500</strong></td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                    <td>15 Oct 2024</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verHistorialCliente(1)" title="Ver historial">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editarCliente(1)" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="cambiarEstadoCliente(1, false)" title="Desactivar">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="background: var(--primary-100); color: var(--primary-700); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                                P
+                                            </div>
+                                            <div>
+                                                <strong>Pinturas El Sol S.A.</strong>
+                                                <br><span class="badge" style="background: var(--info-100); color: var(--info-700);">Empresa</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        ventas@pinturaselsol.com
+                                        <br><small style="color: var(--success-green);"><i class="fas fa-envelope"></i> Promociones</small>
+                                    </td>
+                                    <td>+502 2345 6789</td>
+                                    <td>
+                                        <span class="badge badge-warning">Empresa</span>
+                                    </td>
+                                    <td><strong>15</strong></td>
+                                    <td><strong>Q 25,400</strong></td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                    <td>02 Sep 2024</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verHistorialCliente(2)" title="Ver historial">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editarCliente(2)" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="cambiarEstadoCliente(2, false)" title="Desactivar">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="background: var(--primary-100); color: var(--primary-700); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                                J
+                                            </div>
+                                            <div>
+                                                <strong>Juan Pérez</strong>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>juan.perez@email.com</td>
+                                    <td>+502 3456 7890</td>
+                                    <td>
+                                        <span class="badge badge-success">Individual</span>
+                                    </td>
+                                    <td><strong>3</strong></td>
+                                    <td><strong>Q 1,200</strong></td>
+                                    <td><span class="status-badge status-activo">Activo</span></td>
+                                    <td>20 Oct 2024</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-action btn-view" onclick="verHistorialCliente(3)" title="Ver historial">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editarCliente(3)" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="cambiarEstadoCliente(3, false)" title="Desactivar">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Cliente -->
+    <div id="modalCliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalClienteTitle">Nuevo Cliente</h3>
+                <button class="close-modal" onclick="cerrarModal('modalCliente')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCliente">
+                    <input type="hidden" id="clienteId" name="id">
+                    
+                    <!-- Información Básica -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--gray-700);">
+                            <i class="fas fa-user"></i>
+                            Información Personal
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Nombre Completo *</label>
+                                <input type="text" class="form-input" id="clienteNombre" name="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Cliente</label>
+                                <select class="form-select" id="clienteTipo" name="tipo">
+                                    <option value="individual">Individual</option>
+                                    <option value="empresa">Empresa</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-input" id="clienteEmail" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" class="form-input" id="clienteTelefono" name="telefono">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Dirección</label>
+                            <textarea class="form-input" id="clienteDireccion" name="direccion" rows="3" placeholder="Dirección completa del cliente"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Información Fiscal (para empresas) -->
+                    <div id="infoFiscal" style="margin-bottom: 2rem; display: none;">
+                        <h4 style="margin-bottom: 1rem; color: var(--gray-700);">
+                            <i class="fas fa-building"></i>
+                            Información Fiscal
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">NIT</label>
+                                <input type="text" class="form-input" id="clienteNit" name="nit">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nombre Comercial</label>
+                                <input type="text" class="form-input" id="clienteNombreComercial" name="nombre_comercial">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Dirección Fiscal</label>
+                            <textarea class="form-input" id="clienteDireccionFiscal" name="direccion_fiscal" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Preferencias -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--gray-700);">
+                            <i class="fas fa-cog"></i>
+                            Preferencias
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="clientePromociones" name="suscrito_promociones">
+                                    <span>Recibir promociones por email</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" id="clienteEstado" name="activo">
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalCliente')">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Guardar Cliente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let editandoCliente = null;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de clientes cargada correctamente');
+            configurarEventos();
+        });
+
+        // Configurar event listeners
+        function configurarEventos() {
+            document.getElementById('formCliente').addEventListener('submit', guardarCliente);
+            
+            document.getElementById('clienteTipo').addEventListener('change', function() {
+                const infoFiscal = document.getElementById('infoFiscal');
+                infoFiscal.style.display = this.value === 'empresa' ? 'block' : 'none';
+            });
+
+            document.getElementById('buscarCliente').addEventListener('input', debounce(aplicarFiltros, 500));
+            
+            const filtros = ['filtroEstado', 'filtroTipo', 'filtroPromociones'];
+            filtros.forEach(filtro => {
+                const elemento = document.getElementById(filtro);
+                if (elemento) {
+                    elemento.addEventListener('change', aplicarFiltros);
+                }
+            });
+        }
+
+        // Abrir modal cliente
+        function abrirModalCliente() {
+            editandoCliente = null;
+            document.getElementById('modalClienteTitle').textContent = 'Nuevo Cliente';
+            document.getElementById('formCliente').reset();
+            document.getElementById('clienteId').value = '';
+            document.getElementById('infoFiscal').style.display = 'none';
+            document.getElementById('modalCliente').style.display = 'block';
+        }
+
+        // Aplicar filtros
+        function aplicarFiltros() {
+            console.log('Aplicando filtros...');
+            alert('Filtros aplicados (simulación)');
+        }
+
+        // Limpiar filtros
+        function limpiarFiltros() {
+            document.getElementById('buscarCliente').value = '';
+            document.getElementById('filtroEstado').value = '';
+            document.getElementById('filtroTipo').value = '';
+            document.getElementById('filtroPromociones').value = '';
+            console.log('Filtros limpiados');
+        }
+
+        // Guardar cliente
+        function guardarCliente(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const clienteData = {
+                nombre: formData.get('nombre'),
+                tipo: formData.get('tipo'),
+                email: formData.get('email'),
+                telefono: formData.get('telefono'),
+                direccion: formData.get('direccion'),
+                nit: formData.get('nit'),
+                nombre_comercial: formData.get('nombre_comercial'),
+                direccion_fiscal: formData.get('direccion_fiscal'),
+                suscrito_promociones: formData.has('suscrito_promociones'),
+                activo: formData.get('activo') === 'true'
+            };
+
+            console.log('Datos del cliente:', clienteData);
+            alert(editandoCliente ? 'Cliente actualizado correctamente' : 'Cliente creado correctamente');
+            cerrarModal('modalCliente');
+        }
+
+        // Funciones adicionales
+        function editarCliente(clienteId) {
+            alert(`Editando cliente ${clienteId} (en desarrollo)`);
+        }
+
+        function verHistorialCliente(clienteId) {
+            alert(`Ver historial del cliente ${clienteId} (en desarrollo)`);
+        }
+
+        function cambiarEstadoCliente(clienteId, nuevoEstado) {
+            const accion = nuevoEstado ? 'activar' : 'desactivar';
+            if (confirm(`¿Está seguro de que desea ${accion} este cliente?`)) {
+                alert(`Cliente ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`);
+            }
+        }
+
+        function exportarClientes() {
+            alert('Función de exportar en desarrollo');
+        }
+
+        // Utilidades
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

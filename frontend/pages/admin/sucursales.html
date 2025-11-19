@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Sucursales - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar" id="userAvatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;" id="userName">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);" id="userRole">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Administración</h2>
+                <p class="sidebar-subtitle">Gestión de sucursales</p>
+            </div>
+            
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/admin/usuarios.html">
+                        <i class="fas fa-users"></i>
+                        Usuarios
+                    </a></li>
+                    <li><a href="/frontend/pages/admin/sucursales.html" class="active">
+                        <i class="fas fa-store"></i>
+                        Sucursales
+                    </a></li>
+                    <li><a href="/frontend/pages/admin/configuracion.html">
+                        <i class="fas fa-cog"></i>
+                        Configuración
+                    </a></li>
+                    <li><a href="/frontend/pages/admin/backup.html">
+                        <i class="fas fa-database"></i>
+                        Backup
+                    </a></li>
+                    <li><a href="/frontend/pages/admin/auditoria.html">
+                        <i class="fas fa-clipboard-check"></i>
+                        Auditoría
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Reportes
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div style="margin-bottom: 2rem;">
+                <h1>
+                    <i class="fas fa-store"></i>
+                    Gestión de Sucursales
+                </h1>
+                <p style="color: var(--gray-600);">Administra todas las sucursales de la cadena</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="abrirModalSucursal()">
+                    <i class="fas fa-plus"></i>
+                    Nueva Sucursal
+                </button>
+                <button class="btn btn-secondary" onclick="sincronizarInventarios()">
+                    <i class="fas fa-sync"></i>
+                    Sincronizar Inventarios
+                </button>
+                <button class="btn btn-info" onclick="verMapaSucursales()">
+                    <i class="fas fa-map"></i>
+                    Ver en Mapa
+                </button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Sucursales</p>
+                                <h2 style="color: var(--primary-blue);">6</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-store" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Sucursales Activas</p>
+                                <h2 style="color: var(--success-green);">6</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Ventas Totales (Hoy)</p>
+                                <h2 style="color: var(--warning-yellow);">Q 34,250</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-dollar-sign" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Empleados Totales</p>
+                                <h2 style="color: var(--info-color);">24</h2>
+                            </div>
+                            <div style="background: var(--info-100); padding: 1rem; border-radius: 50%; color: var(--info-700);">
+                                <i class="fas fa-users" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sucursales Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <!-- Sucursal 1 -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--success-100); border-bottom: 1px solid var(--success-200);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="background: var(--success-green); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-store" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color: var(--success-700); margin-bottom: 0.25rem;">Pradera Chimaltenango</h3>
+                                    <p style="color: var(--success-600); margin: 0; font-size: 0.9rem;">Sucursal Principal</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-activo">Activa</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="margin-bottom: 1rem;">
+                            <p style="margin: 0.25rem 0;"><strong>Dirección:</strong> CC Pradera Chimaltenango, Chimaltenango</p>
+                            <p style="margin: 0.25rem 0;"><strong>Teléfono:</strong> +502 7849-1200</p>
+                            <p style="margin: 0.25rem 0;"><strong>Gerente:</strong> Ana García</p>
+                            <p style="margin: 0.25rem 0;"><strong>Horario:</strong> Lun-Dom 8:00-20:00</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Ventas Hoy</p>
+                                <strong style="color: var(--success-green);">Q 8,450</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Empleados</p>
+                                <strong style="color: var(--info-color);">6</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-sm btn-primary" onclick="verDetallesSucursal(1)">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="editarSucursal(1)">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="verInventarioSucursal(1)">
+                                <i class="fas fa-boxes"></i> Inventario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sucursal 2 -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--primary-50); border-bottom: 1px solid var(--primary-200);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="background: var(--primary-blue); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-store" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color: var(--primary-700); margin-bottom: 0.25rem;">Pradera Escuintla</h3>
+                                    <p style="color: var(--primary-600); margin: 0; font-size: 0.9rem;">Sucursal Regional</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-activo">Activa</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="margin-bottom: 1rem;">
+                            <p style="margin: 0.25rem 0;"><strong>Dirección:</strong> CC Pradera Escuintla, Escuintla</p>
+                            <p style="margin: 0.25rem 0;"><strong>Teléfono:</strong> +502 7888-3400</p>
+                            <p style="margin: 0.25rem 0;"><strong>Gerente:</strong> Carlos Mendoza</p>
+                            <p style="margin: 0.25rem 0;"><strong>Horario:</strong> Lun-Dom 8:00-20:00</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Ventas Hoy</p>
+                                <strong style="color: var(--success-green);">Q 6,780</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Empleados</p>
+                                <strong style="color: var(--info-color);">4</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-sm btn-primary" onclick="verDetallesSucursal(2)">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="editarSucursal(2)">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="verInventarioSucursal(2)">
+                                <i class="fas fa-boxes"></i> Inventario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sucursal 3 -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--warning-100); border-bottom: 1px solid var(--warning-200);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="background: var(--warning-yellow); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-store" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color: var(--warning-700); margin-bottom: 0.25rem;">Las Américas Mazatenango</h3>
+                                    <p style="color: var(--warning-600); margin: 0; font-size: 0.9rem;">Sucursal Regional</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-activo">Activa</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="margin-bottom: 1rem;">
+                            <p style="margin: 0.25rem 0;"><strong>Dirección:</strong> CC Las Américas, Mazatenango</p>
+                            <p style="margin: 0.25rem 0;"><strong>Teléfono:</strong> +502 7872-5600</p>
+                            <p style="margin: 0.25rem 0;"><strong>Gerente:</strong> María Rodríguez</p>
+                            <p style="margin: 0.25rem 0;"><strong>Horario:</strong> Lun-Dom 8:00-20:00</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Ventas Hoy</p>
+                                <strong style="color: var(--success-green);">Q 5,920</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Empleados</p>
+                                <strong style="color: var(--info-color);">4</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-sm btn-primary" onclick="verDetallesSucursal(3)">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="editarSucursal(3)">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="verInventarioSucursal(3)">
+                                <i class="fas fa-boxes"></i> Inventario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sucursal 4 -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--info-100); border-bottom: 1px solid var(--info-200);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="background: var(--info-color); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-store" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color: var(--info-700); margin-bottom: 0.25rem;">La Trinidad Coatepeque</h3>
+                                    <p style="color: var(--info-600); margin: 0; font-size: 0.9rem;">Sucursal Regional</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-activo">Activa</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="margin-bottom: 1rem;">
+                            <p style="margin: 0.25rem 0;"><strong>Dirección:</strong> CC La Trinidad, Coatepeque</p>
+                            <p style="margin: 0.25rem 0;"><strong>Teléfono:</strong> +502 7775-8900</p>
+                            <p style="margin: 0.25rem 0;"><strong>Gerente:</strong> Luis Morales</p>
+                            <p style="margin: 0.25rem 0;"><strong>Horario:</strong> Lun-Dom 8:00-20:00</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Ventas Hoy</p>
+                                <strong style="color: var(--success-green);">Q 4,650</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Empleados</p>
+                                <strong style="color: var(--info-color);">3</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-sm btn-primary" onclick="verDetallesSucursal(4)">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="editarSucursal(4)">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="verInventarioSucursal(4)">
+                                <i class="fas fa-boxes"></i> Inventario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sucursal 5 -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--error-100); border-bottom: 1px solid var(--error-200);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="background: var(--error-red); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-store" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color: var(--error-700); margin-bottom: 0.25rem;">Pradera Xela</h3>
+                                    <p style="color: var(--error-600); margin: 0; font-size: 0.9rem;">Sucursal Regional</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-activo">Activa</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="margin-bottom: 1rem;">
+                            <p style="margin: 0.25rem 0;"><strong>Dirección:</strong> CC Pradera Xela, Quetzaltenango</p>
+                            <p style="margin: 0.25rem 0;"><strong>Teléfono:</strong> +502 7761-2300</p>
+                            <p style="margin: 0.25rem 0;"><strong>Gerente:</strong> Pedro Castillo</p>
+                            <p style="margin: 0.25rem 0;"><strong>Horario:</strong> Lun-Dom 8:00-20:00</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Ventas Hoy</p>
+                                <strong style="color: var(--success-green);">Q 4,200</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Empleados</p>
+                                <strong style="color: var(--info-color);">3</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-sm btn-primary" onclick="verDetallesSucursal(5)">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="editarSucursal(5)">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="verInventarioSucursal(5)">
+                                <i class="fas fa-boxes"></i> Inventario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sucursal 6 -->
+                <div class="card">
+                    <div class="card-header" style="background: var(--gray-100); border-bottom: 1px solid var(--gray-200);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="background: var(--gray-600); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-store" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color: var(--gray-700); margin-bottom: 0.25rem;">Miraflores Ciudad</h3>
+                                    <p style="color: var(--gray-600); margin: 0; font-size: 0.9rem;">Sucursal Capital</p>
+                                </div>
+                            </div>
+                            <span class="status-badge status-activo">Activa</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="margin-bottom: 1rem;">
+                            <p style="margin: 0.25rem 0;"><strong>Dirección:</strong> CC Miraflores, Ciudad de Guatemala</p>
+                            <p style="margin: 0.25rem 0;"><strong>Teléfono:</strong> +502 2385-7400</p>
+                            <p style="margin: 0.25rem 0;"><strong>Gerente:</strong> Sandra López</p>
+                            <p style="margin: 0.25rem 0;"><strong>Horario:</strong> Lun-Dom 9:00-21:00</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Ventas Hoy</p>
+                                <strong style="color: var(--success-green);">Q 4,250</strong>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                <p class="text-muted" style="margin: 0; font-size: 0.8rem;">Empleados</p>
+                                <strong style="color: var(--info-color);">4</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-sm btn-primary" onclick="verDetallesSucursal(6)">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="editarSucursal(6)">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="verInventarioSucursal(6)">
+                                <i class="fas fa-boxes"></i> Inventario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Nueva/Editar Sucursal -->
+    <div id="modalSucursal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 id="modalSucursalTitle">Nueva Sucursal</h3>
+                <button class="close-modal" onclick="cerrarModal('modalSucursal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formSucursal">
+                    <input type="hidden" id="sucursalId" name="id">
+                    
+                    <!-- Información Básica -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--gray-700);">
+                            <i class="fas fa-store"></i>
+                            Información Básica
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Nombre de la Sucursal *</label>
+                                <input type="text" class="form-input" id="sucursalNombre" name="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Código de Sucursal</label>
+                                <input type="text" class="form-input" id="sucursalCodigo" name="codigo" placeholder="SUC001">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-input" id="sucursalDescripcion" name="descripcion" rows="2" 
+                                placeholder="Descripción de la sucursal..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Información de Contacto -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--gray-700);">
+                            <i class="fas fa-phone"></i>
+                            Información de Contacto
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Dirección *</label>
+                            <textarea class="form-input" id="sucursalDireccion" name="direccion" rows="2" required
+                                placeholder="Dirección completa de la sucursal"></textarea>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Teléfono *</label>
+                                <input type="tel" class="form-input" id="sucursalTelefono" name="telefono" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" id="sucursalEmail" name="email">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Horario de Apertura</label>
+                                <input type="time" class="form-input" id="sucursalApertura" name="horario_apertura" value="08:00">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Horario de Cierre</label>
+                                <input type="time" class="form-input" id="sucursalCierre" name="horario_cierre" value="20:00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gestión -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--gray-700);">
+                            <i class="fas fa-user-tie"></i>
+                            Gestión y Personal
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Gerente</label>
+                                <select class="form-select" id="sucursalGerente" name="gerente_id">
+                                    <option value="">Seleccionar gerente</option>
+                                    <option value="1">Ana García</option>
+                                    <option value="2">Carlos Mendoza</option>
+                                    <option value="3">María Rodríguez</option>
+                                    <option value="4">Luis Morales</option>
+                                    <option value="5">Pedro Castillo</option>
+                                    <option value="6">Sandra López</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" id="sucursalEstado" name="activa">
+                                    <option value="true">Activa</option>
+                                    <option value="false">Inactiva</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Número de Empleados</label>
+                                <input type="number" class="form-input" id="sucursalEmpleados" name="numero_empleados" min="1" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Sucursal</label>
+                                <select class="form-select" id="sucursalTipo" name="tipo">
+                                    <option value="principal">Principal</option>
+                                    <option value="regional">Regional</option>
+                                    <option value="capital">Capital</option>
+                                    <option value="express">Express</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalSucursal')">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Guardar Sucursal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        let editandoSucursal = null;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de sucursales cargada correctamente');
+            configurarEventos();
+        });
+
+        // Configurar event listeners
+        function configurarEventos() {
+            document.getElementById('formSucursal').addEventListener('submit', guardarSucursal);
+        }
+
+        // Abrir modal sucursal
+        function abrirModalSucursal() {
+            editandoSucursal = null;
+            document.getElementById('modalSucursalTitle').textContent = 'Nueva Sucursal';
+            document.getElementById('formSucursal').reset();
+            document.getElementById('sucursalId').value = '';
+            document.getElementById('modalSucursal').style.display = 'block';
+        }
+
+        // Ver detalles de sucursal
+        function verDetallesSucursal(sucursalId) {
+            alert(`Ver detalles de sucursal ${sucursalId} (en desarrollo)`);
+        }
+
+        // Editar sucursal
+        function editarSucursal(sucursalId) {
+            alert(`Editando sucursal ${sucursalId} (en desarrollo)`);
+        }
+
+        // Ver inventario de sucursal
+        function verInventarioSucursal(sucursalId) {
+            window.location.href = `/frontend/pages/productos/inventario.html?sucursal=${sucursalId}`;
+        }
+
+        // Sincronizar inventarios
+        function sincronizarInventarios() {
+            if (confirm('¿Está seguro de que desea sincronizar los inventarios de todas las sucursales?')) {
+                alert('Sincronización de inventarios iniciada (simulación)');
+            }
+        }
+
+        // Ver mapa de sucursales
+        function verMapaSucursales() {
+            window.location.href = '/frontend/pages/public/tiendas.html';
+        }
+
+        // Guardar sucursal
+        function guardarSucursal(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const sucursalData = {
+                nombre: formData.get('nombre'),
+                codigo: formData.get('codigo'),
+                descripcion: formData.get('descripcion'),
+                direccion: formData.get('direccion'),
+                telefono: formData.get('telefono'),
+                email: formData.get('email'),
+                horario_apertura: formData.get('horario_apertura'),
+                horario_cierre: formData.get('horario_cierre'),
+                gerente_id: formData.get('gerente_id'),
+                numero_empleados: parseInt(formData.get('numero_empleados')),
+                tipo: formData.get('tipo'),
+                activa: formData.get('activa') === 'true'
+            };
+
+            console.log('Datos de la sucursal:', sucursalData);
+            alert(editandoSucursal ? 'Sucursal actualizada correctamente' : 'Sucursal creada correctamente');
+            cerrarModal('modalSucursal');
+        }
+
+        // Utilidades
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        }
+    </script>
+
+    <!-- Estilos adicionales -->
+    <style>
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+    </style>
+</body>
+</html>
