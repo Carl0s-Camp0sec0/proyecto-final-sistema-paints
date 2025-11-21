@@ -88,7 +88,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <p class="text-muted">Total Productos</p>
-                                <h2 style="color: var(--primary-blue);">234</h2>
+                                <h2 id="estadisticaTotalProductos" style="color: var(--primary-blue);">0</h2>
                             </div>
                             <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
                                 <i class="fas fa-box" style="font-size: 1.5rem;"></i>
@@ -102,7 +102,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <p class="text-muted">Valor Total</p>
-                                <h2 style="color: var(--success-green);">Q 456,750</h2>
+                                <h2 id="estadisticaValorTotal" style="color: var(--success-green);">Q 0.00</h2>
                             </div>
                             <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
                                 <i class="fas fa-dollar-sign" style="font-size: 1.5rem;"></i>
@@ -116,7 +116,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <p class="text-muted">Stock Bajo</p>
-                                <h2 style="color: var(--warning-yellow);">18</h2>
+                                <h2 id="estadisticaStockBajo" style="color: var(--warning-yellow);">0</h2>
                             </div>
                             <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
                                 <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem;"></i>
@@ -130,7 +130,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <p class="text-muted">Agotados</p>
-                                <h2 style="color: var(--error-red);">3</h2>
+                                <h2 id="estadisticaAgotados" style="color: var(--error-red);">0</h2>
                             </div>
                             <div style="background: var(--error-100); padding: 1rem; border-radius: 50%; color: var(--error-red);">
                                 <i class="fas fa-times-circle" style="font-size: 1.5rem;"></i>
@@ -149,53 +149,42 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                         <div class="form-group">
                             <label class="form-label">Sucursal</label>
-                            <select class="form-select">
-                                <option>Todas las Sucursales</option>
-                                <option>Pradera Chimaltenango</option>
-                                <option>Pradera Escuintla</option>
-                                <option>Las Américas Mazatenango</option>
+                            <select id="selectSucursal" class="form-select">
+                                <option value="">Todas las Sucursales</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label">Categoría</label>
-                            <select class="form-select">
-                                <option>Todas las Categorías</option>
-                                <option>Pinturas</option>
-                                <option>Accesorios</option>
-                                <option>Solventes</option>
+                            <select id="selectCategoria" class="form-select">
+                                <option value="">Todas las Categorías</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Estado de Stock</label>
-                            <select class="form-select">
-                                <option>Todos los Estados</option>
-                                <option>Normal</option>
-                                <option>Stock Bajo</option>
-                                <option>Agotado</option>
+                            <select id="selectEstadoStock" class="form-select">
+                                <option value="">Todos los Estados</option>
+                                <option value="normal">Normal</option>
+                                <option value="bajo">Stock Bajo</option>
+                                <option value="agotado">Agotado</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Marca</label>
-                            <select class="form-select">
-                                <option>Todas las Marcas</option>
-                                <option>Sherwin-Williams</option>
-                                <option>Comex</option>
-                                <option>Benjamin Moore</option>
-                            </select>
+                            <label class="form-label">Búsqueda</label>
+                            <input id="inputBuscar" type="text" class="form-input" placeholder="Buscar producto...">
                         </div>
                     </div>
-                    
+
                     <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-                        <button class="btn btn-primary">
+                        <button id="btnAplicarFiltros" class="btn btn-primary">
                             <i class="fas fa-filter"></i>
                             Aplicar Filtros
                         </button>
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-download"></i>
-                            Exportar Excel
+                        <button id="btnExportarPDF" class="btn btn-secondary">
+                            <i class="fas fa-file-pdf"></i>
+                            Exportar PDF
                         </button>
                     </div>
                 </div>
@@ -219,34 +208,13 @@
                                     <th>Stock Actual</th>
                                     <th>Stock Mínimo</th>
                                     <th>Estado</th>
-                                    <th>Acción</th>
+                                    <th>Prioridad</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tablaAlertasCriticas">
                                 <tr>
-                                    <td><strong>Pintura Látex Blanca 1 Galón</strong></td>
-                                    <td>Pradera Chimaltenango</td>
-                                    <td style="color: var(--error-red); font-weight: bold;">0</td>
-                                    <td>10</td>
-                                    <td><span class="status-badge status-inactivo">Agotado</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary">
-                                            <i class="fas fa-plus"></i>
-                                            Reabastecer
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Brocha Premium 3"</strong></td>
-                                    <td>Pradera Escuintla</td>
-                                    <td style="color: var(--warning-yellow); font-weight: bold;">2</td>
-                                    <td>15</td>
-                                    <td><span class="status-badge status-pendiente">Crítico</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                            Urgente
-                                        </button>
+                                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                                        <i class="fas fa-spinner fa-spin"></i> Cargando alertas críticas...
                                     </td>
                                 </tr>
                             </tbody>
@@ -267,81 +235,18 @@
                                 <tr>
                                     <th>Producto</th>
                                     <th>Categoría</th>
+                                    <th>Sucursal</th>
                                     <th>Stock Actual</th>
                                     <th>Stock Mínimo</th>
                                     <th>Precio Unitario</th>
                                     <th>Valor Total</th>
                                     <th>Estado</th>
-                                    <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tablaInventarioDetallado">
                                 <tr>
-                                    <td>
-                                        <strong>Pintura Comex Vinimex 1 Galón</strong><br>
-                                        <small class="text-muted">Sherwin-Williams</small>
-                                    </td>
-                                    <td>Pinturas</td>
-                                    <td><strong>45</strong></td>
-                                    <td>10</td>
-                                    <td>Q 360.00</td>
-                                    <td><strong>Q 16,200.00</strong></td>
-                                    <td><span class="status-badge status-activo">Normal</span></td>
-                                    <td>
-                                        <button class="btn-action btn-view" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Benjamin Moore Eco Advance</strong><br>
-                                        <small class="text-muted">Benjamin Moore</small>
-                                    </td>
-                                    <td>Pinturas</td>
-                                    <td><strong>28</strong></td>
-                                    <td>8</td>
-                                    <td>Q 712.00</td>
-                                    <td><strong>Q 19,936.00</strong></td>
-                                    <td><span class="status-badge status-activo">Normal</span></td>
-                                    <td>
-                                        <button class="btn-action btn-view" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Rodillo Antichorreo 9"</strong><br>
-                                        <small class="text-muted">Professional</small>
-                                    </td>
-                                    <td>Accesorios</td>
-                                    <td><strong>67</strong></td>
-                                    <td>20</td>
-                                    <td>Q 53.00</td>
-                                    <td><strong>Q 3,551.00</strong></td>
-                                    <td><span class="status-badge status-activo">Normal</span></td>
-                                    <td>
-                                        <button class="btn-action btn-view" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Espátula Ancha 6"</strong><br>
-                                        <small class="text-muted">ProTools</small>
-                                    </td>
-                                    <td>Herramientas</td>
-                                    <td style="color: var(--warning-yellow); font-weight: bold;">3</td>
-                                    <td>15</td>
-                                    <td>Q 45.00</td>
-                                    <td><strong>Q 135.00</strong></td>
-                                    <td><span class="status-badge status-pendiente">Bajo</span></td>
-                                    <td>
-                                        <button class="btn-action btn-view" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
+                                    <td colspan="8" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                                        <i class="fas fa-spinner fa-spin"></i> Cargando inventario...
                                     </td>
                                 </tr>
                             </tbody>
@@ -359,6 +264,20 @@
         </div>
     </footer>
 
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <!-- jsPDF y jsPDF-AutoTable para exportar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Sistema - Scripts del módulo -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+
+    <!-- Script específico de la página -->
     <script src="/frontend/assets/js/pages/reporte-inventario.js"></script>
 </body>
 </html>
