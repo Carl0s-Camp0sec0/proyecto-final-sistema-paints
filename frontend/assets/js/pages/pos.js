@@ -118,7 +118,7 @@ async function searchProducts(query) {
     }
 
     try {
-        const params = { buscar: query, limit: 20 };
+        const params = { buscar: query, limit: 20, sucursal_id: 1 };
         if (currentCategory !== 'all') {
             params.categoria = currentCategory;
         }
@@ -127,7 +127,10 @@ async function searchProducts(query) {
 
         if (response.success && response.data.length > 0) {
             const resultsHTML = response.data.map(product => {
-                const stock = product.stock || 0;
+                // Calcular stock total sumando todas las cantidades del inventario
+                const stock = product.inventarios && product.inventarios.length > 0
+                    ? product.inventarios.reduce((total, inv) => total + (inv.cantidad || 0), 0)
+                    : 0;
                 const stockClass = stock > 10 ? '' : stock > 0 ? 'low' : 'out';
                 const stockText = stock > 0 ? `Stock: ${stock}` : 'Sin stock';
 
