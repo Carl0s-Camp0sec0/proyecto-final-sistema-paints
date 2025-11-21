@@ -69,8 +69,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     nit: {
       type: DataTypes.STRING(20),
-      allowNull: false,
-      unique: true,
+      allowNull: true, // Temporalmente nullable para migración
+      unique: false, // Temporalmente no unique para migración
       validate: {
         notEmpty: true
       },
