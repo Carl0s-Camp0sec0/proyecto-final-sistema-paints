@@ -132,8 +132,7 @@ async function searchProducts(query) {
                 const stockText = stock > 0 ? `Stock: ${stock}` : 'Sin stock';
 
                 return `
-                    <div class="product-search-item" onclick="addToInvoice(${product.id}, '${product.nombre.replace(/'/g, "\\'")}', ${product.precio_base}, ${stock})"
-                         ${stock === 0 ? 'style="opacity: 0.6; cursor: not-allowed;"' : ''}>
+                    <div class="product-search-item" onclick="addToInvoice(${product.id}, '${product.nombre.replace(/'/g, "\\'")}', ${product.precio_base}, ${stock})">
                         <div class="product-info">
                             <div class="product-name">${product.nombre}</div>
                             <div class="product-details">
@@ -145,7 +144,7 @@ async function searchProducts(query) {
                             <div class="product-price">
                                 ${Utils.formatCurrency(product.precio_base)}
                             </div>
-                            <button class="btn btn-sm btn-primary" ${stock === 0 ? 'disabled' : ''}>
+                            <button class="btn btn-sm btn-primary">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
@@ -198,20 +197,14 @@ function scanBarcode() {
 
 // Agregar producto a la factura
 function addToInvoice(productId, productName, price, stock) {
-    if (stock === 0) {
-        Utils.showToast('Producto sin stock disponible', 'error');
-        return;
-    }
-
     const existingItem = invoiceItems.find(item => item.productId === productId);
 
     if (existingItem) {
-        if (existingItem.quantity < stock) {
-            existingItem.quantity += 1;
-            Utils.showToast(`Cantidad actualizada: ${productName}`, 'success');
+        existingItem.quantity += 1;
+        if (stock === 0 || existingItem.quantity > stock) {
+            Utils.showToast(`Advertencia: ${productName} - Stock insuficiente`, 'warning');
         } else {
-            Utils.showToast('No hay más stock disponible', 'error');
-            return;
+            Utils.showToast(`Cantidad actualizada: ${productName}`, 'success');
         }
     } else {
         invoiceItems.push({
@@ -221,7 +214,11 @@ function addToInvoice(productId, productName, price, stock) {
             quantity: 1,
             maxStock: stock
         });
-        Utils.showToast(`${productName} agregado a la factura`, 'success');
+        if (stock === 0) {
+            Utils.showToast(`${productName} agregado (Sin stock disponible)`, 'warning');
+        } else {
+            Utils.showToast(`${productName} agregado a la factura`, 'success');
+        }
     }
 
     updateInvoiceDisplay();
@@ -231,11 +228,12 @@ function addToInvoice(productId, productName, price, stock) {
 function updateQuantity(productId, newQuantity) {
     const item = invoiceItems.find(item => item.productId === productId);
     if (item) {
-        if (newQuantity > 0 && newQuantity <= item.maxStock) {
+        if (newQuantity > 0) {
             item.quantity = newQuantity;
+            if (item.maxStock === 0 || newQuantity > item.maxStock) {
+                Utils.showToast('Advertencia: Cantidad excede el stock disponible', 'warning');
+            }
             updateInvoiceDisplay();
-        } else if (newQuantity > item.maxStock) {
-            Utils.showToast('Cantidad excede el stock disponible', 'error');
         } else {
             removeFromInvoice(productId);
         }
@@ -294,29 +292,33 @@ function updateInvoiceDisplay() {
         `;
         itemCount.textContent = '0 productos';
     } else {
-        const itemsHTML = invoiceItems.map(item => `
-            <div class="invoice-product-item">
-                <div style="flex: 1;">
-                    <div style="font-weight: 500;">${item.name}</div>
-                    <div style="font-size: 0.875rem; color: var(--gray-600);">
-                        ${Utils.formatCurrency(item.price)} c/u • Stock: ${item.maxStock}
+        const itemsHTML = invoiceItems.map(item => {
+            const stockWarning = (item.maxStock === 0 || item.quantity > item.maxStock) ?
+                ' <span style="color: var(--warning-yellow);">⚠</span>' : '';
+
+            return `
+                <div class="invoice-product-item">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 500;">${item.name}${stockWarning}</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-600);">
+                            ${Utils.formatCurrency(item.price)} c/u • Stock: ${item.maxStock}
+                        </div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.quantity - 1})"
+                                ${item.quantity <= 1 ? 'style="opacity: 0.5;"' : ''}>-</button>
+                        <input type="number" value="${item.quantity}" class="quantity-input"
+                               onchange="updateQuantity(${item.productId}, parseInt(this.value))"
+                               min="1">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.quantity + 1})">+</button>
+                        <button class="btn btn-sm btn-danger" onclick="removeFromInvoice(${item.productId})"
+                                style="margin-left: 0.5rem;" title="Eliminar producto">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.quantity - 1})"
-                            ${item.quantity <= 1 ? 'style="opacity: 0.5;"' : ''}>-</button>
-                    <input type="number" value="${item.quantity}" class="quantity-input"
-                           onchange="updateQuantity(${item.productId}, parseInt(this.value))"
-                           min="1" max="${item.maxStock}">
-                    <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.quantity + 1})"
-                            ${item.quantity >= item.maxStock ? 'style="opacity: 0.5;"' : ''}>+</button>
-                    <button class="btn btn-sm btn-danger" onclick="removeFromInvoice(${item.productId})"
-                            style="margin-left: 0.5rem;" title="Eliminar producto">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         container.innerHTML = itemsHTML;
         itemCount.textContent = `${invoiceItems.length} producto${invoiceItems.length !== 1 ? 's' : ''}`;
