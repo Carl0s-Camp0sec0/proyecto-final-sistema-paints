@@ -87,6 +87,12 @@ class ApiClient {
         });
     }
 
+    async deleteProducto(id) {
+        return this.request(`/productos/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
     // === MÉTODOS DE CLIENTES ===
     async getClientes(params = {}) {
         const queryString = new URLSearchParams(params).toString();
@@ -134,6 +140,36 @@ class ApiClient {
     async getEstadisticasVentas(params = {}) {
         const queryString = new URLSearchParams(params).toString();
         return this.request(`/facturas/estadisticas?${queryString}`);
+    }
+
+    // === MÉTODOS DE USUARIOS ===
+    async getUsuarios(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/usuarios?${queryString}`);
+    }
+
+    async getUsuario(id) {
+        return this.request(`/usuarios/${id}`);
+    }
+
+    async createUsuario(userData) {
+        return this.request('/usuarios', {
+            method: 'POST',
+            body: JSON.stringify(userData)
+        });
+    }
+
+    async updateUsuario(id, userData) {
+        return this.request(`/usuarios/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(userData)
+        });
+    }
+
+    async deleteUsuario(id) {
+        return this.request(`/usuarios/${id}`, {
+            method: 'DELETE'
+        });
     }
 }
 

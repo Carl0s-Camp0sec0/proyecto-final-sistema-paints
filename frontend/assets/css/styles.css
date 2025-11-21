@@ -2,6 +2,7 @@
 :root {
     --primary-blue: #2563eb;
     --primary-blue-hover: #1d4ed8;
+    --secondary-blue: #3b82f6;
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -257,7 +258,7 @@ body {
     padding: 1.5rem;
     border-bottom: 1px solid var(--gray-200);
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: center;
 }
 

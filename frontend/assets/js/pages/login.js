@@ -1,17 +1,5 @@
 // Funciones específicas para la página de login
-
-function togglePasswordVisibility(button) {
-    const input = button.previousElementSibling;
-    const icon = button.querySelector('i');
-
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-    } else {
-        input.type = 'password';
-        icon.className = 'fas fa-eye';
-    }
-}
+// Nota: togglePasswordVisibility ahora está definida en global.js
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {

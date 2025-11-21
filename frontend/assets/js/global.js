@@ -53,3 +53,23 @@ if (document.readyState === 'loading') {
 } else {
     loadUserData();
 }
+
+// Función global para alternar visibilidad de contraseñas
+function togglePasswordVisibility(button) {
+    const input = button.previousElementSibling;
+    const icon = button.querySelector('i');
+
+    if (input && icon) {
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+}
+
+// Hacer disponibles globalmente
+window.logout = logout;
+window.togglePasswordVisibility = togglePasswordVisibility;

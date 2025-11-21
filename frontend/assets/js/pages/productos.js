@@ -138,7 +138,7 @@
                                 <button class="btn btn-sm btn-primary" onclick="editProduct(${product.id})" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id}, '${product.nombre.replace(/'/g, "\\'")}') title="Eliminar">
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id}, '${product.nombre.replace(/'/g, "\\'")}')" title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -204,7 +204,7 @@
                                 <button class="btn btn-sm btn-primary" onclick="editProduct(${product.id})" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id}, '${product.nombre.replace(/'/g, "\\'")}') title="Eliminar">
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id}, '${product.nombre.replace(/'/g, "\\'")}')" title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

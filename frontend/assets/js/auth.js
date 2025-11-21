@@ -53,7 +53,7 @@ class AuthManager {
         this.user = null;
         localStorage.removeItem('paints_token');
         localStorage.removeItem('paints_user');
-        window.location.reload();
+        window.location.href = '/frontend/pages/public/login.html';
     }
 
     // Obtener token para requests
