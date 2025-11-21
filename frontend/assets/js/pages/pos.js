@@ -129,6 +129,13 @@ async function searchProducts(query) {
         if (response.success && response.data.length > 0) {
             const resultsHTML = response.data.map(product => {
                 console.log('🔍 Producto:', product.nombre, 'Inventarios:', product.inventarios);
+
+                // Debug: ver estructura del primer inventario
+                if (product.inventarios && product.inventarios.length > 0) {
+                    console.log('📋 Estructura del primer inventario:', product.inventarios[0]);
+                    console.log('📋 Claves del inventario:', Object.keys(product.inventarios[0]));
+                }
+
                 // Calcular stock total sumando todas las cantidades del inventario
                 const stock = product.inventarios && product.inventarios.length > 0
                     ? product.inventarios.reduce((total, inv) => total + (inv.cantidad || 0), 0)
