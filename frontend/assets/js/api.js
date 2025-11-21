@@ -37,6 +37,13 @@ class ApiClient {
         }
     }
 
+    // Método GET con parámetros de query
+    async get(endpoint, params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+        return this.request(url, { method: 'GET' });
+    }
+
     // === MÉTODOS DE SISTEMA ===
     async getCategorias() {
         return this.request('/sistema/categorias');
