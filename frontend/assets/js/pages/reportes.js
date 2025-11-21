@@ -17,20 +17,31 @@ function loadUserData() {
 
 // Mostrar reporte específico
 function showReport(reportType) {
-    const reportContent = document.getElementById('reportContent');
+    try {
+        console.log('showReport llamado con tipo:', reportType);
+        const reportContent = document.getElementById('reportContent');
 
-    switch(reportType) {
-        case 'stock-minimo':
-            showStockMinimoReport(reportContent);
-            break;
-        case 'mas-vendidos':
-            showMasVendidosReport(reportContent);
-            break;
-        case 'analisis-abc':
-            showAnalisisABCReport(reportContent);
-            break;
-        default:
-            Utils.showToast('Reporte no disponible', 'info');
+        if (!reportContent) {
+            console.error('Elemento reportContent no encontrado');
+            return;
+        }
+
+        switch(reportType) {
+            case 'stock-minimo':
+                showStockMinimoReport(reportContent);
+                break;
+            case 'mas-vendidos':
+                showMasVendidosReport(reportContent);
+                break;
+            case 'analisis-abc':
+                showAnalisisABCReport(reportContent);
+                break;
+            default:
+                Utils.showToast('Reporte no disponible', 'info');
+        }
+    } catch (error) {
+        console.error('Error en showReport:', error);
+        Utils.showToast('Error al mostrar el reporte', 'error');
     }
 }
 
@@ -256,9 +267,16 @@ function showAnalisisABCReport(container) {
 
 // Mostrar búsqueda de factura
 function showFacturaSearch() {
-    const reportContent = document.getElementById('reportContent');
+    try {
+        console.log('showFacturaSearch llamado');
+        const reportContent = document.getElementById('reportContent');
 
-    reportContent.innerHTML = `
+        if (!reportContent) {
+            console.error('Elemento reportContent no encontrado');
+            return;
+        }
+
+        reportContent.innerHTML = `
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
@@ -300,21 +318,32 @@ function showFacturaSearch() {
             </div>
         </div>
     `;
+    } catch (error) {
+        console.error('Error en showFacturaSearch:', error);
+        Utils.showToast('Error al mostrar búsqueda de factura', 'error');
+    }
 }
 
 // Buscar factura
 function searchFactura() {
-    const serie = document.getElementById('facturaSerie').value;
-    const correlativo = document.getElementById('facturaCorrelativo').value;
-    const fecha = document.getElementById('facturaFecha').value;
-    const clienteNit = document.getElementById('facturaClienteNit').value;
+    try {
+        console.log('searchFactura llamado');
+        const serie = document.getElementById('facturaSerie').value;
+        const correlativo = document.getElementById('facturaCorrelativo').value;
+        const fecha = document.getElementById('facturaFecha').value;
+        const clienteNit = document.getElementById('facturaClienteNit').value;
 
-    if (!correlativo) {
-        Utils.showToast('Ingrese el correlativo de la factura', 'error');
-        return;
-    }
+        if (!correlativo) {
+            Utils.showToast('Ingrese el correlativo de la factura', 'error');
+            return;
+        }
 
-    const resultContainer = document.getElementById('facturaResult');
+        const resultContainer = document.getElementById('facturaResult');
+
+        if (!resultContainer) {
+            console.error('Elemento facturaResult no encontrado');
+            return;
+        }
 
     // Simulación de búsqueda
     resultContainer.innerHTML = `
@@ -399,22 +428,26 @@ function searchFactura() {
         </div>
     `;
 
-    Utils.showToast('Factura encontrada (ejemplo)', 'success');
-}
-
-// Función de logout
-function logout() {
-    if (confirm('¿Está seguro de que desea cerrar sesión?')) {
-        auth.logout();
-        window.location.href = '/frontend/pages/public/login.html';
+        Utils.showToast('Factura encontrada (ejemplo)', 'success');
+    } catch (error) {
+        console.error('Error en searchFactura:', error);
+        Utils.showToast('Error al buscar la factura', 'error');
     }
 }
 
 // Hacer funciones disponibles globalmente
-window.showReport = showReport;
-window.showFacturaSearch = showFacturaSearch;
-window.searchFactura = searchFactura;
-window.logout = logout;
+if (typeof window !== 'undefined') {
+    window.showReport = showReport;
+    window.showFacturaSearch = showFacturaSearch;
+    window.searchFactura = searchFactura;
+
+    // Debug: verificar que las funciones están disponibles
+    console.log('Funciones de reportes cargadas:', {
+        showReport: typeof window.showReport,
+        showFacturaSearch: typeof window.showFacturaSearch,
+        searchFactura: typeof window.searchFactura
+    });
+}
 
 // Inicializar página
 document.addEventListener('DOMContentLoaded', () => {

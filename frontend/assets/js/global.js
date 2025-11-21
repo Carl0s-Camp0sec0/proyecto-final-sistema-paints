@@ -4,10 +4,18 @@
 
 // Función global de logout
 function logout() {
-    if (auth && typeof auth.logout === 'function') {
-        auth.logout();
-    } else {
-        // Fallback manual
+    try {
+        if (auth && typeof auth.logout === 'function') {
+            auth.logout();
+        } else {
+            // Fallback manual
+            localStorage.removeItem('paints_token');
+            localStorage.removeItem('paints_user');
+            window.location.href = '/frontend/pages/public/login.html';
+        }
+    } catch (error) {
+        console.error('Error en logout:', error);
+        // Forzar limpieza y redirección
         localStorage.removeItem('paints_token');
         localStorage.removeItem('paints_user');
         window.location.href = '/frontend/pages/public/login.html';
@@ -71,5 +79,13 @@ function togglePasswordVisibility(button) {
 }
 
 // Hacer disponibles globalmente
-window.logout = logout;
-window.togglePasswordVisibility = togglePasswordVisibility;
+if (typeof window !== 'undefined') {
+    window.logout = logout;
+    window.togglePasswordVisibility = togglePasswordVisibility;
+
+    // Debug: verificar que las funciones están disponibles
+    console.log('Funciones globales cargadas:', {
+        logout: typeof window.logout,
+        togglePasswordVisibility: typeof window.togglePasswordVisibility
+    });
+}
