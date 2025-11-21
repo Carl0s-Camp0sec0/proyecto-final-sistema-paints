@@ -144,8 +144,13 @@ async function searchProducts(query) {
                 const stockClass = stock > 10 ? '' : stock > 0 ? 'low' : 'out';
                 const stockText = stock > 0 ? `Stock: ${stock}` : 'Sin stock';
 
+                // Obtener unidad de medida del primer inventario disponible
+                const unidadMedidaId = product.inventarios && product.inventarios.length > 0
+                    ? product.inventarios[0].unidad_medida_id
+                    : null;
+
                 return `
-                    <div class="product-search-item" onclick="addToInvoice(${product.id}, '${product.nombre.replace(/'/g, "\\'")}', ${product.precio_base}, ${stock})">
+                    <div class="product-search-item" onclick="addToInvoice(${product.id}, '${product.nombre.replace(/'/g, "\\'")}', ${product.precio_base}, ${stock}, ${unidadMedidaId})">
                         <div class="product-info">
                             <div class="product-name">${product.nombre}</div>
                             <div class="product-details">
@@ -209,7 +214,7 @@ function scanBarcode() {
 }
 
 // Agregar producto a la factura
-function addToInvoice(productId, productName, price, stock) {
+function addToInvoice(productId, productName, price, stock, unidadMedidaId) {
     const existingItem = invoiceItems.find(item => item.productId === productId);
 
     if (existingItem) {
@@ -225,7 +230,8 @@ function addToInvoice(productId, productName, price, stock) {
             name: productName,
             price: price,
             quantity: 1,
-            maxStock: stock
+            maxStock: stock,
+            unidadMedidaId: unidadMedidaId
         });
         if (stock === 0) {
             Utils.showToast(`${productName} agregado (Sin stock disponible)`, 'warning');
@@ -468,66 +474,129 @@ async function processInvoice() {
             }
         }
 
-        // Preparar datos de la factura
+        Utils.showToast('Procesando venta...', 'info');
+
+        // Obtener o crear cliente
+        let clienteId;
+        const consumidorFinal = document.getElementById('consumidorFinal').checked;
+
+        if (consumidorFinal) {
+            // Buscar o crear cliente "Consumidor Final"
+            const clientesResponse = await api.getClientes({ buscar: 'Consumidor Final', limit: 1 });
+            if (clientesResponse.success && clientesResponse.data.length > 0) {
+                clienteId = clientesResponse.data[0].id;
+            } else {
+                // Crear cliente Consumidor Final
+                const nuevoCliente = await api.createCliente({
+                    nombre_completo: 'Consumidor Final',
+                    nit: 'CF',
+                    email: 'cf@system.local',
+                    telefono: '00000000',
+                    direccion: 'Ciudad'
+                });
+                if (nuevoCliente.success) {
+                    clienteId = nuevoCliente.data.id;
+                } else {
+                    Utils.showToast('Error creando cliente', 'error');
+                    return;
+                }
+            }
+        } else {
+            // Buscar o crear cliente con NIT
+            const clientNit = document.getElementById('clientNit').value;
+            const clientName = document.getElementById('clientName').value;
+            const clientAddress = document.getElementById('clientAddress').value;
+
+            if (!clientNit || !clientName) {
+                Utils.showToast('Complete los datos del cliente', 'error');
+                return;
+            }
+
+            const clientesResponse = await api.getClientes({ nit: clientNit, limit: 1 });
+            if (clientesResponse.success && clientesResponse.data.length > 0) {
+                clienteId = clientesResponse.data[0].id;
+            } else {
+                // Crear nuevo cliente
+                const nuevoCliente = await api.createCliente({
+                    nombre_completo: clientName,
+                    nit: clientNit,
+                    email: `${clientNit}@cliente.local`,
+                    telefono: '00000000',
+                    direccion: clientAddress || 'Ciudad'
+                });
+                if (nuevoCliente.success) {
+                    clienteId = nuevoCliente.data.id;
+                } else {
+                    Utils.showToast('Error creando cliente: ' + (nuevoCliente.message || ''), 'error');
+                    return;
+                }
+            }
+        }
+
+        // Calcular descuento y subtotal
+        const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+        // Preparar datos de la factura según formato del backend
         const facturaData = {
-            serie: 'A',
-            correlativo: parseInt(document.getElementById('nextCorrelativo').textContent),
-            fecha_emision: new Date().toISOString(),
-            consumidor_final: document.getElementById('consumidorFinal').checked,
-            cliente_nit: document.getElementById('clientNit').value || null,
-            cliente_nombre: document.getElementById('clientName').value || 'Consumidor Final',
-            cliente_direccion: document.getElementById('clientAddress').value || null,
+            cliente_id: clienteId,
             sucursal_id: 1,
-            empleado_id: auth.user.id,
-            descuento_total: discountAmount,
+            descuento: discountAmount,
+            observaciones: null,
             productos: invoiceItems.map(item => ({
                 producto_id: item.productId,
+                unidad_medida_id: item.unidadMedidaId,
                 cantidad: item.quantity,
                 precio_unitario: item.price,
-                descuento: 0
+                descuento_porcentaje: 0
             })),
-            metodos_pago: [{
-                tipo_pago_id: selectedPaymentMethod === 'efectivo' ? 1 : selectedPaymentMethod === 'tarjeta' ? 3 : 2,
-                monto: total
+            medios_pago: [{
+                medio_pago_id: selectedPaymentMethod === 'efectivo' ? 1 : selectedPaymentMethod === 'tarjeta' ? 3 : 2,
+                monto: total,
+                referencia: selectedPaymentMethod === 'tarjeta' ? document.getElementById('cardNumber')?.value :
+                           selectedPaymentMethod === 'cheque' ? document.getElementById('checkNumber')?.value : null
             }]
         };
 
-        Utils.showToast('Procesando venta...', 'info');
+        console.log('📤 Enviando factura:', facturaData);
 
-        // Simular API call (reemplazar con llamada real)
-        // const response = await api.createFactura(facturaData);
+        // Llamada real a la API
+        const response = await api.createFactura(facturaData);
 
-        // Simulación de éxito
-        setTimeout(() => {
-            const invoiceNumber = `A-${document.getElementById('nextCorrelativo').textContent}`;
-            showSuccessModal(invoiceNumber, total);
+        if (response.success) {
+            Utils.showToast('Venta procesada exitosamente', 'success');
+            const invoiceNumber = response.data.numero_factura;
+            showSuccessModal(invoiceNumber, total, response.data.id);
 
             // Limpiar factura
             invoiceItems = [];
             discountAmount = 0;
             updateInvoiceDisplay();
 
-            // Incrementar correlativo
-            const nextNum = parseInt(document.getElementById('nextCorrelativo').textContent) + 1;
-            document.getElementById('nextCorrelativo').textContent = nextNum.toString().padStart(3, '0');
-
             // Limpiar campos de cliente
             document.getElementById('consumidorFinal').checked = true;
             document.getElementById('clientDataSection').classList.add('hidden');
+            document.getElementById('clientNit').value = '';
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientAddress').value = '';
 
             // Resetear método de pago
             updatePaymentDetails();
-
-        }, 1500);
+        } else {
+            Utils.showToast('Error: ' + (response.message || 'No se pudo crear la factura'), 'error');
+        }
 
     } catch (error) {
         console.error('Error processing invoice:', error);
-        Utils.showToast('Error procesando la venta', 'error');
+        Utils.showToast('Error procesando la venta: ' + (error.message || ''), 'error');
     }
 }
 
+// Variable global para almacenar el ID de la última factura
+let lastInvoiceId = null;
+
 // Mostrar modal de éxito
-function showSuccessModal(invoiceNumber, total) {
+function showSuccessModal(invoiceNumber, total, facturaId) {
+    lastInvoiceId = facturaId;
     document.getElementById('invoiceNumber').textContent = invoiceNumber;
     document.getElementById('invoiceTotalModal').textContent = Utils.formatCurrency(total);
     document.getElementById('successModal').style.display = 'flex';
@@ -538,10 +607,100 @@ function closeSuccessModal() {
     document.getElementById('successModal').style.display = 'none';
 }
 
+// Ver factura
+async function viewInvoice() {
+    if (!lastInvoiceId) {
+        Utils.showToast('No hay factura para mostrar', 'warning');
+        return;
+    }
+
+    try {
+        const response = await api.request(`/facturas/${lastInvoiceId}`);
+        if (response.success) {
+            // Crear una ventana emergente con los detalles de la factura
+            const factura = response.data;
+            const detallesHTML = factura.detalles.map(d => `
+                <tr>
+                    <td>${d.producto?.nombre || 'Producto'}</td>
+                    <td>${d.cantidad}</td>
+                    <td>${Utils.formatCurrency(d.precio_unitario)}</td>
+                    <td>${Utils.formatCurrency(d.subtotal)}</td>
+                </tr>
+            `).join('');
+
+            const ventana = window.open('', '_blank', 'width=800,height=600');
+            ventana.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Factura ${factura.letra_serie}${factura.numero_correlativo.toString().padStart(8, '0')}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { text-align: center; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #2563eb; color: white; }
+                        .totals { text-align: right; margin: 20px 0; }
+                        .totals div { margin: 5px 0; }
+                        @media print {
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>FACTURA ${factura.letra_serie}${factura.numero_correlativo.toString().padStart(8, '0')}</h1>
+                    <div>
+                        <strong>Cliente:</strong> ${factura.cliente?.nombre_completo || 'N/A'}<br>
+                        <strong>NIT:</strong> ${factura.cliente?.nit || 'CF'}<br>
+                        <strong>Fecha:</strong> ${new Date(factura.fecha_creacion).toLocaleString()}<br>
+                        <strong>Sucursal:</strong> ${factura.sucursal?.nombre || 'N/A'}
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${detallesHTML}
+                        </tbody>
+                    </table>
+                    <div class="totals">
+                        <div><strong>Subtotal:</strong> ${Utils.formatCurrency(factura.subtotal)}</div>
+                        <div><strong>Descuento:</strong> ${Utils.formatCurrency(factura.descuento)}</div>
+                        <div><strong>TOTAL:</strong> ${Utils.formatCurrency(factura.total)}</div>
+                    </div>
+                    <div class="no-print" style="text-align: center; margin-top: 30px;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Imprimir
+                        </button>
+                        <button onclick="window.close()" style="padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                            Cerrar
+                        </button>
+                    </div>
+                </body>
+                </html>
+            `);
+            ventana.document.close();
+        } else {
+            Utils.showToast('Error al cargar la factura', 'error');
+        }
+    } catch (error) {
+        console.error('Error viewing invoice:', error);
+        Utils.showToast('Error al mostrar la factura', 'error');
+    }
+}
+
 // Imprimir factura
 function printInvoice() {
-    Utils.showToast('Imprimiendo factura...', 'info');
-    // Aquí se implementaría la lógica de impresión
+    if (!lastInvoiceId) {
+        Utils.showToast('No hay factura para imprimir', 'warning');
+        return;
+    }
+    viewInvoice();
 }
 
 // Configurar event listeners
@@ -599,6 +758,7 @@ window.calculateChange = calculateChange;
 window.processInvoice = processInvoice;
 window.closeSuccessModal = closeSuccessModal;
 window.printInvoice = printInvoice;
+window.viewInvoice = viewInvoice;
 
 // Inicializar página
 document.addEventListener('DOMContentLoaded', () => {

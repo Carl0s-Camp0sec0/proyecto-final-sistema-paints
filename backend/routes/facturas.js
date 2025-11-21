@@ -303,4 +303,88 @@ router.post('/',
   }
 );
 
+/**
+ * @route   GET /api/facturas/:id
+ * @desc    Obtener factura por ID
+ * @access  Private
+ */
+router.get('/:id',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`🧾 Obteniendo factura ${id}...`);
+
+      const factura = await Factura.findByPk(id, {
+        include: [
+          {
+            model: Cliente,
+            as: 'cliente',
+            attributes: ['id', 'nombre_completo', 'nit', 'email', 'telefono', 'direccion']
+          },
+          {
+            model: Sucursal,
+            as: 'sucursal',
+            attributes: ['id', 'nombre', 'direccion', 'telefono']
+          },
+          {
+            model: Usuario,
+            as: 'usuario',
+            attributes: ['id', 'nombre_completo', 'email']
+          },
+          {
+            model: FacturaDetalle,
+            as: 'detalles',
+            include: [
+              {
+                model: Producto,
+                as: 'producto',
+                attributes: ['id', 'nombre', 'codigo_producto']
+              },
+              {
+                model: UnidadMedida,
+                as: 'unidad_medida',
+                attributes: ['id', 'nombre', 'abreviatura']
+              }
+            ]
+          },
+          {
+            model: FacturaPago,
+            as: 'pagos',
+            include: [
+              {
+                model: MedioPago,
+                as: 'medio_pago',
+                attributes: ['id', 'nombre']
+              }
+            ]
+          }
+        ]
+      });
+
+      if (!factura) {
+        return res.status(404).json({
+          success: false,
+          message: 'Factura no encontrada'
+        });
+      }
+
+      console.log(`✅ Factura ${id} encontrada`);
+
+      res.json({
+        success: true,
+        data: factura
+      });
+
+    } catch (error) {
+      console.error('❌ Error obteniendo factura:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
 module.exports = router;
