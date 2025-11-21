@@ -124,13 +124,16 @@ async function searchProducts(query) {
         }
 
         const response = await api.getProductos(params);
+        console.log('📦 Respuesta de productos:', response);
 
         if (response.success && response.data.length > 0) {
             const resultsHTML = response.data.map(product => {
+                console.log('🔍 Producto:', product.nombre, 'Inventarios:', product.inventarios);
                 // Calcular stock total sumando todas las cantidades del inventario
                 const stock = product.inventarios && product.inventarios.length > 0
                     ? product.inventarios.reduce((total, inv) => total + (inv.cantidad || 0), 0)
                     : 0;
+                console.log('📊 Stock calculado para', product.nombre, ':', stock);
                 const stockClass = stock > 10 ? '' : stock > 0 ? 'low' : 'out';
                 const stockText = stock > 0 ? `Stock: ${stock}` : 'Sin stock';
 
