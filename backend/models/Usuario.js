@@ -29,11 +29,34 @@ module.exports = (sequelize, DataTypes) => {
       return await bcrypt.compare(password, this.password_hash);
     }
 
-    // Método para cambiar password
+    // Método para cambiar password - CON CONTROL MANUAL
     async cambiarPassword(nuevaPassword) {
       const salt = await bcrypt.genSalt(12);
-      this.password_hash = await bcrypt.hash(nuevaPassword, salt);
-      return await this.save();
+      const hashedPassword = await bcrypt.hash(nuevaPassword, salt);
+      
+      // Actualizar SIN activar hooks
+      await this.update({ 
+        password_hash: hashedPassword 
+      }, { 
+        hooks: false // ← CRÍTICO: Desactivar hooks para esta operación
+      });
+      
+      return true;
+    }
+
+    // Método estático para crear usuario con password
+    static async crearUsuario(datosUsuario) {
+      const { password, ...otrosDatos } = datosUsuario;
+      
+      // Hash del password MANUAL
+      const salt = await bcrypt.genSalt(12);
+      const password_hash = await bcrypt.hash(password, salt);
+      
+      // Crear usuario SIN hooks
+      return await Usuario.create({
+        ...otrosDatos,
+        password_hash
+      }, { hooks: false });
     }
   }
 
@@ -94,23 +117,10 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'usuarios',
     timestamps: true,
     createdAt: 'fecha_creacion',
-    updatedAt: 'fecha_actualizacion',
-    hooks: {
-      // Hash password antes de crear usuario
-      beforeCreate: async (usuario) => {
-        if (usuario.password_hash) {
-          const salt = await bcrypt.genSalt(12);
-          usuario.password_hash = await bcrypt.hash(usuario.password_hash, salt);
-        }
-      },
-      // Hash password antes de actualizar si cambió
-      beforeUpdate: async (usuario) => {
-        if (usuario.changed('password_hash')) {
-          const salt = await bcrypt.genSalt(12);
-          usuario.password_hash = await bcrypt.hash(usuario.password_hash, salt);
-        }
-      }
-    }
+    updatedAt: 'fecha_actualizacion'
+    // ✅ HOOKS REMOVIDOS COMPLETAMENTE
+    // Los hooks automáticos causaban double hashing
+    // Ahora usamos métodos manuales para control total
   });
 
   return Usuario;

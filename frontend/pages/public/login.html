@@ -75,57 +75,6 @@
     <script src="/frontend/assets/js/auth.js"></script>
     <script src="/frontend/assets/js/api.js"></script>
     <script src="/frontend/assets/js/utils.js"></script>
-    
-    <script>
-        // Funciones específicas para la página de login
-        function togglePasswordVisibility(button) {
-            const input = button.previousElementSibling;
-            const icon = button.querySelector('i');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
-        }
-
-        // Manejar envío del formulario
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const email = formData.get('email');
-            const password = formData.get('password');
-
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            
-            submitBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px;"></div>';
-            submitBtn.disabled = true;
-
-            try {
-                const result = await auth.login(email, password);
-                
-                if (result.success) {
-                    Utils.showToast('Login exitoso', 'success');
-                    window.location.href = '/frontend/pages/admin/dashboard.html';
-                } else {
-                    Utils.showToast(result.message, 'error');
-                }
-            } catch (error) {
-                Utils.showToast('Error de conexión', 'error');
-            } finally {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
-        });
-
-        // Verificar si ya está logueado
-        if (auth.isAuthenticated()) {
-            window.location.href = '/frontend/pages/admin/dashboard.html';
-        }
-    </script>
+    <script src="/frontend/assets/js/pages/login.js"></script>
 </body>
 </html>

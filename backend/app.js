@@ -74,10 +74,18 @@ app.use('/api/', limiter);
 // === MIDDLEWARE PARA PARSEAR DATOS ===
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use((req, res, next) => {
+    console.log('\n🔥 === REQUEST INTERCEPTED ===');
+    console.log('📡 Method + Path:', req.method, req.path);
+    console.log('📝 Body:', req.body);
+    console.log('==============================\n');
+    next();
+});
 
 // === SERVIR ARCHIVOS ESTÁTICOS ===
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/public', express.static(path.join(__dirname, '../frontend')));
+// Servir archivos del frontend (CSS, JS, imágenes)
+app.use('/frontend', express.static(path.join(__dirname, '../frontend')));
 
 // === MIDDLEWARE PERSONALIZADO ===
 // Logger mejorado para desarrollo con info de CORS
@@ -90,16 +98,9 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // === RUTAS PRINCIPALES ===
+// Ruta raíz: redirigir al index del frontend
 app.get('/', (req, res) => {
-  res.json({
-    message: 'Sistema Paints API',
-    version: '1.0.0',
-    status: 'operativo',
-    timestamp: new Date().toISOString(),
-    proyecto: 'Universidad UMES - Bases de Datos II',
-    documentacion: '/api/test',
-    cors_configurado: true
-  });
+  res.redirect('/frontend/pages/public/index.html');
 });
 
 // Ruta de test específica para verificar CORS

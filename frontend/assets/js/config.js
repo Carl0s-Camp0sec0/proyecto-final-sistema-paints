@@ -1,6 +1,6 @@
 // Configuración de la aplicación
 const CONFIG = {
-    API_BASE_URL: 'http://localhost:3000/api',
+    API_BASE_URL: 'http://localhost:3001/api',
     APP_NAME: 'Paints',
     VERSION: '1.0.0',
     
