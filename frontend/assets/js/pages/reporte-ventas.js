@@ -1,8 +1,590 @@
-function logout() {
-    if (confirm('¿Está seguro de que desea cerrar sesión?')) {
-        window.location.href = '/frontend/pages/public/login.html';
+/* ======================================================
+   REPORTE DE VENTAS - Sistema Paints
+   Reportes: 1) Ventas por período y medios de pago
+             2) Productos que más dinero generan
+   ====================================================== */
+
+// Verificar autenticación
+if (!auth.isAuthenticated()) {
+    window.location.href = '/frontend/pages/public/login.html';
+}
+
+// Verificar permisos (solo Gerente y Admin)
+if (!auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.GERENTE])) {
+    Utils.showToast('No tienes permisos para acceder a reportes', 'error');
+    window.location.href = '/frontend/pages/admin/dashboard.html';
+}
+
+// Variables globales
+let datosReporte = null;
+let chartMetodosPago = null;
+let chartVentasDiarias = null;
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarReporte();
+    configurarEventos();
+    configurarFechasPorDefecto();
+});
+
+/* ==================== INICIALIZACIÓN ==================== */
+
+function inicializarReporte() {
+    cargarDatosUsuario();
+    cargarSucursales();
+    cargarUsuarios();
+}
+
+function cargarDatosUsuario() {
+    document.getElementById('userAvatar').textContent = auth.getUserInitials();
+    document.getElementById('userName').textContent = auth.user.nombre_completo;
+    document.getElementById('userRole').textContent = auth.user.rol;
+}
+
+async function cargarSucursales() {
+    try {
+        const response = await api.get('/sistema/sucursales');
+        const sucursales = response.data.sucursales;
+
+        const select = document.getElementById('sucursalSelect');
+        select.innerHTML = '<option value="">Todas las Sucursales</option>';
+
+        sucursales.forEach(sucursal => {
+            const option = document.createElement('option');
+            option.value = sucursal.id;
+            option.textContent = sucursal.nombre;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error al cargar sucursales:', error);
     }
 }
 
-// Exportar función globalmente
+async function cargarUsuarios() {
+    try {
+        // Nota: Necesitarías un endpoint para obtener usuarios
+        // Por ahora dejamos las opciones hardcoded del HTML
+    } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+    }
+}
+
+function configurarEventos() {
+    // Evento del selector de período
+    document.getElementById('periodoSelect').addEventListener('change', configurarFechas);
+}
+
+function configurarFechasPorDefecto() {
+    // Configurar período "Este Mes" por defecto
+    const hoy = new Date();
+    const primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+    document.getElementById('fechaInicio').valueAsDate = primerDia;
+    document.getElementById('fechaFinal').valueAsDate = hoy;
+}
+
+function configurarFechas() {
+    const periodo = document.getElementById('periodoSelect').value;
+    const hoy = new Date();
+    let fechaInicio, fechaFinal;
+
+    switch(periodo) {
+        case 'today':
+            fechaInicio = fechaFinal = hoy;
+            break;
+
+        case 'week':
+            fechaInicio = new Date(hoy);
+            fechaInicio.setDate(hoy.getDate() - 7);
+            fechaFinal = hoy;
+            break;
+
+        case 'month':
+            fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            fechaFinal = hoy;
+            break;
+
+        case 'quarter':
+            const quarter = Math.floor(hoy.getMonth() / 3);
+            fechaInicio = new Date(hoy.getFullYear(), quarter * 3, 1);
+            fechaFinal = hoy;
+            break;
+
+        case 'year':
+            fechaInicio = new Date(hoy.getFullYear(), 0, 1);
+            fechaFinal = hoy;
+            break;
+
+        case 'custom':
+            // No hacer nada, el usuario seleccionará manualmente
+            return;
+
+        default:
+            return;
+    }
+
+    document.getElementById('fechaInicio').valueAsDate = fechaInicio;
+    document.getElementById('fechaFinal').valueAsDate = fechaFinal;
+}
+
+/* ==================== GENERAR REPORTE ==================== */
+
+async function generarReporte() {
+    // Obtener filtros
+    const filtros = obtenerFiltros();
+
+    // Validar
+    if (!validarFiltros(filtros)) {
+        return;
+    }
+
+    try {
+        // Mostrar loading
+        mostrarLoading(true);
+
+        // Llamar al endpoint de ventas por período
+        const response = await api.get('/reportes/ventas/periodo', filtros);
+
+        if (!response.success) {
+            throw new Error(response.message || 'Error al generar reporte');
+        }
+
+        // Guardar datos
+        datosReporte = response.data;
+
+        // Mostrar datos
+        mostrarEstadisticas(datosReporte.resumen);
+        await cargarTopProductos(filtros);
+        mostrarTablaVentasSucursal(datosReporte.ventas_por_sucursal);
+        mostrarGraficos(datosReporte);
+
+        Utils.showToast('Reporte generado exitosamente', 'success');
+
+    } catch (error) {
+        console.error('Error al generar reporte:', error);
+        Utils.showToast('Error al generar el reporte: ' + error.message, 'error');
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+function obtenerFiltros() {
+    return {
+        fecha_inicio: document.getElementById('fechaInicio').value,
+        fecha_fin: document.getElementById('fechaFinal').value,
+        sucursal_id: document.getElementById('sucursalSelect').value || undefined,
+        metodo_pago: document.getElementById('metodoPagoSelect').value || undefined,
+        usuario_id: document.getElementById('usuarioSelect').value || undefined
+    };
+}
+
+function validarFiltros(filtros) {
+    if (!filtros.fecha_inicio || !filtros.fecha_fin) {
+        Utils.showToast('Debes seleccionar las fechas de inicio y fin', 'warning');
+        return false;
+    }
+
+    if (new Date(filtros.fecha_inicio) > new Date(filtros.fecha_fin)) {
+        Utils.showToast('La fecha de inicio no puede ser mayor a la fecha final', 'warning');
+        return false;
+    }
+
+    return true;
+}
+
+async function cargarTopProductos(filtros) {
+    try {
+        const response = await api.get('/reportes/productos/top-ingresos', {
+            ...filtros,
+            limit: 10
+        });
+
+        if (response.success) {
+            mostrarTablaTopProductos(response.data.productos);
+        }
+    } catch (error) {
+        console.error('Error al cargar top productos:', error);
+    }
+}
+
+/* ==================== MOSTRAR DATOS ==================== */
+
+function mostrarEstadisticas(resumen) {
+    document.getElementById('totalFacturado').textContent = Utils.formatCurrency(resumen.total_general);
+    document.getElementById('numeroFacturas').textContent = resumen.numero_facturas;
+    document.getElementById('ventaPromedio').textContent = Utils.formatCurrency(resumen.venta_promedio);
+    document.getElementById('facturasAnuladas').textContent = resumen.facturas_anuladas;
+}
+
+function mostrarTablaTopProductos(productos) {
+    const tbody = document.getElementById('topProductosVendidos');
+
+    if (!productos || productos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">No hay datos para mostrar</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = productos.map((producto, index) => `
+        <tr>
+            <td>${index + 1}</td>
+            <td>
+                <strong>${producto.nombre}</strong><br>
+                <small class="text-muted">${producto.marca || 'Sin marca'}</small>
+            </td>
+            <td>${producto.categoria}</td>
+            <td>${producto.cantidad_vendida} ${producto.unidad_medida}</td>
+            <td><strong>${Utils.formatCurrency(producto.total_vendido)}</strong></td>
+            <td>${producto.porcentaje.toFixed(1)}%</td>
+        </tr>
+    `).join('');
+}
+
+function mostrarTablaVentasSucursal(ventasSucursal) {
+    const tbody = document.getElementById('ventasPorSucursal');
+
+    if (!ventasSucursal || ventasSucursal.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">No hay datos para mostrar</td></tr>';
+        return;
+    }
+
+    // Calcular total general para porcentajes
+    const totalGeneral = ventasSucursal.reduce((sum, v) => sum + parseFloat(v.total_vendido || 0), 0);
+
+    tbody.innerHTML = ventasSucursal.map(venta => {
+        const total = parseFloat(venta.total_vendido || 0);
+        const porcentaje = totalGeneral > 0 ? (total / totalGeneral * 100) : 0;
+        const promedio = parseFloat(venta.venta_promedio || 0);
+
+        return `
+            <tr>
+                <td>
+                    <strong>${venta['sucursal.nombre'] || 'Sucursal'}</strong><br>
+                    <small class="text-muted">Regional</small>
+                </td>
+                <td>${venta.cantidad_facturas || 0}</td>
+                <td><strong>${Utils.formatCurrency(total)}</strong></td>
+                <td>${Utils.formatCurrency(promedio)}</td>
+                <td>${porcentaje.toFixed(1)}%</td>
+                <td><span style="color: var(--success-green);"><i class="fas fa-arrow-up"></i> +12%</span></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+/* ==================== GRÁFICOS ==================== */
+
+function mostrarGraficos(datos) {
+    mostrarGraficoMetodosPago(datos.desglose_medios_pago);
+    mostrarGraficoVentasDiarias(datos.ventas_por_dia);
+}
+
+function mostrarGraficoMetodosPago(desglose) {
+    const ctx = document.getElementById('chartMetodosPago');
+
+    // Destruir gráfico anterior si existe
+    if (chartMetodosPago) {
+        chartMetodosPago.destroy();
+    }
+
+    // Preparar datos
+    const labels = Object.keys(desglose);
+    const data = Object.values(desglose);
+
+    const colores = [
+        'rgba(16, 185, 129, 0.8)',  // Verde (efectivo)
+        'rgba(59, 130, 246, 0.8)',   // Azul (tarjeta)
+        'rgba(245, 158, 11, 0.8)',   // Amarillo (cheque)
+        'rgba(139, 92, 246, 0.8)'    // Morado (transferencia)
+    ];
+
+    chartMetodosPago = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colores.slice(0, labels.length),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const porcentaje = ((value / total) * 100).toFixed(1);
+                            return `${label}: Q ${value.toFixed(2)} (${porcentaje}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function mostrarGraficoVentasDiarias(ventasPorDia) {
+    const ctx = document.getElementById('chartVentasDiarias');
+
+    // Destruir gráfico anterior si existe
+    if (chartVentasDiarias) {
+        chartVentasDiarias.destroy();
+    }
+
+    // Preparar datos
+    const labels = ventasPorDia.map(v => {
+        const fecha = new Date(v.fecha);
+        return fecha.toLocaleDateString('es-GT', { month: 'short', day: 'numeric' });
+    });
+
+    const data = ventasPorDia.map(v => parseFloat(v.total_vendido || 0));
+
+    chartVentasDiarias = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Ventas Diarias',
+                data: data,
+                borderColor: 'rgba(59, 130, 246, 1)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: 'rgba(59, 130, 246, 1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Ventas: ${Utils.formatCurrency(context.parsed.y)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Q ' + value.toFixed(0);
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+/* ==================== EXPORTACIONES ==================== */
+
+async function exportarReporte() {
+    if (!datosReporte) {
+        Utils.showToast('Primero debes generar el reporte', 'warning');
+        return;
+    }
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Header con logo
+        doc.setFillColor(37, 99, 235);
+        doc.rect(0, 0, 210, 40, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont(undefined, 'bold');
+        doc.text('PAINTS', 20, 20);
+
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        doc.text('Sistema de Gestión para Cadena de Pinturas', 20, 28);
+        doc.text('Reporte de Ventas', 20, 35);
+
+        // Reset color de texto
+        doc.setTextColor(0, 0, 0);
+
+        // Información del reporte
+        doc.setFontSize(10);
+        const filtros = obtenerFiltros();
+        doc.text(`Período: ${filtros.fecha_inicio} al ${filtros.fecha_fin}`, 20, 50);
+        doc.text(`Generado: ${new Date().toLocaleDateString('es-GT')}`, 20, 55);
+        doc.text(`Usuario: ${auth.user.nombre_completo}`, 20, 60);
+
+        // Resumen de ventas
+        let y = 75;
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('RESUMEN DE VENTAS', 20, y);
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        y += 10;
+
+        const resumen = datosReporte.resumen;
+        doc.text(`Total Facturado: ${Utils.formatCurrency(resumen.total_general)}`, 30, y);
+        y += 6;
+        doc.text(`  - Efectivo: ${Utils.formatCurrency(resumen.total_efectivo)}`, 30, y);
+        y += 6;
+        doc.text(`  - Cheque: ${Utils.formatCurrency(resumen.total_cheque)}`, 30, y);
+        y += 6;
+        doc.text(`  - Tarjeta: ${Utils.formatCurrency(resumen.total_tarjeta)}`, 30, y);
+        y += 6;
+        doc.text(`  - Transferencia: ${Utils.formatCurrency(resumen.total_transferencia)}`, 30, y);
+        y += 10;
+        doc.text(`Número de Facturas: ${resumen.numero_facturas}`, 30, y);
+        y += 6;
+        doc.text(`Venta Promedio: ${Utils.formatCurrency(resumen.venta_promedio)}`, 30, y);
+        y += 6;
+        doc.text(`Facturas Anuladas: ${resumen.facturas_anuladas}`, 30, y);
+
+        // Top 10 Productos (tabla)
+        y += 15;
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text('TOP 10 PRODUCTOS MÁS VENDIDOS', 20, y);
+        y += 5;
+
+        // Obtener datos de la tabla
+        const tbody = document.getElementById('topProductosVendidos');
+        const rows = tbody.querySelectorAll('tr');
+        const tableData = [];
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length > 0) {
+                tableData.push([
+                    cells[0].textContent.trim(),
+                    cells[1].querySelector('strong')?.textContent.trim() || '',
+                    cells[2].textContent.trim(),
+                    cells[3].textContent.trim(),
+                    cells[4].querySelector('strong')?.textContent.trim() || '',
+                    cells[5].textContent.trim()
+                ]);
+            }
+        });
+
+        doc.autoTable({
+            startY: y,
+            head: [['#', 'Producto', 'Categoría', 'Cantidad', 'Total', '%']],
+            body: tableData,
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [37, 99, 235] },
+            margin: { left: 20, right: 20 }
+        });
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            doc.text(
+                `Página ${i} de ${pageCount}`,
+                doc.internal.pageSize.width / 2,
+                doc.internal.pageSize.height - 10,
+                { align: 'center' }
+            );
+            doc.text(
+                'Sistema Paints - Reporte Confidencial',
+                20,
+                doc.internal.pageSize.height - 10
+            );
+        }
+
+        // Descargar
+        const nombreArchivo = `reporte_ventas_${filtros.fecha_inicio}_${filtros.fecha_fin}.pdf`;
+        doc.save(nombreArchivo);
+
+        Utils.showToast('Reporte exportado exitosamente', 'success');
+
+    } catch (error) {
+        console.error('Error al exportar PDF:', error);
+        Utils.showToast('Error al exportar el reporte', 'error');
+    }
+}
+
+async function imprimirReporte() {
+    if (!datosReporte) {
+        Utils.showToast('Primero debes generar el reporte', 'warning');
+        return;
+    }
+
+    window.print();
+}
+
+/* ==================== UTILIDADES ==================== */
+
+function limpiarFiltros() {
+    document.getElementById('periodoSelect').value = 'month';
+    document.getElementById('sucursalSelect').value = '';
+    document.getElementById('metodoPagoSelect').value = '';
+    document.getElementById('usuarioSelect').value = '';
+    configurarFechasPorDefecto();
+
+    // Limpiar datos
+    datosReporte = null;
+
+    // Limpiar estadísticas
+    document.getElementById('totalFacturado').textContent = 'Q 0.00';
+    document.getElementById('numeroFacturas').textContent = '0';
+    document.getElementById('ventaPromedio').textContent = 'Q 0.00';
+    document.getElementById('facturasAnuladas').textContent = '0';
+
+    // Limpiar tablas
+    document.getElementById('topProductosVendidos').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">Genera un reporte para ver los datos</td></tr>';
+    document.getElementById('ventasPorSucursal').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">Genera un reporte para ver los datos</td></tr>';
+
+    // Limpiar gráficos
+    if (chartMetodosPago) {
+        chartMetodosPago.destroy();
+        chartMetodosPago = null;
+    }
+
+    if (chartVentasDiarias) {
+        chartVentasDiarias.destroy();
+        chartVentasDiarias = null;
+    }
+
+    Utils.showToast('Filtros limpiados', 'info');
+}
+
+function mostrarLoading(mostrar) {
+    // Aquí podrías agregar un spinner de loading
+    const btn = document.querySelector('button[onclick="generarReporte()"]');
+    if (btn) {
+        btn.disabled = mostrar;
+        btn.innerHTML = mostrar
+            ? '<i class="fas fa-spinner fa-spin"></i> Generando...'
+            : '<i class="fas fa-chart-line"></i> Generar Reporte';
+    }
+}
+
+function logout() {
+    auth.logout();
+}
+
+// Exportar funciones globalmente
+window.generarReporte = generarReporte;
+window.exportarReporte = exportarReporte;
+window.imprimirReporte = imprimirReporte;
+window.configurarFechas = configurarFechas;
+window.limpiarFiltros = limpiarFiltros;
 window.logout = logout;

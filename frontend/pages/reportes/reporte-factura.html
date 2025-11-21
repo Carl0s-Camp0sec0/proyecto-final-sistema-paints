@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda de Facturas - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Reportes</h2>
+                <p class="sidebar-subtitle">Búsqueda de Facturas</p>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Panel de Reportes
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-ventas.html">
+                        <i class="fas fa-chart-line"></i>
+                        Reporte de Ventas
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-inventario.html">
+                        <i class="fas fa-boxes"></i>
+                        Reporte de Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-productos.html">
+                        <i class="fas fa-box"></i>
+                        Reporte de Productos
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-factura.html" class="active">
+                        <i class="fas fa-file-invoice"></i>
+                        Búsqueda de Facturas
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div style="margin-bottom: 2rem;">
+                <h1><i class="fas fa-file-invoice"></i> Búsqueda de Facturas</h1>
+                <p style="color: var(--gray-600);">Consulta y visualiza facturas por número</p>
+            </div>
+
+            <!-- Búsqueda de Factura -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Buscar Factura</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: end;">
+                        <div class="form-group">
+                            <label class="form-label">Número de Factura</label>
+                            <input id="inputNumeroFactura" type="text" class="form-input" placeholder="Ej: FAC-2025-001">
+                        </div>
+                        <button id="btnBuscarFactura" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultado de la Búsqueda -->
+            <div id="resultadoFactura" style="display: none;">
+                <!-- Información de la Factura -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <h3>Información de la Factura</h3>
+                        <button id="btnExportarPDF" class="btn btn-secondary">
+                            <i class="fas fa-file-pdf"></i>
+                            Exportar PDF
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                            <div>
+                                <p class="text-muted">Número de Factura</p>
+                                <p id="infoNumeroFactura" style="font-size: 1.25rem; font-weight: 600; color: var(--primary-blue);"></p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Fecha</p>
+                                <p id="infoFecha" style="font-size: 1.25rem; font-weight: 600;"></p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Total</p>
+                                <p id="infoTotal" style="font-size: 1.25rem; font-weight: 600; color: var(--success-green);"></p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Estado</p>
+                                <p id="infoEstado"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del Cliente -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <h3>Datos del Cliente</h3>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                            <div>
+                                <p class="text-muted">Nombre</p>
+                                <p id="clienteNombre" style="font-weight: 500;"></p>
+                            </div>
+                            <div>
+                                <p class="text-muted">NIT</p>
+                                <p id="clienteNit" style="font-weight: 500;"></p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Teléfono</p>
+                                <p id="clienteTelefono" style="font-weight: 500;"></p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Dirección</p>
+                                <p id="clienteDireccion" style="font-weight: 500;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Venta -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <h3>Información de Venta</h3>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                            <div>
+                                <p class="text-muted">Sucursal</p>
+                                <p id="ventaSucursal" style="font-weight: 500;"></p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Responsable</p>
+                                <p id="ventaResponsable" style="font-weight: 500;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles de Productos -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <h3>Productos</h3>
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio Unitario</th>
+                                        <th>Descuento</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaProductos">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Métodos de Pago -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Métodos de Pago</h3>
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Método de Pago</th>
+                                        <th>Monto</th>
+                                        <th>Referencia</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaMetodosPago">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje de No Encontrado -->
+            <div id="mensajeNoEncontrado" class="card" style="display: none;">
+                <div class="card-content" style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-search" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--gray-600);">Factura no encontrada</h3>
+                    <p style="color: var(--gray-500);">No se encontró ninguna factura con el número especificado</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico</p>
+        </div>
+    </footer>
+
+    <!-- jsPDF y jsPDF-AutoTable para exportar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Sistema - Scripts del módulo -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+
+    <!-- Script específico de la página -->
+    <script src="/frontend/assets/js/pages/reporte-factura.js"></script>
+</body>
+</html>

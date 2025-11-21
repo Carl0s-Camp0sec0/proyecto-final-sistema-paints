@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Inventario - Sistema Paints</title>
+    <title>Ingresos de Inventario - Sistema Paints</title>
     <link rel="stylesheet" href="/frontend/assets/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -36,9 +36,9 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2 class="sidebar-title">Reportes</h2>
-                <p class="sidebar-subtitle">Inventario</p>
+                <p class="sidebar-subtitle">Ingresos de Inventario</p>
             </div>
-            
+
             <nav>
                 <ul class="sidebar-nav">
                     <li><a href="/frontend/pages/admin/dashboard.html">
@@ -53,7 +53,7 @@
                         <i class="fas fa-chart-line"></i>
                         Reporte de Ventas
                     </a></li>
-                    <li><a href="/frontend/pages/reportes/reporte-inventario.html" class="active">
+                    <li><a href="/frontend/pages/reportes/reporte-inventario.html">
                         <i class="fas fa-boxes"></i>
                         Reporte de Inventario
                     </a></li>
@@ -61,9 +61,9 @@
                         <i class="fas fa-box"></i>
                         Reporte de Productos
                     </a></li>
-                    <li><a href="/frontend/pages/reportes/reporte-clientes.html">
-                        <i class="fas fa-users"></i>
-                        Reporte de Clientes
+                    <li><a href="/frontend/pages/reportes/reporte-ingresos.html" class="active">
+                        <i class="fas fa-truck-loading"></i>
+                        Ingresos de Inventario
                     </a></li>
                 </ul>
             </nav>
@@ -77,21 +77,49 @@
         <!-- Main Content -->
         <main class="main-content">
             <div style="margin-bottom: 2rem;">
-                <h1><i class="fas fa-boxes"></i> Reporte de Inventario</h1>
-                <p style="color: var(--gray-600);">Estado actual del inventario por sucursal</p>
+                <h1><i class="fas fa-truck-loading"></i> Ingresos de Inventario</h1>
+                <p style="color: var(--gray-600);">Historial de entradas de productos al inventario</p>
             </div>
 
-            <!-- Estadísticas de Inventario -->
+            <!-- Estadísticas de Ingresos -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                 <div class="card">
                     <div class="card-content">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <p class="text-muted">Total Productos</p>
-                                <h2 id="estadisticaTotalProductos" style="color: var(--primary-blue);">0</h2>
+                                <p class="text-muted">Total Ingresos</p>
+                                <h2 id="estadisticaTotalIngresos" style="color: var(--primary-blue);">0</h2>
                             </div>
                             <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-truck-loading" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Productos</p>
+                                <h2 id="estadisticaTotalProductos" style="color: var(--success-green);">0</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
                                 <i class="fas fa-box" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Unidades</p>
+                                <h2 id="estadisticaTotalUnidades" style="color: var(--warning-yellow);">0</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-boxes" style="font-size: 1.5rem;"></i>
                             </div>
                         </div>
                     </div>
@@ -110,43 +138,25 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="card">
-                    <div class="card-content">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <p class="text-muted">Stock Bajo</p>
-                                <h2 id="estadisticaStockBajo" style="color: var(--warning-yellow);">0</h2>
-                            </div>
-                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
-                                <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem;"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-content">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <p class="text-muted">Agotados</p>
-                                <h2 id="estadisticaAgotados" style="color: var(--error-red);">0</h2>
-                            </div>
-                            <div style="background: var(--error-100); padding: 1rem; border-radius: 50%; color: var(--error-red);">
-                                <i class="fas fa-times-circle" style="font-size: 1.5rem;"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Filtros -->
             <div class="card" style="margin-bottom: 2rem;">
                 <div class="card-header">
-                    <h3>Filtros de Inventario</h3>
+                    <h3>Filtros de Búsqueda</h3>
                 </div>
                 <div class="card-content">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Fecha Inicio</label>
+                            <input id="inputFechaInicio" type="date" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Fecha Fin</label>
+                            <input id="inputFechaFin" type="date" class="form-input">
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label">Sucursal</label>
                             <select id="selectSucursal" class="form-select">
@@ -155,25 +165,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Categoría</label>
-                            <select id="selectCategoria" class="form-select">
-                                <option value="">Todas las Categorías</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Estado de Stock</label>
-                            <select id="selectEstadoStock" class="form-select">
-                                <option value="">Todos los Estados</option>
-                                <option value="normal">Normal</option>
-                                <option value="bajo">Stock Bajo</option>
-                                <option value="agotado">Agotado</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Búsqueda</label>
-                            <input id="inputBuscar" type="text" class="form-input" placeholder="Buscar producto...">
+                            <label class="form-label">Producto</label>
+                            <input id="inputProducto" type="text" class="form-input" placeholder="Buscar producto...">
                         </div>
                     </div>
 
@@ -181,6 +174,10 @@
                         <button id="btnAplicarFiltros" class="btn btn-primary">
                             <i class="fas fa-filter"></i>
                             Aplicar Filtros
+                        </button>
+                        <button id="btnLimpiarFiltros" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Limpiar
                         </button>
                         <button id="btnExportarPDF" class="btn btn-secondary">
                             <i class="fas fa-file-pdf"></i>
@@ -190,63 +187,30 @@
                 </div>
             </div>
 
-            <!-- Alertas Críticas -->
-            <div class="card" style="margin-bottom: 2rem;">
-                <div class="card-header" style="background: var(--error-100); border-bottom: 1px solid var(--error-200);">
-                    <h3 style="color: var(--error-700);">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Alertas Críticas de Stock
-                    </h3>
-                </div>
-                <div class="card-content" style="padding: 0;">
-                    <div class="table-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Sucursal</th>
-                                    <th>Stock Actual</th>
-                                    <th>Stock Mínimo</th>
-                                    <th>Estado</th>
-                                    <th>Prioridad</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaAlertasCriticas">
-                                <tr>
-                                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">
-                                        <i class="fas fa-spinner fa-spin"></i> Cargando alertas críticas...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inventario Detallado -->
+            <!-- Historial de Ingresos -->
             <div class="card">
                 <div class="card-header">
-                    <h3>Inventario Detallado por Producto</h3>
+                    <h3>Historial de Ingresos</h3>
                 </div>
                 <div class="card-content" style="padding: 0;">
                     <div class="table-container">
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th>Fecha</th>
                                     <th>Producto</th>
-                                    <th>Categoría</th>
                                     <th>Sucursal</th>
-                                    <th>Stock Actual</th>
-                                    <th>Stock Mínimo</th>
-                                    <th>Precio Unitario</th>
-                                    <th>Valor Total</th>
-                                    <th>Estado</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo Unitario</th>
+                                    <th>Costo Total</th>
+                                    <th>Proveedor</th>
+                                    <th>Responsable</th>
                                 </tr>
                             </thead>
-                            <tbody id="tablaInventarioDetallado">
+                            <tbody id="tablaIngresos">
                                 <tr>
                                     <td colspan="8" style="text-align: center; padding: 2rem; color: var(--gray-500);">
-                                        <i class="fas fa-spinner fa-spin"></i> Cargando inventario...
+                                        <i class="fas fa-spinner fa-spin"></i> Cargando ingresos...
                                     </td>
                                 </tr>
                             </tbody>
@@ -278,6 +242,6 @@
     <script src="/frontend/assets/js/utils.js"></script>
 
     <!-- Script específico de la página -->
-    <script src="/frontend/assets/js/pages/reporte-inventario.js"></script>
+    <script src="/frontend/assets/js/pages/reporte-ingresos.js"></script>
 </body>
 </html>
