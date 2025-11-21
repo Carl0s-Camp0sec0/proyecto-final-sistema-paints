@@ -20,7 +20,7 @@ async function startServer() {
       console.log('🔧 Sincronizando modelos con base de datos...');
       // NOTA: alter: true actualiza tablas sin borrar datos
       // Si necesitas recrear todo: { force: true }
-      await sequelize.sync({ alter: false }); // Cambia a true si necesitas actualizar estructura
+      await sequelize.sync({ alter: true }); // Cambia a true si necesitas actualizar estructura
       console.log('✅ Modelos sincronizados correctamente');
     }
 

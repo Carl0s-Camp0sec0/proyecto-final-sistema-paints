@@ -67,10 +67,18 @@ module.exports = (sequelize, DataTypes) => {
         len: [2, 100]
       }
     },
+    nit: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      unique: true,
+      validate: {
+        notEmpty: true
+      },
+      comment: 'NIT del cliente (CF para consumidor final)'
+    },
     email: {
       type: DataTypes.STRING(100),
       allowNull: true,
-      unique: true,
       validate: {
         isEmail: true
       }
