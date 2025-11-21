@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresos de Inventario - Sistema Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/frontend/pages/admin/dashboard.html" class="logo">
+                <span class="logo-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </span>
+                Sistema Paints
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-avatar">A</span>
+                    <div>
+                        <div style="font-weight: 500;">Admin</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Reportes</h2>
+                <p class="sidebar-subtitle">Ingresos de Inventario</p>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="/frontend/pages/admin/dashboard.html">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reportes.html">
+                        <i class="fas fa-chart-bar"></i>
+                        Panel de Reportes
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-ventas.html">
+                        <i class="fas fa-chart-line"></i>
+                        Reporte de Ventas
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-inventario.html">
+                        <i class="fas fa-boxes"></i>
+                        Reporte de Inventario
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-productos.html">
+                        <i class="fas fa-box"></i>
+                        Reporte de Productos
+                    </a></li>
+                    <li><a href="/frontend/pages/reportes/reporte-ingresos.html" class="active">
+                        <i class="fas fa-truck-loading"></i>
+                        Ingresos de Inventario
+                    </a></li>
+                </ul>
+            </nav>
+
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div style="margin-bottom: 2rem;">
+                <h1><i class="fas fa-truck-loading"></i> Ingresos de Inventario</h1>
+                <p style="color: var(--gray-600);">Historial de entradas de productos al inventario</p>
+            </div>
+
+            <!-- Estadísticas de Ingresos -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Ingresos</p>
+                                <h2 id="estadisticaTotalIngresos" style="color: var(--primary-blue);">0</h2>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
+                                <i class="fas fa-truck-loading" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Productos</p>
+                                <h2 id="estadisticaTotalProductos" style="color: var(--success-green);">0</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-box" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Total Unidades</p>
+                                <h2 id="estadisticaTotalUnidades" style="color: var(--warning-yellow);">0</h2>
+                            </div>
+                            <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
+                                <i class="fas fa-boxes" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="text-muted">Valor Total</p>
+                                <h2 id="estadisticaValorTotal" style="color: var(--success-green);">Q 0.00</h2>
+                            </div>
+                            <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
+                                <i class="fas fa-dollar-sign" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <h3>Filtros de Búsqueda</h3>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Fecha Inicio</label>
+                            <input id="inputFechaInicio" type="date" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Fecha Fin</label>
+                            <input id="inputFechaFin" type="date" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Sucursal</label>
+                            <select id="selectSucursal" class="form-select">
+                                <option value="">Todas las Sucursales</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Producto</label>
+                            <input id="inputProducto" type="text" class="form-input" placeholder="Buscar producto...">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button id="btnAplicarFiltros" class="btn btn-primary">
+                            <i class="fas fa-filter"></i>
+                            Aplicar Filtros
+                        </button>
+                        <button id="btnLimpiarFiltros" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Limpiar
+                        </button>
+                        <button id="btnExportarPDF" class="btn btn-secondary">
+                            <i class="fas fa-file-pdf"></i>
+                            Exportar PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de Ingresos -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Historial de Ingresos</h3>
+                </div>
+                <div class="card-content" style="padding: 0;">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Producto</th>
+                                    <th>Sucursal</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo Unitario</th>
+                                    <th>Costo Total</th>
+                                    <th>Proveedor</th>
+                                    <th>Responsable</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaIngresos">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                                        <i class="fas fa-spinner fa-spin"></i> Cargando ingresos...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--gray-300); padding: 2rem 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico</p>
+        </div>
+    </footer>
+
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <!-- jsPDF y jsPDF-AutoTable para exportar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Sistema - Scripts del módulo -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+
+    <!-- Script específico de la página -->
+    <script src="/frontend/assets/js/pages/reporte-ingresos.js"></script>
+</body>
+</html>
