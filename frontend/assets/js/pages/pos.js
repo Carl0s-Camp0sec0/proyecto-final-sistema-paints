@@ -136,9 +136,9 @@ async function searchProducts(query) {
                     console.log('📋 Claves del inventario:', Object.keys(product.inventarios[0]));
                 }
 
-                // Calcular stock total sumando todas las cantidades del inventario
+                // Calcular stock total sumando el stock disponible de todos los inventarios
                 const stock = product.inventarios && product.inventarios.length > 0
-                    ? product.inventarios.reduce((total, inv) => total + (inv.cantidad || 0), 0)
+                    ? product.inventarios.reduce((total, inv) => total + (inv.stock_disponible || 0), 0)
                     : 0;
                 console.log('📊 Stock calculado para', product.nombre, ':', stock);
                 const stockClass = stock > 10 ? '' : stock > 0 ? 'low' : 'out';
