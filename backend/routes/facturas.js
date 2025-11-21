@@ -190,8 +190,10 @@ router.post('/',
         });
       }
 
-      // Calcular total
-      const total = subtotal - parseFloat(descuento);
+      // Calcular total con IVA
+      const afterDiscount = subtotal - parseFloat(descuento);
+      const impuestos = afterDiscount * 0.12; // IVA 12%
+      const total = afterDiscount + impuestos;
 
       // Validar medios de pago
       let totalPagado = 0;
@@ -224,8 +226,8 @@ router.post('/',
         usuario_id: req.usuario.id,
         subtotal,
         descuento: parseFloat(descuento),
-        impuestos: 0,
-        total,
+        impuestos: parseFloat(impuestos.toFixed(2)),
+        total: parseFloat(total.toFixed(2)),
         estado: 'activa',
         observaciones
       }, { transaction });
