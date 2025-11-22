@@ -222,6 +222,24 @@ function setupEventListeners() {
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', Utils.debounce(filterCategories, 300));
 
+    // Botón agregar categoría
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    if (addCategoryBtn) {
+        addCategoryBtn.addEventListener('click', showAddCategoryModal);
+    }
+
+    // Botón logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            if (typeof auth !== 'undefined' && typeof auth.logout === 'function') {
+                auth.logout();
+            } else {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        });
+    }
+
     // Selector de color
     document.querySelectorAll('.color-option').forEach(option => {
         option.addEventListener('click', () => {
