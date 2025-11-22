@@ -110,7 +110,14 @@ async function cargarIngresos(filtros = {}) {
 
         if (response.success && response.data) {
             ingresosData = response.data.ingresos || [];
-            actualizarEstadisticas(response.data.estadisticas || {});
+
+            // Calcular estadísticas adicionales
+            const estadisticas = response.data.estadisticas || {};
+            estadisticas.total_productos = calcularTotalProductos(ingresosData);
+            estadisticas.total_unidades = calcularTotalUnidades(ingresosData);
+            estadisticas.valor_total = estadisticas.total_monto || 0;
+
+            actualizarEstadisticas(estadisticas);
             mostrarIngresos(ingresosData);
         }
     } catch (error) {
@@ -127,6 +134,36 @@ async function cargarIngresos(filtros = {}) {
             </tr>
         `;
     }
+}
+
+/**
+ * Calcula el total de productos diferentes en los ingresos
+ */
+function calcularTotalProductos(ingresos) {
+    const productosUnicos = new Set();
+    ingresos.forEach(ingreso => {
+        if (ingreso.productos) {
+            ingreso.productos.forEach(prod => {
+                productosUnicos.add(prod.producto_id);
+            });
+        }
+    });
+    return productosUnicos.size;
+}
+
+/**
+ * Calcula el total de unidades ingresadas
+ */
+function calcularTotalUnidades(ingresos) {
+    let totalUnidades = 0;
+    ingresos.forEach(ingreso => {
+        if (ingreso.productos) {
+            ingreso.productos.forEach(prod => {
+                totalUnidades += parseInt(prod.cantidad) || 0;
+            });
+        }
+    });
+    return totalUnidades;
 }
 
 /**

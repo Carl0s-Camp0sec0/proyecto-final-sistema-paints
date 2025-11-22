@@ -247,8 +247,9 @@ class ApiClient {
         return this.request(`/reportes/productos/top-cantidad?${queryString}`);
     }
 
-    async getReporteInventarioGeneral() {
-        return this.request('/reportes/inventario/general');
+    async getReporteInventarioGeneral(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/inventario/general?${queryString}`);
     }
 
     async getReporteProductosMenosVendidos(params = {}) {
@@ -256,12 +257,14 @@ class ApiClient {
         return this.request(`/reportes/productos/menos-vendidos?${queryString}`);
     }
 
-    async getReporteProductosSinStock() {
-        return this.request('/reportes/inventario/sin-stock');
+    async getReporteProductosSinStock(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/inventario/sin-stock?${queryString}`);
     }
 
-    async getReporteProductosStockBajo() {
-        return this.request('/reportes/inventario/stock-bajo');
+    async getReporteProductosStockBajo(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/inventario/stock-bajo?${queryString}`);
     }
 
     async getReporteInventarioPorTienda(sucursalId) {
@@ -275,6 +278,26 @@ class ApiClient {
     async getReporteIngresosInventario(params = {}) {
         const queryString = new URLSearchParams(params).toString();
         return this.request(`/reportes/inventario/ingresos?${queryString}`);
+    }
+
+    async getReporteClientesEstadisticas(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/clientes/estadisticas?${queryString}`);
+    }
+
+    async getReporteClientesTopVentas(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/clientes/top-ventas?${queryString}`);
+    }
+
+    async getReporteClientesSegmentacion(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/clientes/segmentacion?${queryString}`);
+    }
+
+    async getReporteClientesPorTipo(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/clientes/por-tipo?${queryString}`);
     }
 }
 

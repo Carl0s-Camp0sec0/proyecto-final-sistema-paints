@@ -69,17 +69,17 @@ async function showStockMinimoReport(container) {
             `;
         } else {
             tableRows = productos.map(producto => {
-                const stockStatus = producto.stock_disponible === 0 ? 'Agotado' :
-                    producto.stock_disponible <= producto.stock_minimo / 2 ? 'Crítico' : 'Bajo';
-                const statusClass = producto.stock_disponible === 0 ? 'badge-danger' :
-                    producto.stock_disponible <= producto.stock_minimo / 2 ? 'badge-danger' : 'badge-warning';
+                const stockStatus = producto.stock_actual === 0 ? 'Agotado' :
+                    producto.stock_actual <= producto.stock_minimo / 2 ? 'Crítico' : 'Bajo';
+                const statusClass = producto.stock_actual === 0 ? 'badge-danger' :
+                    producto.stock_actual <= producto.stock_minimo / 2 ? 'badge-danger' : 'badge-warning';
 
                 return `
                     <tr>
                         <td>${producto.nombre || producto.producto?.nombre || 'N/A'}</td>
                         <td>${producto.categoria?.nombre || 'N/A'}</td>
-                        <td style="color: var(${producto.stock_disponible === 0 ? '--error-red' : '--warning-yellow'}); font-weight: 600;">
-                            ${producto.stock_disponible || 0}
+                        <td style="color: var(${producto.stock_actual === 0 ? '--error-red' : '--warning-yellow'}); font-weight: 600;">
+                            ${producto.stock_actual || 0}
                         </td>
                         <td>${producto.stock_minimo || 0}</td>
                         <td><span class="badge ${statusClass}">${stockStatus}</span></td>

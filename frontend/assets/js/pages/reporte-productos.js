@@ -307,52 +307,33 @@ async function cargarListadoCompleto() {
         const tbody = document.querySelector('.card:last-child tbody');
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">Cargando...</td></tr>';
 
-        // Por ahora mostrar datos de ejemplo
-        // En producción, esto vendría de un endpoint
-        const productosEjemplo = [
-            {
-                nombre: 'Pintura Látex Premium Blanca',
-                marca: 'Sherwin-Williams',
-                categoria: 'Pinturas',
-                precio: 360,
-                stock: 145,
-                ventas30d: 48,
-                ultima_venta: 'Hoy',
-                activo: true
-            },
-            {
-                nombre: 'Comex Vinimex Color Base',
-                marca: 'Comex',
-                categoria: 'Pinturas',
-                precio: 280,
-                stock: 89,
-                ventas30d: 32,
-                ultima_venta: 'Ayer',
-                activo: true
-            },
-            {
-                nombre: 'Brocha Professional 3"',
-                marca: 'Premium Tools',
-                categoria: 'Accesorios',
-                precio: 90,
-                stock: 267,
-                ventas30d: 18,
-                ultima_venta: '2 días',
-                activo: true
-            },
-            {
-                nombre: 'Barniz Marina Transparente',
-                marca: 'Speciality',
-                categoria: 'Barnices',
-                precio: 168,
-                stock: 12,
-                ventas30d: 0,
-                ultima_venta: '45 días',
-                activo: false
-            }
-        ];
+        // Obtener productos desde el backend
+        const response = await api.getProductos({ limit: 100 });
 
-        tbody.innerHTML = productosEjemplo.map(producto => `
+        if (!response.success || !response.data || response.data.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        <i class="fas fa-inbox"></i> No hay productos disponibles
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        const productos = response.data.map(p => ({
+            id: p.id,
+            nombre: p.nombre,
+            marca: p.marca || 'N/A',
+            categoria: p.categoria?.nombre || 'Sin categoría',
+            precio: p.precio_base || 0,
+            stock: p.stock_total || 0,
+            ventas30d: 0, // TODO: Implementar contador de ventas
+            ultima_venta: 'N/A', // TODO: Implementar última venta
+            activo: p.activo
+        }));
+
+        tbody.innerHTML = productos.map(producto => `
             <tr>
                 <td>
                     <strong>${producto.nombre}</strong><br>
@@ -374,6 +355,14 @@ async function cargarListadoCompleto() {
 
     } catch (error) {
         console.error('Error al cargar listado completo:', error);
+        const tbody = document.querySelector('.card:last-child tbody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 2rem; color: var(--error-red);">
+                    <i class="fas fa-exclamation-triangle"></i> Error al cargar el listado de productos
+                </td>
+            </tr>
+        `;
     }
 }
 

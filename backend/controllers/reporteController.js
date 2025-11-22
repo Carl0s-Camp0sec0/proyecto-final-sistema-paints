@@ -22,7 +22,7 @@ const Proveedor = db.Proveedor;
    ============================================ */
 exports.getVentasPorPeriodo = async (req, res) => {
     try {
-        const { fecha_inicio, fecha_fin, sucursal_id, metodo_pago } = req.query;
+        const { fecha_inicio, fecha_fin, sucursal_id, metodo_pago, usuario_id } = req.query;
 
         // Validar fechas
         if (!fecha_inicio || !fecha_fin) {
@@ -42,6 +42,10 @@ exports.getVentasPorPeriodo = async (req, res) => {
 
         if (sucursal_id) {
             whereFactura.sucursal_id = sucursal_id;
+        }
+
+        if (usuario_id) {
+            whereFactura.usuario_id = usuario_id;
         }
 
         // Obtener facturas del período
@@ -839,7 +843,7 @@ exports.getFacturaPorNumero = async (req, res) => {
    ============================================ */
 exports.getIngresosInventario = async (req, res) => {
     try {
-        const { fecha_inicio, fecha_fin, sucursal_id, proveedor_id } = req.query;
+        const { fecha_inicio, fecha_fin, sucursal_id, proveedor_id, producto } = req.query;
 
         if (!fecha_inicio || !fecha_fin) {
             return res.status(400).json({
@@ -860,6 +864,15 @@ exports.getIngresosInventario = async (req, res) => {
 
         if (proveedor_id) {
             whereIngreso.proveedor_id = proveedor_id;
+        }
+
+        // Construir where para producto si se especifica
+        const whereProducto = {};
+        if (producto) {
+            whereProducto[Op.or] = [
+                { nombre: { [Op.like]: `%${producto}%` } },
+                { marca: { [Op.like]: `%${producto}%` } }
+            ];
         }
 
         const ingresos = await IngresoInventario.findAll({
@@ -883,11 +896,13 @@ exports.getIngresosInventario = async (req, res) => {
                 {
                     model: IngresoDetalle,
                     as: 'detalles',
+                    ...(producto ? { required: true } : {}),
                     include: [
                         {
                             model: Producto,
                             as: 'producto',
                             attributes: ['id', 'nombre', 'marca'],
+                            ...(producto ? { where: whereProducto, required: true } : {}),
                             include: [{
                                 model: Categoria,
                                 as: 'categoria',
