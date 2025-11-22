@@ -135,8 +135,15 @@
                     <li><a href="/frontend/pages/public/cotizacion.html" class="nav-link">Cotización</a></li>
                 </ul>
             </nav>
-            <div class="user-menu">
-                <a href="/frontend/pages/public/login.html" class="btn btn-primary btn-sm">Iniciar Sesión</a>
+            <div class="user-menu" id="userMenu">
+                <a href="/frontend/pages/public/carrito.html" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-shopping-cart"></i>
+                    Carrito
+                </a>
+                <a href="/frontend/pages/public/login-cliente.html" class="btn btn-primary btn-sm">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
+                </a>
             </div>
         </div>
     </header>
@@ -150,17 +157,17 @@
                 Control de inventario, ventas, facturación y reportes en tiempo real.
             </p>
             <div class="hero-buttons">
-                <a href="/frontend/pages/public/login.html" class="btn btn-lg" style="background: white; color: var(--primary-blue);">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Acceder al Sistema
-                </a>
-                <a href="/frontend/pages/public/catalogo.html" class="btn btn-lg btn-secondary">
+                <a href="/frontend/pages/public/catalogo.html" class="btn btn-lg" style="background: white; color: var(--primary-blue);">
                     <i class="fas fa-paint-brush"></i>
                     Ver Catálogo
                 </a>
-                <a href="/frontend/pages/public/tiendas.html" class="btn btn-lg btn-secondary">
-                    <i class="fas fa-map-marker-alt"></i>
-                    Nuestras Tiendas
+                <a href="/frontend/pages/public/login-cliente.html" class="btn btn-lg btn-secondary">
+                    <i class="fas fa-user"></i>
+                    Soy Cliente
+                </a>
+                <a href="/frontend/pages/public/login.html" class="btn btn-lg btn-secondary">
+                    <i class="fas fa-user-tie"></i>
+                    Soy Empleado
                 </a>
             </div>
         </div>
@@ -178,12 +185,19 @@
                 </p>
             </div>
 
-            <div id="catalogoPreview" class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-                <!-- Los productos se cargarán dinámicamente -->
-                <div style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-blue);"></i>
-                    <p style="margin-top: 1rem; color: var(--gray-600);">Cargando productos...</p>
+            <!-- Carrusel de productos -->
+            <div style="position: relative; overflow: hidden; padding: 2rem 0;">
+                <div id="carruselProductos" style="display: flex; transition: transform 0.5s ease; gap: 2rem;">
+                    <!-- Los productos se cargarán dinámicamente -->
                 </div>
+
+                <!-- Controles del carrusel -->
+                <button onclick="moverCarrusel(-1)" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; padding: 1rem; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;">
+                    <i class="fas fa-chevron-left" style="color: var(--primary-blue);"></i>
+                </button>
+                <button onclick="moverCarrusel(1)" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; padding: 1rem; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;">
+                    <i class="fas fa-chevron-right" style="color: var(--primary-blue);"></i>
+                </button>
             </div>
 
             <div style="text-align: center; margin-top: 2rem;">

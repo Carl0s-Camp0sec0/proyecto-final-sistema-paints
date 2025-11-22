@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Paints</title>
+    <title>Iniciar Sesión - Cliente - Paints</title>
     <link rel="stylesheet" href="/frontend/assets/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -19,34 +19,35 @@
                 © 2025 Sistema Paints - Universidad UMES. Proyecto Académico
                 <div style="margin-top: 0.5rem;">
                     <a href="/frontend/pages/public/index.html" style="color: currentColor; margin-right: 1rem;">Inicio</a>
-                    <a href="#" style="color: currentColor;">Política de privacidad</a>
+                    <a href="/frontend/pages/public/login.html" style="color: currentColor;">Login Empleados</a>
                 </div>
             </div>
         </div>
         <div class="login-right">
             <div class="login-form-container">
-                <h2 class="login-form-title">Acceso para Empleados</h2>
-                <p class="login-form-subtitle">Sistema interno de Paints</p>
-                
-                <form id="loginForm">
+                <h2 class="login-form-title">Iniciar Sesión como Cliente</h2>
+                <p class="login-form-subtitle">Accede a tu cuenta de compras</p>
+
+                <form id="loginClienteForm">
                     <div class="form-group">
-                        <label class="form-label">Correo electrónico / Usuario</label>
-                        <input type="email" name="email" class="form-input" 
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" name="email" class="form-input"
                                placeholder="tu@email.com" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">Contraseña</label>
                         <div class="password-input-container">
-                            <input type="password" name="password" class="form-input" 
+                            <input type="password" name="password" class="form-input"
                                    placeholder="••••••••" required>
                             <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                        <i class="fas fa-sign-in-alt"></i>
                         Entrar
                     </button>
 
@@ -56,27 +57,18 @@
                     </a>
                 </form>
 
-                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
-                    <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">
-                        ¿Quieres comprar en nuestra tienda?
-                    </p>
-                    <a href="/frontend/pages/public/login-cliente.html" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-shopping-cart"></i>
-                        Acceso para Clientes
-                    </a>
+                <div class="login-links">
+                    ¿No tienes una cuenta? <a href="/frontend/pages/public/register-cliente.html">Regístrate aquí</a>
                 </div>
 
-                <!-- Usuarios de prueba -->
-                <div style="margin-top: 2rem; padding: 1rem; background: var(--gray-100); border-radius: var(--border-radius);">
-                    <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">
-                        <strong>Usuarios de prueba:</strong>
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                    <p style="font-size: 0.875rem; color: var(--gray-600);">
+                        ¿Eres empleado de Paints?
                     </p>
-                    <div style="font-size: 0.75rem; color: var(--gray-500);">
-                        <div>Admin: admin@paints.com / admin123</div>
-                        <div>Cajero: cajero@paints.com / cajero123</div>
-                        <div>Digitador: digitador@paints.com / digitador123</div>
-                        <div>Gerente: gerente@paints.com / gerente123</div>
-                    </div>
+                    <a href="/frontend/pages/public/login.html" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;">
+                        <i class="fas fa-user-tie"></i>
+                        Acceso para Empleados
+                    </a>
                 </div>
             </div>
         </div>
@@ -89,6 +81,6 @@
     <script src="/frontend/assets/js/utils.js"></script>
     <script src="/frontend/assets/js/global.js"></script>
     <!-- Page-specific script -->
-    <script src="/frontend/assets/js/pages/login.js"></script>
+    <script src="/frontend/assets/js/pages/login-cliente.js"></script>
 </body>
 </html>

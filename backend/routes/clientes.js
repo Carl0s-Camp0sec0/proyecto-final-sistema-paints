@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Cliente, Sucursal } = require('../models');
 const AuthMiddleware = require('../middleware/auth');
+const jwt = require('jsonwebtoken');
 
 /**
  * @route   GET /api/clientes
@@ -226,5 +227,234 @@ router.get('/sucursal-cercana', async (req, res) => {
     });
   }
 });
+
+/**
+ * @route   POST /api/clientes/registro
+ * @desc    Registro de nuevo cliente (público)
+ * @access  Public
+ */
+router.post('/registro', async (req, res) => {
+  try {
+    console.log('🆕 Registrando nuevo cliente...');
+
+    const {
+      nombre_completo,
+      email,
+      password,
+      telefono,
+      nit,
+      direccion
+    } = req.body;
+
+    // Validaciones básicas
+    if (!nombre_completo || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nombre completo, email y contraseña son requeridos'
+      });
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Formato de email inválido'
+      });
+    }
+
+    // Validar longitud de contraseña
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      });
+    }
+
+    // Verificar si ya existe un cliente con ese email
+    const { Op } = require('sequelize');
+    const clienteExistente = await Cliente.findOne({
+      where: {
+        email: email,
+        activo: true
+      }
+    });
+
+    if (clienteExistente) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ya existe una cuenta con ese email'
+      });
+    }
+
+    // Crear el cliente usando el método estático
+    const nuevoCliente = await Cliente.crearCliente({
+      nombre_completo,
+      email,
+      password,
+      telefono: telefono || null,
+      nit: nit || 'CF',
+      direccion: direccion || null,
+      recibe_promociones: true,
+      activo: true
+    });
+
+    // Generar token JWT
+    const token = jwt.sign(
+      {
+        id: nuevoCliente.id,
+        email: nuevoCliente.email,
+        tipo: 'cliente'
+      },
+      process.env.JWT_SECRET || 'tu_secreto_super_seguro_cambialo',
+      { expiresIn: '7d' }
+    );
+
+    console.log(`✅ Cliente registrado: ${nuevoCliente.nombre_completo}`);
+
+    // No devolver el password_hash
+    const clienteResponse = nuevoCliente.toJSON();
+    delete clienteResponse.password_hash;
+
+    res.status(201).json({
+      success: true,
+      message: 'Cliente registrado exitosamente',
+      token,
+      cliente: clienteResponse
+    });
+
+  } catch (error) {
+    console.error('❌ Error registrando cliente:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * @route   POST /api/clientes/login
+ * @desc    Login de cliente
+ * @access  Public
+ */
+router.post('/login', async (req, res) => {
+  try {
+    console.log('🔐 Cliente intentando login...');
+
+    const { email, password } = req.body;
+
+    // Validaciones
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email y contraseña son requeridos'
+      });
+    }
+
+    // Buscar cliente por email
+    const cliente = await Cliente.findOne({
+      where: {
+        email: email,
+        activo: true
+      }
+    });
+
+    if (!cliente) {
+      return res.status(401).json({
+        success: false,
+        message: 'Credenciales inválidas'
+      });
+    }
+
+    // Verificar contraseña
+    const passwordValida = await cliente.validarPassword(password);
+
+    if (!passwordValida) {
+      return res.status(401).json({
+        success: false,
+        message: 'Credenciales inválidas'
+      });
+    }
+
+    // Generar token JWT
+    const token = jwt.sign(
+      {
+        id: cliente.id,
+        email: cliente.email,
+        tipo: 'cliente'
+      },
+      process.env.JWT_SECRET || 'tu_secreto_super_seguro_cambialo',
+      { expiresIn: '7d' }
+    );
+
+    console.log(`✅ Cliente autenticado: ${cliente.nombre_completo}`);
+
+    // No devolver el password_hash
+    const clienteResponse = cliente.toJSON();
+    delete clienteResponse.password_hash;
+
+    res.json({
+      success: true,
+      message: 'Login exitoso',
+      token,
+      cliente: clienteResponse
+    });
+
+  } catch (error) {
+    console.error('❌ Error en login de cliente:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * @route   GET /api/clientes/perfil
+ * @desc    Obtener perfil del cliente autenticado
+ * @access  Private (Cliente)
+ */
+router.get('/perfil',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      console.log('👤 Obteniendo perfil de cliente...');
+
+      // Verificar que el token sea de un cliente
+      if (req.usuario.tipo !== 'cliente') {
+        return res.status(403).json({
+          success: false,
+          message: 'Acceso denegado'
+        });
+      }
+
+      const cliente = await Cliente.findByPk(req.usuario.id, {
+        attributes: { exclude: ['password_hash'] }
+      });
+
+      if (!cliente || !cliente.activo) {
+        return res.status(404).json({
+          success: false,
+          message: 'Cliente no encontrado'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: cliente
+      });
+
+    } catch (error) {
+      console.error('❌ Error obteniendo perfil:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
 
 module.exports = router;

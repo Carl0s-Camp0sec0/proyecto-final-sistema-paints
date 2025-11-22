@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cuenta - Paints</title>
+    <link rel="stylesheet" href="/frontend/assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <div class="login-brand">
+                <h1 class="login-title">Únete a Paints</h1>
+                <p class="login-subtitle">Crea tu cuenta y empieza a comprar.</p>
+            </div>
+            <div class="login-footer">
+                © 2025 Sistema Paints - Universidad UMES. Proyecto Académico
+                <div style="margin-top: 0.5rem;">
+                    <a href="/frontend/pages/public/index.html" style="color: currentColor; margin-right: 1rem;">Inicio</a>
+                    <a href="/frontend/pages/public/login-cliente.html" style="color: currentColor;">Iniciar Sesión</a>
+                </div>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="login-form-container">
+                <h2 class="login-form-title">Crear Cuenta de Cliente</h2>
+                <p class="login-form-subtitle">Completa el formulario para registrarte</p>
+
+                <form id="registerClienteForm">
+                    <div class="form-group">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" name="nombre_completo" class="form-input"
+                               placeholder="Juan Pérez" required minlength="3">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" name="email" class="form-input"
+                               placeholder="tu@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" name="telefono" class="form-input"
+                               placeholder="+502 1234-5678">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">NIT (opcional)</label>
+                        <input type="text" name="nit" class="form-input"
+                               placeholder="CF o tu NIT">
+                        <small style="color: var(--gray-500); font-size: 0.875rem;">
+                            Si no tienes NIT, deja "CF" (Consumidor Final)
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Dirección (opcional)</label>
+                        <textarea name="direccion" class="form-input"
+                                  placeholder="Ingresa tu dirección" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <div class="password-input-container">
+                            <input type="password" name="password" class="form-input"
+                                   placeholder="••••••••" required minlength="6">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small style="color: var(--gray-500); font-size: 0.875rem;">
+                            Mínimo 6 caracteres
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Confirmar Contraseña</label>
+                        <div class="password-input-container">
+                            <input type="password" name="confirmPassword" class="form-input"
+                                   placeholder="••••••••" required minlength="6">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="recibe_promociones">
+                            Quiero recibir promociones y ofertas especiales
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" required>
+                            Acepto los <a href="#" style="color: var(--primary-blue);">términos y condiciones</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                        <i class="fas fa-user-plus"></i>
+                        Crear Cuenta
+                    </button>
+                </form>
+
+                <div class="login-links">
+                    ¿Ya tienes una cuenta? <a href="/frontend/pages/public/login-cliente.html">Inicia sesión aquí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core scripts -->
+    <script src="/frontend/assets/js/config.js"></script>
+    <script src="/frontend/assets/js/auth.js"></script>
+    <script src="/frontend/assets/js/api.js"></script>
+    <script src="/frontend/assets/js/utils.js"></script>
+    <script src="/frontend/assets/js/global.js"></script>
+    <!-- Page-specific script -->
+    <script src="/frontend/assets/js/pages/register-cliente.js"></script>
+</body>
+</html>

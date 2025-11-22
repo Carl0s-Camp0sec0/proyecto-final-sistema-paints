@@ -11,6 +11,11 @@ class AuthManager {
         return userData ? JSON.parse(userData) : null;
     }
 
+    // Obtener usuario actual
+    getUser() {
+        return this.user;
+    }
+
     // Verificar si está autenticado
     isAuthenticated() {
         return this.token && this.user;
@@ -49,11 +54,18 @@ class AuthManager {
 
     // Logout
     logout() {
+        const userType = this.user?.tipo;
         this.token = null;
         this.user = null;
         localStorage.removeItem('paints_token');
         localStorage.removeItem('paints_user');
-        window.location.href = '/frontend/pages/public/login.html';
+
+        // Redirigir según tipo de usuario
+        if (userType === 'cliente') {
+            window.location.href = '/frontend/pages/public/index.html';
+        } else {
+            window.location.href = '/frontend/pages/public/login.html';
+        }
     }
 
     // Obtener token para requests

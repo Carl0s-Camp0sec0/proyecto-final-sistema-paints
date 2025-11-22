@@ -1,5 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
+const bcrypt = require('bcryptjs');
 
 module.exports = (sequelize, DataTypes) => {
   class Cliente extends Model {
@@ -40,16 +41,42 @@ module.exports = (sequelize, DataTypes) => {
       if (!this.latitud || !this.longitud || !sucursal.latitud || !sucursal.longitud) {
         return null;
       }
-      
+
       const R = 6371; // Radio de la Tierra en km
       const dLat = (sucursal.latitud - this.latitud) * Math.PI / 180;
       const dLng = (sucursal.longitud - this.longitud) * Math.PI / 180;
-      const a = 
+      const a =
         Math.sin(dLat/2) * Math.sin(dLat/2) +
         Math.cos(this.latitud * Math.PI / 180) * Math.cos(sucursal.latitud * Math.PI / 180) *
         Math.sin(dLng/2) * Math.sin(dLng/2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       return R * c; // Distancia en km
+    }
+
+    // Método para validar contraseña
+    async validarPassword(password) {
+      if (!this.password_hash) return false;
+      return await bcrypt.compare(password, this.password_hash);
+    }
+
+    // Método para cambiar contraseña
+    async cambiarPassword(nuevaPassword) {
+      const salt = await bcrypt.genSalt(10);
+      this.password_hash = await bcrypt.hash(nuevaPassword, salt);
+      await this.save();
+    }
+
+    // Método estático para crear cliente con password
+    static async crearCliente(datos) {
+      const { password, ...datosCliente } = datos;
+
+      // Hash de la contraseña si se proporciona
+      if (password) {
+        const salt = await bcrypt.genSalt(10);
+        datosCliente.password_hash = await bcrypt.hash(password, salt);
+      }
+
+      return await Cliente.create(datosCliente);
     }
   }
 
@@ -82,6 +109,11 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         isEmail: true
       }
+    },
+    password_hash: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      comment: 'Hash de la contraseña para autenticación del cliente'
     },
     telefono: {
       type: DataTypes.STRING(20),
