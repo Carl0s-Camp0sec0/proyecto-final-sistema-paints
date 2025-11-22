@@ -275,11 +275,108 @@ function requestAdvice() {
 
 // Generar cotización
 function generateQuote() {
-    Utils.showToast('Generando cotización PDF...', 'info');
-    // Implementar generación de PDF
-    setTimeout(() => {
+    if (cartItems.length === 0) {
+        Utils.showToast('El carrito está vacío', 'error');
+        return;
+    }
+
+    try {
+        Utils.showToast('Generando cotización PDF...', 'info');
+
+        // Crear PDF usando jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Header del PDF
+        doc.setFillColor(37, 99, 235);
+        doc.rect(0, 0, 210, 40, 'F');
+
+        // Intentar cargar logo (si existe)
+        try {
+            const logo = new Image();
+            logo.src = '/frontend/assets/images/logo.png';
+            logo.onload = function() {
+                // Logo cargado exitosamente, agregarlo al PDF
+                doc.addImage(logo, 'PNG', 15, 10, 20, 20);
+            };
+        } catch (e) {
+            // Si no hay logo, continuar sin él
+            console.log('Logo no encontrado, continuando sin logo');
+        }
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.text('PAINTS', 40, 25);
+        doc.setFontSize(12);
+        doc.text('Sistema de Gestión para Cadena de Pinturas', 40, 32);
+
+        // Información de la cotización
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(18);
+        doc.text('COTIZACIÓN DE CARRITO', 20, 60);
+
+        const fecha = new Date().toLocaleDateString('es-GT');
+        doc.setFontSize(10);
+        doc.text(`Fecha: ${fecha}`, 20, 70);
+        doc.text(`Cotización No: CART-${Date.now()}`, 20, 75);
+
+        // Tabla de productos
+        const tableData = cartItems.map(item => [
+            item.name,
+            item.brand || 'N/A',
+            `Q ${item.price.toFixed(2)}`,
+            item.quantity.toString(),
+            `Q ${(item.price * item.quantity).toFixed(2)}`
+        ]);
+
+        doc.autoTable({
+            head: [['Producto', 'Marca', 'Precio Unit.', 'Cantidad', 'Subtotal']],
+            body: tableData,
+            startY: 85,
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [37, 99, 235] }
+        });
+
+        // Calcular totales
+        const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const iva = subtotal * 0.12;
+        const total = subtotal + iva + shippingCost - promoDiscount;
+
+        // Totales
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.text(`Subtotal: Q ${subtotal.toFixed(2)}`, 140, finalY);
+        doc.text(`IVA (12%): Q ${iva.toFixed(2)}`, 140, finalY + 5);
+        if (shippingCost > 0) {
+            doc.text(`Envío: Q ${shippingCost.toFixed(2)}`, 140, finalY + 10);
+        }
+        if (promoDiscount > 0) {
+            doc.text(`Descuento: -Q ${promoDiscount.toFixed(2)}`, 140, finalY + 15);
+        }
+
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        const totalY = shippingCost > 0 || promoDiscount > 0 ? finalY + 20 : finalY + 10;
+        doc.text(`TOTAL: Q ${total.toFixed(2)}`, 140, totalY);
+
+        // Información de entrega
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Método de entrega: ${selectedShipping === 'pickup' ? 'Recoger en tienda' : 'Entrega a domicilio'}`, 20, totalY + 10);
+
+        // Footer
+        doc.setFontSize(8);
+        doc.text('Esta cotización es válida por 15 días a partir de la fecha de emisión', 20, 280);
+        doc.text('Gracias por preferirnos - PAINTS', 20, 285);
+
+        // Descargar PDF
+        const nombreArchivo = `cotizacion_carrito_${Date.now()}.pdf`;
+        doc.save(nombreArchivo);
+
         Utils.showToast('Cotización generada exitosamente', 'success');
-    }, 2000);
+    } catch (error) {
+        console.error('Error generando PDF:', error);
+        Utils.showToast('Error al generar la cotización', 'error');
+    }
 }
 
 // Proceder al checkout

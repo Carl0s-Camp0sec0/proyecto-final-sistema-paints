@@ -8,10 +8,9 @@ const AuthMiddleware = require('../middleware/auth');
 /**
  * @route   GET /api/productos
  * @desc    Listar productos con filtros
- * @access  Private
+ * @access  Public (permite acceso sin autenticación para catálogo público)
  */
 router.get('/',
-  AuthMiddleware.verificarToken,
   async (req, res) => {
     try {
       console.log('🛍️ Listando productos...');
@@ -111,10 +110,9 @@ router.get('/',
 /**
  * @route   GET /api/productos/:id
  * @desc    Obtener producto por ID
- * @access  Private
+ * @access  Public (permite acceso sin autenticación para catálogo público)
  */
 router.get('/:id',
-  AuthMiddleware.verificarToken,
   async (req, res) => {
     try {
       console.log('🛍️ Obteniendo producto:', req.params.id);

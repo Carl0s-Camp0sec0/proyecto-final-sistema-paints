@@ -3,8 +3,43 @@ let currentPage = 1;
 let totalPages = 1;
 let currentProducts = [];
 let cartItems = getCartFromStorage();
+let allProducts = [];
 
-// Datos de productos simulados
+// Cargar productos desde la API
+async function loadProductsFromAPI() {
+    try {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/productos?limit=1000`);
+        const result = await response.json();
+
+        if (result.success && result.data) {
+            allProducts = result.data.map(p => ({
+                id: p.id,
+                nombre: p.nombre,
+                categoria: { nombre: p.categoria?.nombre || 'Otros' },
+                marca: p.marca || 'Sin marca',
+                descripcion: p.descripcion || '',
+                precio_base: p.precio_base || 0,
+                precio_descuento: p.precio_descuento || null,
+                stock: p.variaciones && p.variaciones.length > 0
+                    ? p.variaciones.reduce((sum, v) => sum + (v.stock || 0), 0)
+                    : 0,
+                colores: p.detalle_pintura?.colores || [],
+                rating: 4.0 + Math.random() * 0.8, // Rating aleatorio entre 4.0 y 4.8
+                reviews: Math.floor(Math.random() * 50) + 5 // Reviews aleatorios entre 5 y 55
+            }));
+            console.log(`✅ Cargados ${allProducts.length} productos desde la API`);
+        } else {
+            console.warn('⚠️ No se pudieron cargar productos de la API, usando productos de respaldo');
+            // Fallback to mock products if API fails
+            allProducts = mockProducts;
+        }
+    } catch (error) {
+        console.error('❌ Error cargando productos:', error);
+        allProducts = mockProducts;
+    }
+}
+
+// Datos de productos simulados (fallback)
 const mockProducts = [
     {
         id: 1,
@@ -165,7 +200,7 @@ function filterProducts() {
     const brandFilter = document.getElementById('brandFilter').value.toLowerCase();
     const priceFilter = document.getElementById('priceFilter').value;
 
-    let filtered = mockProducts.filter(product => {
+    let filtered = allProducts.filter(product => {
         const matchesSearch = !searchTerm ||
             product.nombre.toLowerCase().includes(searchTerm) ||
             product.descripcion.toLowerCase().includes(searchTerm) ||
@@ -358,7 +393,7 @@ function displayProducts(products) {
 
 // Agregar al carrito
 function addToCart(productId, productName, price) {
-    const product = mockProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => p.id === productId);
     if (!product || product.stock === 0) {
         showToast('Producto no disponible', 'error');
         return;
@@ -384,7 +419,7 @@ function addToCart(productId, productName, price) {
 
 // Ver producto
 function viewProduct(productId) {
-    const product = mockProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => p.id === productId);
     if (!product) {
         showToast('Producto no encontrado', 'error');
         return;
@@ -753,7 +788,10 @@ function setupEventListeners() {
 }
 
 // Inicializar página
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Cargar productos desde la API primero
+    await loadProductsFromAPI();
+
     setupEventListeners();
     loadProducts();
     updateCartBadge();

@@ -7,66 +7,57 @@ let cotizacionState = {
     total: 0
 };
 
-// Productos de ejemplo
-const productosEjemplo = [
-    {
-        id: 1,
-        nombre: "Pintura Base Agua Blanca",
-        marca: "Sherwin Williams",
-        categoria: "pinturas",
-        precio: 125.00,
-        unidad: "Galón",
-        color: "Blanco",
-        descripcion: "Pintura de alta calidad base agua"
-    },
-    {
-        id: 2,
-        nombre: "Solvente Limpiador",
-        marca: "Comex",
-        categoria: "solventes",
-        precio: 35.50,
-        unidad: "1/4 Galón",
-        descripcion: "Solvente para limpieza de herramientas"
-    },
-    {
-        id: 3,
-        nombre: "Brocha Professional 4\"",
-        marca: "Purdy",
-        categoria: "accesorios",
-        precio: 85.00,
-        unidad: "Pieza",
-        descripcion: "Brocha profesional para acabados finos"
-    },
-    {
-        id: 4,
-        nombre: "Rodillo Antigoteo 9\"",
-        marca: "Wooster",
-        categoria: "accesorios",
-        precio: 45.00,
-        unidad: "Pieza",
-        descripcion: "Rodillo de alta absorción"
-    },
-    {
-        id: 5,
-        nombre: "Pintura Base Aceite Azul",
-        marca: "Benjamin Moore",
-        categoria: "pinturas",
-        precio: 180.00,
-        unidad: "Galón",
-        color: "Azul Marino",
-        descripcion: "Pintura durable para exteriores"
+// Almacenamiento de productos cargados desde la API
+let todosLosProductos = [];
+
+// Cargar productos desde la API
+async function cargarProductosDesdeAPI() {
+    try {
+        // Cargar todos los productos con un límite alto
+        const response = await fetch(`${CONFIG.API_BASE_URL}/productos?limit=1000`);
+        const result = await response.json();
+
+        if (result.success && result.data) {
+            // Transformar los productos de la API al formato que necesitamos
+            todosLosProductos = result.data.map(p => ({
+                id: p.id,
+                nombre: p.nombre,
+                marca: p.marca || 'Sin marca',
+                categoria: p.categoria?.nombre?.toLowerCase() || 'otros',
+                precio: p.precio_base || 0,
+                unidad: p.variaciones && p.variaciones.length > 0
+                    ? p.variaciones[0].unidad_medida?.nombre || 'Unidad'
+                    : 'Unidad',
+                color: p.detalle_pintura?.color || '',
+                descripcion: p.descripcion || ''
+            }));
+            console.log(`✅ Cargados ${todosLosProductos.length} productos desde la API`);
+        } else {
+            console.warn('⚠️ No se pudieron cargar productos de la API, usando datos de respaldo');
+            todosLosProductos = [];
+        }
+    } catch (error) {
+        console.error('❌ Error cargando productos:', error);
+        todosLosProductos = [];
     }
-];
+}
 
 // Inicializar página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    await cargarProductosDesdeAPI();
     cargarProductos();
     configurarEventos();
 });
 
 function cargarProductos(filtroCategoria = '', busqueda = '') {
     const grid = document.getElementById('productosGrid');
-    let productos = productosEjemplo;
+    let productos = todosLosProductos;
+
+    // Si no hay productos, mostrar mensaje
+    if (productos.length === 0) {
+        grid.innerHTML = '<p class="text-muted">Cargando productos...</p>';
+        return;
+    }
 
     // Aplicar filtros
     if (filtroCategoria) {
@@ -115,7 +106,11 @@ function configurarEventos() {
 }
 
 function agregarProducto(productoId) {
-    const producto = productosEjemplo.find(p => p.id === productoId);
+    const producto = todosLosProductos.find(p => p.id === productoId);
+    if (!producto) {
+        alert('Producto no encontrado');
+        return;
+    }
     const cantidadInput = document.querySelector(`input[data-producto-id="${productoId}"]`);
     const cantidad = parseInt(cantidadInput.value);
 
@@ -201,11 +196,24 @@ function generarCotizacionPDF() {
     doc.setFillColor(37, 99, 235);
     doc.rect(0, 0, 210, 40, 'F');
 
+    // Intentar cargar logo (si existe)
+    try {
+        const logo = new Image();
+        logo.src = '/frontend/assets/images/logo.png';
+        logo.onload = function() {
+            // Logo cargado exitosamente, agregarlo al PDF
+            doc.addImage(logo, 'PNG', 15, 10, 20, 20);
+        };
+    } catch (e) {
+        // Si no hay logo, continuar sin él
+        console.log('Logo no encontrado, continuando sin logo');
+    }
+
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
-    doc.text('PAINTS', 20, 25);
+    doc.text('PAINTS', 40, 25);
     doc.setFontSize(12);
-    doc.text('Sistema de Gestión para Cadena de Pinturas', 20, 32);
+    doc.text('Sistema de Gestión para Cadena de Pinturas', 40, 32);
 
     // Información de la cotización
     doc.setTextColor(0, 0, 0);
@@ -264,9 +272,6 @@ function generarCotizacionPDF() {
     doc.save(nombreArchivo);
 }
 
-function enviarCotizacion() {
-    alert('Funcionalidad de envío por email será implementada próximamente');
-}
 
 function limpiarCotizacion() {
     if (confirm('¿Está seguro que desea limpiar toda la cotización?')) {

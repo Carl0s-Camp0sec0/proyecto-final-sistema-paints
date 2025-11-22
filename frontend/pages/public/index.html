@@ -131,8 +131,8 @@
                 <ul class="nav-menu">
                     <li><a href="#inicio" class="nav-link">Inicio</a></li>
                     <li><a href="/frontend/pages/public/catalogo.html" class="nav-link">Catálogo</a></li>
-                    <li><a href="#caracteristicas" class="nav-link">Características</a></li>
-                    <li><a href="#contacto" class="nav-link">Contacto</a></li>
+                    <li><a href="/frontend/pages/public/tiendas.html" class="nav-link">Tiendas</a></li>
+                    <li><a href="/frontend/pages/public/cotizacion.html" class="nav-link">Cotización</a></li>
                 </ul>
             </nav>
             <div class="user-menu">
@@ -158,80 +158,44 @@
                     <i class="fas fa-paint-brush"></i>
                     Ver Catálogo
                 </a>
-                <a href="#caracteristicas" class="btn btn-lg btn-secondary">
-                    <i class="fas fa-info-circle"></i>
-                    Conocer Más
+                <a href="/frontend/pages/public/tiendas.html" class="btn btn-lg btn-secondary">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Nuestras Tiendas
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="caracteristicas" class="features-section">
+    <!-- Catalog Preview Section -->
+    <section id="catalogo-preview" class="features-section">
         <div class="features-container">
             <div style="text-align: center; margin-bottom: 3rem;">
                 <h2 style="font-size: 2.5rem; color: var(--gray-800); margin-bottom: 1rem;">
-                    Características del Sistema
+                    Nuestros Productos
                 </h2>
                 <p style="font-size: 1.1rem; color: var(--gray-600);">
-                    Herramientas profesionales para la gestión completa de tu negocio
+                    Descubre nuestra amplia variedad de pinturas y accesorios de las mejores marcas
                 </p>
             </div>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-boxes"></i>
-                    </div>
-                    <h3>Gestión de Inventario</h3>
-                    <p>Control total del inventario con alertas de stock bajo, categorización de productos y seguimiento en tiempo real.</p>
+
+            <div id="catalogoPreview" class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <!-- Los productos se cargarán dinámicamente -->
+                <div style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-blue);"></i>
+                    <p style="margin-top: 1rem; color: var(--gray-600);">Cargando productos...</p>
                 </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-cash-register"></i>
-                    </div>
-                    <h3>Punto de Venta</h3>
-                    <p>Sistema POS completo con facturación automática, múltiples métodos de pago y impresión de comprobantes.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <h3>Reportes Avanzados</h3>
-                    <p>Informes detallados de ventas, productos más vendidos, análisis de rentabilidad y estadísticas en tiempo real.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Gestión de Usuarios</h3>
-                    <p>Sistema de roles y permisos para diferentes tipos de usuarios: administradores, cajeros, digitadores y gerentes.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-store"></i>
-                    </div>
-                    <h3>Multi-Sucursal</h3>
-                    <p>Gestión centralizada de múltiples sucursales con inventarios independientes y reportes consolidados.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>Seguridad</h3>
-                    <p>Sistema seguro con autenticación JWT, encriptación de datos y control de acceso granular.</p>
-                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/frontend/pages/public/catalogo.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-eye"></i> Ver Catálogo Completo
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer id="contacto" class="footer-section">
+    <footer class="footer-section">
         <div class="footer-content">
             <div class="footer-grid">
                 <div>
@@ -242,45 +206,44 @@
                         <h3>Paints</h3>
                     </div>
                     <p style="color: var(--gray-300); line-height: 1.6;">
-                        Sistema integral de gestión para cadenas de pintura. 
-                        Desarrollado con tecnología moderna y segura.
+                        Tu tienda de confianza para pinturas y accesorios.
+                        Calidad, variedad y el mejor servicio en Guatemala.
                     </p>
                 </div>
-                
+
                 <div>
-                    <h4>Enlaces Rápidos</h4>
+                    <h4>Navegación</h4>
                     <ul class="footer-links">
                         <li><a href="#inicio">Inicio</a></li>
                         <li><a href="/frontend/pages/public/catalogo.html">Catálogo</a></li>
-                        <li><a href="#caracteristicas">Características</a></li>
+                        <li><a href="/frontend/pages/public/tiendas.html">Nuestras Tiendas</a></li>
+                        <li><a href="/frontend/pages/public/cotizacion.html">Cotización</a></li>
                         <li><a href="/frontend/pages/public/login.html">Iniciar Sesión</a></li>
-                        <li><a href="/frontend/pages/public/register.html">Registrarse</a></li>
                     </ul>
                 </div>
-                
+
                 <div>
-                    <h4>Información del Proyecto</h4>
+                    <h4>Contacto</h4>
                     <ul class="footer-links">
-                        <li>Universidad UMES</li>
-                        <li>Bases de Datos II</li>
-                        <li>Programación Web</li>
-                        <li>Sexto Semestre - 2025</li>
+                        <li><i class="fas fa-phone"></i> Tel: 2234-5678</li>
+                        <li><i class="fas fa-envelope"></i> info@paints.com.gt</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Ciudad de Guatemala</li>
+                        <li><i class="fas fa-clock"></i> Lun-Sab: 8:00 AM - 8:00 PM</li>
                     </ul>
                 </div>
-                
+
                 <div>
-                    <h4>Tecnología</h4>
+                    <h4>Síguenos</h4>
                     <ul class="footer-links">
-                        <li>Node.js + Express</li>
-                        <li>MySQL + Sequelize</li>
-                        <li>JavaScript ES6+</li>
-                        <li>JWT Authentication</li>
+                        <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                        <li><a href="#"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
                     </ul>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <p>&copy; 2025 Sistema Paints - Universidad UMES. Proyecto Académico.</p>
+                <p>&copy; 2025 Paints Guatemala. Todos los derechos reservados. | Proyecto Académico - Universidad UMES</p>
             </div>
         </div>
     </footer>

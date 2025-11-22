@@ -371,15 +371,6 @@ function mostrarTiendas() {
                     <div>Domingo: ${tienda.horarios.domingo}</div>
                 </div>
 
-                <div style="margin: 1rem 0;">
-                    <h5><i class="fas fa-concierge-bell"></i> Servicios</h5>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        ${tienda.servicios.map(servicio =>
-                            `<span style="background: var(--primary-100); color: var(--primary-700); padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${servicio}</span>`
-                        ).join('')}
-                    </div>
-                </div>
-
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                     <button onclick="centrarEnTienda(${tienda.lat}, ${tienda.lng})" class="btn btn-primary btn-sm">
                         <i class="fas fa-map"></i> Ver en Mapa
