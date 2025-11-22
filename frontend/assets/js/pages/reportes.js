@@ -56,7 +56,7 @@ async function showStockMinimoReport(container) {
             throw new Error(response.message || 'Error al cargar reporte');
         }
 
-        const productos = response.data || [];
+        const productos = response.data?.productos || [];
 
         let tableRows = '';
         if (productos.length === 0) {
@@ -145,7 +145,16 @@ async function showMasVendidosReport(container) {
     container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Cargando productos más vendidos...</p></div>';
 
     try {
-        const response = await api.getReporteProductosTopCantidad({ limit: 10 });
+        // Usar fechas por defecto (último mes)
+        const fechaFin = new Date();
+        const fechaInicio = new Date();
+        fechaInicio.setMonth(fechaInicio.getMonth() - 1);
+
+        const response = await api.getReporteProductosTopCantidad({
+            limit: 10,
+            fecha_inicio: fechaInicio.toISOString().split('T')[0],
+            fecha_fin: fechaFin.toISOString().split('T')[0]
+        });
 
         if (!response.success) {
             throw new Error(response.message || 'Error al cargar reporte');
@@ -231,7 +240,16 @@ async function showAnalisisABCReport(container) {
     container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Cargando análisis ABC...</p></div>';
 
     try {
-        const response = await api.getReporteProductosTopIngresos({ limit: 100 });
+        // Usar fechas por defecto (último mes)
+        const fechaFin = new Date();
+        const fechaInicio = new Date();
+        fechaInicio.setMonth(fechaInicio.getMonth() - 1);
+
+        const response = await api.getReporteProductosTopIngresos({
+            limit: 100,
+            fecha_inicio: fechaInicio.toISOString().split('T')[0],
+            fecha_fin: fechaFin.toISOString().split('T')[0]
+        });
 
         if (!response.success) {
             throw new Error(response.message || 'Error al cargar reporte');

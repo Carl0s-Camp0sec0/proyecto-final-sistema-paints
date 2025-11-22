@@ -16,12 +16,10 @@ async function loadProductsFromAPI() {
 
         if (result.success && result.data && result.data.length > 0) {
             allProducts = result.data.map(p => {
-                // Calcular stock total desde inventario o variaciones
+                // Calcular stock total desde inventarios de todas las sucursales
                 let stock = 0;
-                if (p.inventario && p.inventario.length > 0) {
-                    stock = p.inventario.reduce((sum, inv) => sum + (inv.stock_actual || 0), 0);
-                } else if (p.variaciones && p.variaciones.length > 0) {
-                    stock = p.variaciones.reduce((sum, v) => sum + (v.stock || 0), 0);
+                if (p.inventarios && p.inventarios.length > 0) {
+                    stock = p.inventarios.reduce((sum, inv) => sum + (parseInt(inv.stock_actual) || 0), 0);
                 }
 
                 return {

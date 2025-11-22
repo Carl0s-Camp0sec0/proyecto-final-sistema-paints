@@ -35,9 +35,9 @@ async function cargarSucursales() {
         const data = await response.json();
         console.log('📦 Datos recibidos:', data);
 
-        if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
+        if (data.success && data.data && data.data.sucursales && Array.isArray(data.data.sucursales) && data.data.sucursales.length > 0) {
             // Transformar datos del backend al formato esperado
-            tiendas = data.data.map(sucursal => ({
+            tiendas = data.data.sucursales.map(sucursal => ({
                 id: sucursal.id,
                 nombre: sucursal.nombre,
                 direccion: sucursal.direccion,

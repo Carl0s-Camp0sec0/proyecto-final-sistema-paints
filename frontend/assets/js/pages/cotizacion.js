@@ -19,18 +19,28 @@ async function cargarProductosDesdeAPI() {
 
         if (result.success && result.data) {
             // Transformar los productos de la API al formato que necesitamos
-            todosLosProductos = result.data.map(p => ({
-                id: p.id,
-                nombre: p.nombre,
-                marca: p.marca || 'Sin marca',
-                categoria: p.categoria?.nombre?.toLowerCase() || 'otros',
-                precio: p.precio_base || 0,
-                unidad: p.variaciones && p.variaciones.length > 0
-                    ? p.variaciones[0].unidad_medida?.nombre || 'Unidad'
-                    : 'Unidad',
-                color: p.detalle_pintura?.color || '',
-                descripcion: p.descripcion || ''
-            }));
+            todosLosProductos = result.data.map(p => {
+                // Calcular stock total desde inventarios de todas las sucursales
+                let stock = 0;
+                if (p.inventarios && p.inventarios.length > 0) {
+                    stock = p.inventarios.reduce((sum, inv) => sum + (parseInt(inv.stock_actual) || 0), 0);
+                }
+
+                return {
+                    id: p.id,
+                    nombre: p.nombre,
+                    marca: p.marca || 'Sin marca',
+                    categoria: p.categoria?.nombre?.toLowerCase() || 'otros',
+                    precio: p.precio_base || 0,
+                    unidad: p.variaciones && p.variaciones.length > 0
+                        ? p.variaciones[0].unidad_medida?.nombre || 'Unidad'
+                        : 'Unidad',
+                    color: p.detalle_pintura?.color || '',
+                    descripcion: p.descripcion || '',
+                    stock: stock,
+                    disponible: stock > 0
+                };
+            });
             console.log(`✅ Cargados ${todosLosProductos.length} productos desde la API`);
         } else {
             console.warn('⚠️ No se pudieron cargar productos de la API, usando datos de respaldo');
@@ -70,24 +80,30 @@ function cargarProductos(filtroCategoria = '', busqueda = '') {
         );
     }
 
-    grid.innerHTML = productos.map(producto => `
-        <div class="producto-card" data-producto-id="${producto.id}">
+    grid.innerHTML = productos.map(producto => {
+        const stockClass = producto.stock === 0 ? 'out-of-stock' : producto.stock <= 10 ? 'low-stock' : 'in-stock';
+        const stockText = producto.stock === 0 ? 'Agotado' : producto.stock <= 10 ? `Pocas unidades (${producto.stock})` : `En stock (${producto.stock})`;
+        const isDisabled = producto.stock === 0 ? 'disabled' : '';
+
+        return `
+        <div class="producto-card ${!producto.disponible ? 'disabled' : ''}" data-producto-id="${producto.id}">
             <h4>${producto.nombre}</h4>
             <p><strong>Marca:</strong> ${producto.marca}</p>
             ${producto.color ? `<p><strong>Color:</strong> ${producto.color}</p>` : ''}
             <p><strong>Precio:</strong> Q ${producto.precio.toFixed(2)} / ${producto.unidad}</p>
+            <p class="stock-info ${stockClass}"><i class="fas fa-box"></i> ${stockText}</p>
             <p class="text-muted">${producto.descripcion}</p>
             <div style="margin-top: 1rem;">
                 <label>Cantidad:</label>
-                <input type="number" min="1" value="1" class="cantidad-input form-input"
-                       data-producto-id="${producto.id}">
+                <input type="number" min="1" max="${producto.stock}" value="1" class="cantidad-input form-input"
+                       data-producto-id="${producto.id}" ${isDisabled}>
                 <button type="button" class="btn btn-sm btn-primary"
-                        onclick="agregarProducto(${producto.id})">
-                    <i class="fas fa-plus"></i> Agregar
+                        onclick="agregarProducto(${producto.id})" ${isDisabled}>
+                    <i class="fas fa-plus"></i> ${producto.disponible ? 'Agregar' : 'Agotado'}
                 </button>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function configurarEventos() {

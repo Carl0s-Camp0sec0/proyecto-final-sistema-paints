@@ -56,20 +56,28 @@ class ProductoController {
         }
       ];
 
-      // Si se especifica sucursal, incluir inventario
+      // Siempre incluir inventarios (filtrar por sucursal si se especifica)
+      const inventarioInclude = {
+        model: InventarioSucursal,
+        as: 'inventarios',
+        required: false,
+        include: [{
+          model: UnidadMedida,
+          as: 'unidad_medida',
+          attributes: ['id', 'nombre', 'abreviatura']
+        }, {
+          model: Sucursal,
+          as: 'sucursal',
+          attributes: ['id', 'nombre']
+        }]
+      };
+
+      // Si se especifica sucursal, filtrar solo esa
       if (sucursal_id) {
-        include.push({
-          model: InventarioSucursal,
-          as: 'inventarios',
-          where: { sucursal_id },
-          required: false,
-          include: [{
-            model: UnidadMedida,
-            as: 'unidad_medida',
-            attributes: ['id', 'nombre', 'abreviatura']
-          }]
-        });
+        inventarioInclude.where = { sucursal_id };
       }
+
+      include.push(inventarioInclude);
 
       const productos = await Producto.findAndCountAll({
         where: whereClause,
