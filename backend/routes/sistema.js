@@ -57,7 +57,9 @@ router.get('/sucursales',
 
       res.json({
         success: true,
-        data: sucursales
+        data: {
+          sucursales: sucursales
+        }
       });
     } catch (error) {
       console.error('❌ Error obteniendo sucursales:', error);

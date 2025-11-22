@@ -22,7 +22,7 @@ async function cargarSucursales() {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(`${API_CONFIG.BASE_URL}/sistema/sucursales`, {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/sistema/sucursales`, {
             headers
         });
 

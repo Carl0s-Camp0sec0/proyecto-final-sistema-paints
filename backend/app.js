@@ -8,12 +8,51 @@ const path = require('path');
 const app = express();
 
 // === MIDDLEWARE DE SEGURIDAD ===
-// Desactivar CSP en desarrollo para evitar bloqueos
+// Configuración de Helmet con CSP personalizado
 if (process.env.NODE_ENV === 'production') {
-  // Solo activar Helmet en producción
-  app.use(helmet());
+  // En producción: CSP personalizado que permite scripts inline (necesario para onclick)
+  console.log('🔒 Helmet activado en modo PRODUCCIÓN con CSP personalizado');
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: [
+            "'self'",
+            "'unsafe-inline'", // ⚠️ Permite onclick y scripts inline (necesario para el frontend actual)
+            "https://cdn.jsdelivr.net",
+            "https://cdnjs.cloudflare.com",
+            "https://unpkg.com",
+            "https://fonts.googleapis.com"
+          ],
+          scriptSrcAttr: ["'unsafe-inline'"], // ✅ CRÍTICO: Permite onclick="" en HTML
+          styleSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "https://cdnjs.cloudflare.com",
+            "https://fonts.googleapis.com"
+          ],
+          imgSrc: ["'self'", "data:", "https:", "http:"],
+          connectSrc: [
+            "'self'",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "https://*.tile.openstreetmap.org" // Para mapas de Leaflet
+          ],
+          fontSrc: [
+            "'self'",
+            "https://fonts.gstatic.com",
+            "https://cdnjs.cloudflare.com"
+          ],
+          objectSrc: ["'none'"],
+          upgradeInsecureRequests: []
+        }
+      }
+    })
+  );
 } else {
-  // En desarrollo, desactivar CSP completamente
+  // En desarrollo: desactivar CSP completamente para evitar bloqueos
+  console.log('⚠️  Helmet activado en modo DESARROLLO (CSP desactivado)');
   app.use(
     helmet({
       contentSecurityPolicy: false, // Desactivar CSP completamente en desarrollo
