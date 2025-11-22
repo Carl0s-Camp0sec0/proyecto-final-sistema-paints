@@ -122,12 +122,6 @@ function configurarEventos() {
         btnExportarPDF.addEventListener('click', exportarPDF);
     }
 
-    // Botón exportar Excel
-    const btnExportarExcel = document.getElementById('btnExportarExcel');
-    if (btnExportarExcel) {
-        btnExportarExcel.addEventListener('click', exportarExcel);
-    }
-
     // Campo de búsqueda - búsqueda en tiempo real
     const inputBuscar = document.getElementById('inputBuscar');
     if (inputBuscar) {
@@ -149,29 +143,35 @@ async function generarReporte() {
     try {
         mostrarLoading(true);
 
-        // Obtener filtros
-        filtrosActuales = obtenerFiltros();
+        // Guardar filtros del usuario
+        filtrosActuales = obtenerTodosFiltros();
 
         // Obtener rango de fechas (últimos 30 días por defecto)
         const hoy = new Date();
         const hace30Dias = new Date();
         hace30Dias.setDate(hoy.getDate() - 30);
 
-        const filtrosConFechas = {
-            ...filtrosActuales,
+        const parametrosFechas = {
             fecha_inicio: hace30Dias.toISOString().split('T')[0],
             fecha_fin: hoy.toISOString().split('T')[0]
         };
 
-        // Cargar todos los reportes en paralelo
+        // Cargar todos los datos sin filtros (los aplicaremos localmente)
         await Promise.all([
-            cargarTopProductos(filtrosConFechas),
-            cargarProductosMenosVendidos(filtrosConFechas),
-            cargarAnalisisPorCategoria(filtrosConFechas)
+            cargarTopProductos(parametrosFechas),
+            cargarProductosMenosVendidos(parametrosFechas),
+            cargarAnalisisPorCategoria(parametrosFechas)
         ]);
 
-        // Calcular estadísticas generales localmente después de cargar los datos
-        calcularEstadisticasGenerales();
+        // Verificar que se hayan cargado datos
+        if (!datosProductosCompleto || datosProductosCompleto.length === 0) {
+            Utils.showToast('No se encontraron productos en el período seleccionado', 'warning');
+            mostrarEstadoVacio();
+            return;
+        }
+
+        // Aplicar filtros localmente a todos los datos cargados
+        aplicarTodosFiltros();
 
         Utils.showToast('Reporte generado exitosamente', 'success');
 
@@ -184,24 +184,31 @@ async function generarReporte() {
         }
 
         Utils.showToast(errorMessage, 'error');
-
-        // Mostrar estado vacío
-        mostrarEstadisticas({
-            total_productos: 0,
-            producto_mas_vendido: { nombre: 'N/A', cantidad: 0 },
-            productos_activos: 0,
-            sin_movimiento: 0
-        });
+        mostrarEstadoVacio();
 
     } finally {
         mostrarLoading(false);
     }
 }
 
-function obtenerFiltros() {
+function mostrarEstadoVacio() {
+    // Mostrar estado vacío
+    mostrarEstadisticas({
+        total_productos: 0,
+        producto_mas_vendido: { nombre: 'N/A', cantidad: 0 },
+        productos_activos: 0,
+        sin_movimiento: 0
+    });
+
+    mostrarTopProductos([]);
+    mostrarProductosMenosVendidos([]);
+    mostrarAnalisisCategoria({});
+}
+
+function obtenerTodosFiltros() {
+    // Obtener todos los filtros del usuario
     const filtros = {};
 
-    // Filtros que se envían al backend (solo categoría y marca son soportados)
     const categoriaId = document.getElementById('selectCategoria')?.value;
     if (categoriaId && categoriaId !== '') {
         filtros.categoria_id = categoriaId;
@@ -211,13 +218,6 @@ function obtenerFiltros() {
     if (marca && marca !== '') {
         filtros.marca = marca;
     }
-
-    return filtros;
-}
-
-function obtenerFiltrosLocales() {
-    // Filtros que se aplican localmente
-    const filtros = {};
 
     const estado = document.getElementById('selectEstado')?.value;
     if (estado && estado !== '') {
@@ -234,24 +234,68 @@ function obtenerFiltrosLocales() {
         filtros.rango_precio = rangoPrecio;
     }
 
+    const busqueda = document.getElementById('inputBuscar')?.value;
+    if (busqueda && busqueda.trim() !== '') {
+        filtros.busqueda = busqueda.trim();
+    }
+
     return filtros;
 }
 
-function aplicarFiltrosLocales(productos) {
+function aplicarTodosFiltros() {
+    // Aplicar todos los filtros a los datos cargados
+    let productosFiltrados = [...datosProductosCompleto];
+    let topFiltrados = [...datosTopProductos];
+    let menosFiltrados = [...datosMenosVendidos];
+
+    // Aplicar filtros a cada conjunto de datos
+    productosFiltrados = aplicarFiltrosAProductos(productosFiltrados);
+    topFiltrados = aplicarFiltrosAProductos(topFiltrados);
+    menosFiltrados = aplicarFiltrosAProductos(menosFiltrados);
+
+    // Mostrar datos filtrados
+    const productosPorCategoria = agruparPorCategoria(productosFiltrados);
+    mostrarAnalisisCategoria(productosPorCategoria);
+    mostrarTopProductos(topFiltrados.slice(0, 5));
+    mostrarProductosMenosVendidos(menosFiltrados.slice(0, 5));
+
+    // Calcular estadísticas con datos filtrados
+    calcularEstadisticasConDatos(productosFiltrados);
+}
+
+function aplicarFiltrosAProductos(productos) {
     if (!productos || productos.length === 0) {
         return productos;
     }
 
     let productosFiltrados = [...productos];
-    const filtrosLocales = obtenerFiltrosLocales();
+
+    // Filtro de categoría
+    if (filtrosActuales.categoria_id) {
+        const selectCategoria = document.getElementById('selectCategoria');
+        const categoriaNombre = selectCategoria?.options[selectCategoria.selectedIndex]?.text;
+
+        if (categoriaNombre) {
+            productosFiltrados = productosFiltrados.filter(p =>
+                p.categoria === categoriaNombre
+            );
+        }
+    }
+
+    // Filtro de marca
+    if (filtrosActuales.marca) {
+        productosFiltrados = productosFiltrados.filter(p =>
+            p.marca && p.marca.toLowerCase() === filtrosActuales.marca.toLowerCase()
+        );
+    }
 
     // Filtro de rotación (basado en cantidad vendida en 30 días)
-    if (filtrosLocales.rotacion) {
+    if (filtrosActuales.rotacion) {
         productosFiltrados = productosFiltrados.filter(p => {
             const cantidad = p.cantidad_vendida || 0;
             const ventasMensuales = cantidad; // Ya es de 30 días
 
-            switch (filtrosLocales.rotacion) {
+            switch (filtrosActuales.rotacion) {
                 case 'alta':
                     return ventasMensuales > 20;
                 case 'media':
@@ -267,13 +311,13 @@ function aplicarFiltrosLocales(productos) {
     }
 
     // Filtro de rango de precio (basado en precio promedio = total_vendido / cantidad_vendida)
-    if (filtrosLocales.rango_precio) {
+    if (filtrosActuales.rango_precio) {
         productosFiltrados = productosFiltrados.filter(p => {
             const precioPromedio = p.cantidad_vendida > 0
                 ? p.total_vendido / p.cantidad_vendida
                 : 0;
 
-            switch (filtrosLocales.rango_precio) {
+            switch (filtrosActuales.rango_precio) {
                 case 'alto':
                     return precioPromedio > 500;
                 case 'medio':
@@ -287,11 +331,11 @@ function aplicarFiltrosLocales(productos) {
     }
 
     // Filtro de estado (activo si tiene ventas, inactivo si no)
-    if (filtrosLocales.estado) {
+    if (filtrosActuales.estado) {
         productosFiltrados = productosFiltrados.filter(p => {
             const tieneVentas = (p.cantidad_vendida || 0) > 0;
 
-            switch (filtrosLocales.estado) {
+            switch (filtrosActuales.estado) {
                 case 'activo':
                     return tieneVentas;
                 case 'inactivo':
@@ -300,6 +344,20 @@ function aplicarFiltrosLocales(productos) {
                 default:
                     return true;
             }
+        });
+    }
+
+    // Filtro de búsqueda por texto
+    if (filtrosActuales.busqueda) {
+        const termino = filtrosActuales.busqueda.toLowerCase();
+        productosFiltrados = productosFiltrados.filter(producto => {
+            const nombre = (producto.nombre || '').toLowerCase();
+            const marca = (producto.marca || '').toLowerCase();
+            const categoria = (producto.categoria || '').toLowerCase();
+
+            return nombre.includes(termino) ||
+                   marca.includes(termino) ||
+                   categoria.includes(termino);
         });
     }
 
@@ -387,26 +445,20 @@ async function cargarProductosMenosVendidos(filtros) {
 
 async function cargarAnalisisPorCategoria(filtros) {
     try {
-        // Obtener top productos por ingreso para análisis de categorías
+        // Obtener todos los productos por ingreso (sin límite bajo para tener datos completos)
         const response = await api.get('/reportes/productos/top-ingresos', {
             ...filtros,
             limit: 100
         });
 
         if (response && response.success) {
-            // Guardar para búsqueda local y cálculo de estadísticas
+            // Guardar datos completos sin filtrar
             datosProductosCompleto = response.data.productos || [];
-
-            // Aplicar filtros locales (rotación, precio, estado)
-            const productosFiltrados = aplicarFiltrosLocales(datosProductosCompleto);
-
-            const productosPorCategoria = agruparPorCategoria(productosFiltrados);
-            mostrarAnalisisCategoria(productosPorCategoria);
+            console.log('Productos cargados:', datosProductosCompleto.length);
         }
     } catch (error) {
-        console.error('Error al cargar análisis por categoría:', error);
+        console.error('Error al cargar productos:', error);
         datosProductosCompleto = [];
-        mostrarAnalisisCategoria({});
     }
 }
 
@@ -552,38 +604,13 @@ function mostrarAnalisisCategoria(categoriasPorProducto) {
 /* ==================== FILTROS Y BÚSQUEDA ==================== */
 
 function aplicarBusquedaLocal() {
-    const termino = document.getElementById('inputBuscar')?.value?.toLowerCase() || '';
-
     if (!datosProductosCompleto || datosProductosCompleto.length === 0) {
         return;
     }
 
-    let productosFiltrados = [...datosProductosCompleto];
-
-    // Aplicar filtros locales primero (rotación, precio, estado)
-    productosFiltrados = aplicarFiltrosLocales(productosFiltrados);
-
-    // Aplicar búsqueda por texto
-    if (termino !== '') {
-        productosFiltrados = productosFiltrados.filter(producto => {
-            const nombre = (producto.nombre || '').toLowerCase();
-            const marca = (producto.marca || '').toLowerCase();
-            const categoria = (producto.categoria || '').toLowerCase();
-
-            return nombre.includes(termino) ||
-                   marca.includes(termino) ||
-                   categoria.includes(termino);
-        });
-    }
-
-    // Actualizar análisis por categoría con productos filtrados
-    const productosPorCategoria = agruparPorCategoria(productosFiltrados);
-    mostrarAnalisisCategoria(productosPorCategoria);
-
-    // Recalcular estadísticas con productos filtrados
-    if (termino !== '' || Object.keys(obtenerFiltrosLocales()).length > 0) {
-        calcularEstadisticasConDatos(productosFiltrados);
-    }
+    // Actualizar filtros actuales y aplicar todos los filtros
+    filtrosActuales = obtenerTodosFiltros();
+    aplicarTodosFiltros();
 }
 
 function calcularEstadisticasConDatos(productos) {
@@ -883,143 +910,6 @@ async function exportarPDF() {
     }
 }
 
-async function exportarExcel() {
-    if (!datosProductosCompleto || datosProductosCompleto.length === 0) {
-        Utils.showToast('Primero debes generar el reporte', 'warning');
-        return;
-    }
-
-    try {
-        // Crear libro de trabajo
-        const wb = XLSX.utils.book_new();
-
-        // Hoja 1: Estadísticas Generales
-        const estadisticas = [
-            ['REPORTE DE PRODUCTOS - SISTEMA PAINTS'],
-            ['Generado:', new Date().toLocaleDateString('es-GT')],
-            ['Usuario:', auth.user.nombre_completo],
-            ['Período:', 'Últimos 30 días'],
-            [],
-            ['ESTADÍSTICAS GENERALES'],
-            ['Total Productos', document.getElementById('estadisticaTotalProductos').textContent],
-            ['Más Vendido (Cantidad)', document.getElementById('estadisticaMasVendidoCantidad').textContent],
-            ['Más Vendido (Nombre)', document.getElementById('estadisticaMasVendidoNombre').textContent],
-            ['Productos Activos', document.getElementById('estadisticaProductosActivos').textContent],
-            ['Sin Movimiento (30d)', document.getElementById('estadisticaSinMovimiento').textContent]
-        ];
-        const wsEstadisticas = XLSX.utils.aoa_to_sheet(estadisticas);
-        XLSX.utils.book_append_sheet(wb, wsEstadisticas, 'Estadísticas');
-
-        // Hoja 2: Top 5 Más Vendidos
-        if (datosTopProductos && datosTopProductos.length > 0) {
-            const topData = [
-                ['TOP 5 PRODUCTOS MÁS VENDIDOS (30 DÍAS)'],
-                [],
-                ['#', 'Producto', 'Marca', 'Categoría', 'Cantidad Vendida', 'Total Vendido']
-            ];
-
-            datosTopProductos.slice(0, 5).forEach((producto, index) => {
-                topData.push([
-                    index + 1,
-                    producto.nombre,
-                    producto.marca || 'Sin marca',
-                    producto.categoria || 'Sin categoría',
-                    producto.cantidad_vendida,
-                    producto.total_vendido
-                ]);
-            });
-
-            const wsTop = XLSX.utils.aoa_to_sheet(topData);
-            XLSX.utils.book_append_sheet(wb, wsTop, 'Top Vendidos');
-        }
-
-        // Hoja 3: Menos Vendidos
-        if (datosMenosVendidos && datosMenosVendidos.length > 0) {
-            const menosData = [
-                ['TOP 5 PRODUCTOS MENOS VENDIDOS (30 DÍAS)'],
-                [],
-                ['#', 'Producto', 'Marca', 'Categoría', 'Cantidad Vendida', 'Días sin Venta']
-            ];
-
-            datosMenosVendidos.slice(0, 5).forEach((producto, index) => {
-                menosData.push([
-                    index + 1,
-                    producto.nombre,
-                    producto.marca || 'Sin marca',
-                    producto.categoria || 'Sin categoría',
-                    producto.cantidad_vendida || 0,
-                    producto.dias_sin_venta || 0
-                ]);
-            });
-
-            const wsMenos = XLSX.utils.aoa_to_sheet(menosData);
-            XLSX.utils.book_append_sheet(wb, wsMenos, 'Menos Vendidos');
-        }
-
-        // Hoja 4: Análisis por Categoría
-        if (datosProductosCompleto && datosProductosCompleto.length > 0) {
-            const categorias = agruparPorCategoria(datosProductosCompleto);
-            const categoriasArray = Object.entries(categorias).map(([nombre, datos]) => ({
-                nombre,
-                ...datos
-            }));
-            categoriasArray.sort((a, b) => b.total_ingresos - a.total_ingresos);
-
-            const totalGeneral = categoriasArray.reduce((sum, cat) => sum + cat.total_ingresos, 0);
-
-            const categoriaData = [
-                ['ANÁLISIS POR CATEGORÍA'],
-                [],
-                ['Categoría', 'Total Productos', 'Productos Activos', 'Ventas (30d)', 'Ingresos (30d)', '% del Total']
-            ];
-
-            categoriasArray.forEach(cat => {
-                const porcentaje = totalGeneral > 0 ? (cat.total_ingresos / totalGeneral * 100) : 0;
-                categoriaData.push([
-                    cat.nombre,
-                    cat.total_productos,
-                    cat.productos.length,
-                    cat.total_ventas,
-                    cat.total_ingresos,
-                    porcentaje.toFixed(1) + '%'
-                ]);
-            });
-
-            const wsCategoria = XLSX.utils.aoa_to_sheet(categoriaData);
-            XLSX.utils.book_append_sheet(wb, wsCategoria, 'Por Categoría');
-        }
-
-        // Hoja 5: Todos los Productos
-        const todosData = [
-            ['TODOS LOS PRODUCTOS'],
-            [],
-            ['Producto', 'Marca', 'Categoría', 'Cantidad Vendida', 'Total Vendido', 'Número Facturas']
-        ];
-
-        datosProductosCompleto.forEach(producto => {
-            todosData.push([
-                producto.nombre,
-                producto.marca || 'Sin marca',
-                producto.categoria || 'Sin categoría',
-                producto.cantidad_vendida,
-                producto.total_vendido,
-                producto.numero_facturas || 0
-            ]);
-        });
-
-        const wsTodos = XLSX.utils.aoa_to_sheet(todosData);
-        XLSX.utils.book_append_sheet(wb, wsTodos, 'Todos los Productos');
-
-        // Guardar archivo
-        XLSX.writeFile(wb, `reporte_productos_${new Date().getTime()}.xlsx`);
-        Utils.showToast('Reporte exportado en Excel exitosamente', 'success');
-
-    } catch (error) {
-        console.error('Error al exportar Excel:', error);
-        Utils.showToast('Error al exportar el reporte: ' + error.message, 'error');
-    }
-}
-
 /* ==================== UTILIDADES ==================== */
 
 function mostrarLoading(mostrar) {
@@ -1039,6 +929,5 @@ function logout() {
 // Exportar funciones globalmente
 window.generarReporte = generarReporte;
 window.exportarPDF = exportarPDF;
-window.exportarExcel = exportarExcel;
 window.limpiarFiltros = limpiarFiltros;
 window.logout = logout;
