@@ -1,8 +1,11 @@
 const path = require('path');
 
+// NOTA: Este proyecto NO usa migraciones de Sequelize.
+// La base de datos se sincroniza automáticamente usando sequelize.sync()
+// en backend/server.js (solo en modo desarrollo)
+
 module.exports = {
   'config': path.resolve('backend', 'config', 'database.js'),
   'models-path': path.resolve('backend', 'models'),
-  'seeders-path': path.resolve('backend', 'seeders'),
-  'migrations-path': path.resolve('backend', 'migrations')
+  'seeders-path': path.resolve('backend', 'seeders')
 };

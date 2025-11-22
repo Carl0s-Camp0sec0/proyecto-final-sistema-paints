@@ -12,11 +12,7 @@
     "dev:backend": "nodemon backend/server.js",
     "dev:frontend": "live-server frontend/",
     "dev:full": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "db:migrate": "npx sequelize-cli db:migrate",
-    "db:migrate:undo": "npx sequelize-cli db:migrate:undo",
     "db:seed": "npx sequelize-cli db:seed:all",
-    "db:reset": "npx sequelize-cli db:migrate:undo:all && npm run db:migrate && npm run db:seed",
-    "db:fresh": "npm run db:reset",
     "test": "echo \"Error: no test specified\" && exit 1",
     "backup": "node backend/utils/backup.js"
   },
