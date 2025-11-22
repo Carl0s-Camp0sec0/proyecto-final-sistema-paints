@@ -158,7 +158,7 @@ async function showMasVendidosReport(container) {
             throw new Error(response.message || 'Error al cargar reporte');
         }
 
-        const productos = response.data || [];
+        const productos = response.data?.productos || [];
 
         let tableRows = '';
         if (productos.length === 0) {
@@ -253,7 +253,7 @@ async function showAnalisisABCReport(container) {
             throw new Error(response.message || 'Error al cargar reporte');
         }
 
-        const productos = response.data || [];
+        const productos = response.data?.productos || [];
 
         // Calcular clasificación ABC
         const totalIngresos = productos.reduce((sum, p) => sum + (p.total_ingresos || 0), 0);

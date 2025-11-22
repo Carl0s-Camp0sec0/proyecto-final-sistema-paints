@@ -300,15 +300,44 @@ function actualizarEstadisticasTop(productos) {
     }
 }
 
+/* ==================== BUSCAR Y FILTRAR ==================== */
+
+async function buscarProductos() {
+    try {
+        const searchInput = document.querySelector('input.form-input');
+        const selects = document.querySelectorAll('select.form-select');
+
+        const filtros = {
+            busqueda: searchInput?.value || '',
+            categoria_id: selects[0]?.value || '',
+            marca: selects[1]?.value || '',
+            estado: selects[2]?.value || '',
+            // Los otros selects pueden ser para rangos de precio, etc.
+        };
+
+        // Si hay término de búsqueda, filtrar productos
+        if (filtros.busqueda || filtros.categoria_id || filtros.marca || filtros.estado) {
+            await cargarListadoCompleto(filtros);
+        } else {
+            await cargarListadoCompleto();
+        }
+
+        Utils.showToast('Búsqueda aplicada', 'success');
+    } catch (error) {
+        console.error('Error al buscar productos:', error);
+        Utils.showToast('Error al buscar productos', 'error');
+    }
+}
+
 /* ==================== LISTADO COMPLETO ==================== */
 
-async function cargarListadoCompleto() {
+async function cargarListadoCompleto(filtros = {}) {
     try {
         const tbody = document.querySelector('.card:last-child tbody');
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">Cargando...</td></tr>';
 
         // Obtener productos desde el backend
-        const response = await api.getProductos({ limit: 100 });
+        const response = await api.getProductos({ limit: 100, ...filtros });
 
         if (!response.success || !response.data || response.data.length === 0) {
             tbody.innerHTML = `
@@ -504,5 +533,6 @@ function logout() {
 
 // Exportar funciones globalmente
 window.generarReporte = generarReporte;
+window.buscarProductos = buscarProductos;
 window.exportarReporte = exportarReporte;
 window.logout = logout;
