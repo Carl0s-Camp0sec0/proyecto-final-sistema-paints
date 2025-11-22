@@ -178,6 +178,7 @@ const Components = {
         const showActions = options.showActions !== false; // Por defecto true
         const editCallback = options.editCallback || 'viewProductDetails';
         const deleteCallback = options.deleteCallback || null;
+        const editIcon = options.editIcon || (editCallback === 'editProduct' ? 'fa-edit' : 'fa-eye');
 
         if (!items || items.length === 0) {
             return `
@@ -220,11 +221,11 @@ const Components = {
                     ${showActions ? `
                     <td>
                         <div class="table-actions">
-                            <button class="btn btn-sm btn-secondary" onclick="${editCallback}(${item.producto.id})">
-                                <i class="fas fa-eye"></i>
+                            <button class="btn btn-sm btn-secondary" onclick="${editCallback}(${item.producto.id})" title="${editCallback === 'editProduct' ? 'Editar producto' : 'Ver detalles'}">
+                                <i class="fas ${editIcon}"></i>
                             </button>
                             ${deleteCallback ? `
-                            <button class="btn btn-sm btn-danger" onclick="${deleteCallback}(${item.producto.id})">
+                            <button class="btn btn-sm btn-danger" onclick="${deleteCallback}(${item.producto.id})" title="Eliminar producto">
                                 <i class="fas fa-trash"></i>
                             </button>
                             ` : ''}

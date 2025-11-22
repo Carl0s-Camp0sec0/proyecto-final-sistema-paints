@@ -117,15 +117,20 @@ function loadInventoryActions() {
 async function loadCategories() {
     try {
         const response = await api.getCategorias();
-        if (response.success) {
+        if (response.success && response.data) {
             const categorySelect = document.getElementById('categoryFilter');
-            const options = response.data.map(cat =>
-                `<option value="${cat.id}">${cat.nombre}</option>`
-            ).join('');
-            categorySelect.innerHTML = '<option value="">Todas las Categorías</option>' + options;
+            if (categorySelect) {
+                const options = response.data.map(cat =>
+                    `<option value="${cat.id}">${cat.nombre}</option>`
+                ).join('');
+                categorySelect.innerHTML = '<option value="">Todas las Categorías</option>' + options;
+            }
+        } else {
+            console.warn('No se pudieron cargar las categorías');
         }
     } catch (error) {
         console.error('Error loading categories:', error);
+        // No bloquear la carga de la página si falla esto
     }
 }
 
@@ -133,9 +138,9 @@ async function loadCategories() {
 async function loadInventory(page = 1) {
     try {
         currentPage = page;
-        const searchTerm = document.getElementById('searchInput').value;
-        const categoryId = document.getElementById('categoryFilter').value;
-        const stockFilter = document.getElementById('stockFilter').value;
+        const searchTerm = document.getElementById('searchInput')?.value || '';
+        const categoryId = document.getElementById('categoryFilter')?.value || '';
+        const stockFilter = document.getElementById('stockFilter')?.value || '';
 
         const params = {
             page: currentPage,
@@ -146,31 +151,69 @@ async function loadInventory(page = 1) {
         if (categoryId) params.categoria_id = categoryId;
         if (stockFilter) params.stock_bajo = stockFilter === 'low';
 
-        document.getElementById('inventoryContent').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+        const contentElement = document.getElementById('inventoryContent');
+        if (!contentElement) {
+            console.error('Elemento inventoryContent no encontrado');
+            return;
+        }
+
+        contentElement.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
 
         const response = await api.getInventarioSucursal(1, params);
 
         if (response.success) {
-            document.getElementById('inventoryContent').innerHTML = Components.inventoryTable(response.data);
+            if (response.data && response.data.length > 0) {
+                // Configurar opciones para los botones según permisos
+                const tableOptions = {
+                    showActions: true,
+                    editCallback: 'editProduct',
+                    deleteCallback: auth.hasPermission([CONFIG.ROLES.ADMIN]) ? 'deleteProduct' : null
+                };
 
-            if (response.pagination) {
-                document.getElementById('paginationContainer').innerHTML = Components.pagination(
+                contentElement.innerHTML = Components.inventoryTable(response.data, tableOptions);
+            } else {
+                contentElement.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        No se encontraron productos en el inventario.
+                        ${auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR]) ?
+                            '<br><a href="/frontend/pages/productos/productos.html" class="btn btn-primary" style="margin-top: 1rem;"><i class="fas fa-plus"></i> Agregar Producto</a>' :
+                            ''}
+                    </div>
+                `;
+            }
+
+            // Renderizar paginación si existe
+            const paginationContainer = document.getElementById('paginationContainer');
+            if (paginationContainer && response.pagination && response.pagination.pages > 1) {
+                paginationContainer.innerHTML = Components.pagination(
                     response.pagination.page,
                     response.pagination.pages,
                     'loadInventory'
                 );
+            } else if (paginationContainer) {
+                paginationContainer.innerHTML = '';
             }
         } else {
-            throw new Error(response.message);
+            throw new Error(response.message || 'Error al cargar inventario');
         }
 
     } catch (error) {
         console.error('Error loading inventory:', error);
-        document.getElementById('inventoryContent').innerHTML = `
-            <div style="text-align: center; padding: 2rem; color: var(--error-red);">
-                Error cargando inventario: ${error.message}
-            </div>
-        `;
+        const contentElement = document.getElementById('inventoryContent');
+        if (contentElement) {
+            contentElement.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="color: var(--error-red); margin-bottom: 1rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem;">Error al cargar inventario</h3>
+                    <p style="color: var(--gray-600);">${error.message}</p>
+                    <button class="btn btn-primary" onclick="loadInventory(1)" style="margin-top: 1rem;">
+                        <i class="fas fa-sync"></i> Reintentar
+                    </button>
+                </div>
+            `;
+        }
     }
 }
 
@@ -192,19 +235,49 @@ function setupEventListeners() {
     });
 }
 
-// Funciones para botones de acción (placeholder)
-function editProduct(productId) {
-    window.location.href = `/frontend/pages/productos/productos.html?edit=${productId}`;
+// Funciones para botones de acción
+async function editProduct(productId) {
+    try {
+        // Verificar permisos
+        if (!auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.DIGITADOR])) {
+            Utils.showToast('No tienes permisos para editar productos', 'error');
+            return;
+        }
+
+        window.location.href = `/frontend/pages/productos/productos.html?edit=${productId}`;
+    } catch (error) {
+        console.error('Error al editar producto:', error);
+        Utils.showToast('Error al abrir el editor de productos', 'error');
+    }
 }
 
 async function deleteProduct(productId) {
-    const confirmed = await Utils.confirm(
-        '¿Estás seguro de que deseas eliminar este producto?',
-        'Confirmar eliminación'
-    );
+    try {
+        // Verificar permisos
+        if (!auth.hasPermission([CONFIG.ROLES.ADMIN])) {
+            Utils.showToast('No tienes permisos para eliminar productos', 'error');
+            return;
+        }
 
-    if (confirmed) {
-        Utils.showToast('Función de eliminar producto en desarrollo', 'info');
+        const confirmed = await Utils.confirm(
+            '¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.',
+            'Confirmar eliminación'
+        );
+
+        if (confirmed) {
+            const response = await api.deleteProducto(productId);
+
+            if (response.success) {
+                Utils.showToast('Producto eliminado correctamente', 'success');
+                // Recargar inventario
+                await loadInventory(currentPage);
+            } else {
+                Utils.showToast(response.message || 'Error al eliminar producto', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error al eliminar producto:', error);
+        Utils.showToast('Error al eliminar el producto', 'error');
     }
 }
 
