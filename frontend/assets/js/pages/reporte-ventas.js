@@ -241,13 +241,28 @@ async function generarReporte() {
 }
 
 function obtenerFiltros() {
-    return {
+    const filtros = {
         fecha_inicio: document.getElementById('fechaInicio').value,
-        fecha_fin: document.getElementById('fechaFinal').value,
-        sucursal_id: document.getElementById('sucursalSelect').value || undefined,
-        metodo_pago: document.getElementById('metodoPagoSelect').value || undefined,
-        usuario_id: document.getElementById('usuarioSelect').value || undefined
+        fecha_fin: document.getElementById('fechaFinal').value
     };
+
+    // Solo agregar filtros opcionales si tienen valor
+    const sucursalId = document.getElementById('sucursalSelect').value;
+    if (sucursalId && sucursalId !== '') {
+        filtros.sucursal_id = sucursalId;
+    }
+
+    const metodoPago = document.getElementById('metodoPagoSelect').value;
+    if (metodoPago && metodoPago !== '') {
+        filtros.metodo_pago = metodoPago;
+    }
+
+    const usuarioId = document.getElementById('usuarioSelect').value;
+    if (usuarioId && usuarioId !== '') {
+        filtros.usuario_id = usuarioId;
+    }
+
+    return filtros;
 }
 
 function validarFiltros(filtros) {

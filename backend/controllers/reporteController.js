@@ -40,11 +40,11 @@ exports.getVentasPorPeriodo = async (req, res) => {
             estado: 'activa'
         };
 
-        if (sucursal_id) {
+        if (sucursal_id && sucursal_id !== 'undefined' && sucursal_id !== 'null') {
             whereFactura.sucursal_id = sucursal_id;
         }
 
-        if (usuario_id) {
+        if (usuario_id && usuario_id !== 'undefined' && usuario_id !== 'null') {
             whereFactura.usuario_id = usuario_id;
         }
 
@@ -224,15 +224,15 @@ exports.getProductosTopIngresos = async (req, res) => {
             estado: 'activa'
         };
 
-        if (sucursal_id) {
+        if (sucursal_id && sucursal_id !== 'undefined' && sucursal_id !== 'null') {
             whereFactura.sucursal_id = sucursal_id;
         }
 
         // Obtener productos más vendidos por ingreso
         const productos = await FacturaDetalle.findAll({
             attributes: [
-                [Sequelize.fn('SUM', Sequelize.col('subtotal')), 'total_vendido'],
-                [Sequelize.fn('SUM', Sequelize.col('cantidad')), 'cantidad_vendida'],
+                [Sequelize.fn('SUM', Sequelize.col('FacturaDetalle.subtotal')), 'total_vendido'],
+                [Sequelize.fn('SUM', Sequelize.col('FacturaDetalle.cantidad')), 'cantidad_vendida'],
                 [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT factura_id')), 'numero_facturas']
             ],
             include: [
@@ -259,7 +259,7 @@ exports.getProductosTopIngresos = async (req, res) => {
                 }
             ],
             group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidad_medida.id', 'unidad_medida.nombre', 'unidad_medida.abreviatura'],
-            order: [[Sequelize.fn('SUM', Sequelize.col('subtotal')), 'DESC']],
+            order: [[Sequelize.fn('SUM', Sequelize.col('FacturaDetalle.subtotal')), 'DESC']],
             limit: parseInt(limit),
             raw: false
         });
