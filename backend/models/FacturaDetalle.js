@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       // Un detalle pertenece a una unidad de medida
       FacturaDetalle.belongsTo(models.UnidadMedida, {
         foreignKey: 'unidad_medida_id',
-        as: 'unidad_medida'
+        as: 'unidadMedida'
       });
     }
 

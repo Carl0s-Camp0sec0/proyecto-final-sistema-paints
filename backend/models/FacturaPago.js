@@ -13,14 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       // Un pago utiliza un medio de pago
       FacturaPago.belongsTo(models.MedioPago, {
         foreignKey: 'medio_pago_id',
-        as: 'medio_pago'
+        as: 'medioPago'
       });
     }
 
     // Método para validar que la referencia es requerida
     validarReferencia() {
       return new Promise(async (resolve, reject) => {
-        const medioPago = await this.getMedio_pago();
+        const medioPago = await this.getMedioPago();
         
         if (medioPago && medioPago.requiere_referencia && !this.referencia) {
           reject(new Error(`El medio de pago ${medioPago.nombre} requiere número de referencia`));
@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     // Método para formatear información de pago
     getInfoFormateada() {
       return {
-        medio_pago: this.medio_pago?.nombre || 'No especificado',
+        medio_pago: this.medioPago?.nombre || 'No especificado',
         monto: parseFloat(this.monto),
         referencia: this.referencia || 'Sin referencia',
         fecha: this.fecha_creacion,
