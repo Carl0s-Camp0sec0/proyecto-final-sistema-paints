@@ -85,6 +85,42 @@ async function cargarUsuarios() {
 function configurarEventos() {
     // Evento del selector de período
     document.getElementById('periodoSelect').addEventListener('change', configurarFechas);
+
+    // Evento del botón generar reporte
+    const generarBtn = document.getElementById('generarReporteBtn');
+    if (generarBtn) {
+        generarBtn.addEventListener('click', generarReporte);
+    }
+
+    // Evento del botón limpiar filtros
+    const limpiarBtn = document.getElementById('limpiarFiltrosBtn');
+    if (limpiarBtn) {
+        limpiarBtn.addEventListener('click', limpiarFiltros);
+    }
+
+    // Evento del botón exportar
+    const exportarBtn = document.getElementById('exportarBtn');
+    if (exportarBtn) {
+        exportarBtn.addEventListener('click', exportarReporte);
+    }
+
+    // Evento del botón imprimir
+    const imprimirBtn = document.getElementById('imprimirBtn');
+    if (imprimirBtn) {
+        imprimirBtn.addEventListener('click', imprimirReporte);
+    }
+
+    // Evento del botón logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            if (typeof logout === 'function') {
+                logout();
+            } else if (typeof auth !== 'undefined' && typeof auth.logout === 'function') {
+                auth.logout();
+            }
+        });
+    }
 }
 
 function configurarFechasPorDefecto() {

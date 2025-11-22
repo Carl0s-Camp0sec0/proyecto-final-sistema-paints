@@ -526,7 +526,45 @@ if (typeof window !== 'undefined') {
     });
 }
 
+// Configurar event listeners para las tarjetas de reportes
+function setupReportCardListeners() {
+    // Event listeners para tarjetas con data-report-url (navegar a otra página)
+    document.querySelectorAll('.report-card[data-report-url]').forEach(card => {
+        card.addEventListener('click', function() {
+            const url = this.dataset.reportUrl;
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
+
+    // Event listeners para tarjetas con data-report-action (mostrar reporte en la página)
+    document.querySelectorAll('.report-card[data-report-action]').forEach(card => {
+        card.addEventListener('click', function() {
+            const action = this.dataset.reportAction;
+            if (action === 'factura-search') {
+                showFacturaSearch();
+            } else {
+                showReport(action);
+            }
+        });
+    });
+
+    // Event listener para botón de logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            if (typeof logout === 'function') {
+                logout();
+            } else {
+                window.location.href = '/frontend/pages/public/login.html';
+            }
+        });
+    }
+}
+
 // Inicializar página
 document.addEventListener('DOMContentLoaded', () => {
     loadUserData();
+    setupReportCardListeners();
 });

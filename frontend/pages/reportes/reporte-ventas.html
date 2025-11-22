@@ -68,7 +68,7 @@
                 </ul>
             </nav>
 
-            <button class="logout-btn" onclick="logout()">
+            <button class="logout-btn" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i>
                 Cerrar Sesión
             </button>
@@ -87,11 +87,11 @@
                         <p style="color: var(--gray-600);">Análisis detallado de ventas y facturación</p>
                     </div>
                     <div style="display: flex; gap: 1rem;">
-                        <button class="btn btn-secondary" onclick="exportarReporte()">
+                        <button class="btn btn-secondary" id="exportarBtn">
                             <i class="fas fa-download"></i>
                             Exportar PDF
                         </button>
-                        <button class="btn btn-info" onclick="imprimirReporte()">
+                        <button class="btn btn-info" id="imprimirBtn">
                             <i class="fas fa-print"></i>
                             Imprimir
                         </button>
@@ -108,7 +108,7 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                         <div class="form-group">
                             <label class="form-label">Período</label>
-                            <select class="form-select" id="periodoSelect" onchange="configurarFechas()">
+                            <select class="form-select" id="periodoSelect">
                                 <option value="custom">Personalizado</option>
                                 <option value="today">Hoy</option>
                                 <option value="week">Esta Semana</option>
@@ -166,11 +166,11 @@
                     </div>
                     
                     <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-                        <button class="btn btn-primary" onclick="generarReporte()">
+                        <button class="btn btn-primary" id="generarReporteBtn">
                             <i class="fas fa-chart-line"></i>
                             Generar Reporte
                         </button>
-                        <button class="btn btn-secondary" onclick="limpiarFiltros()">
+                        <button class="btn btn-secondary" id="limpiarFiltrosBtn">
                             <i class="fas fa-times"></i>
                             Limpiar Filtros
                         </button>

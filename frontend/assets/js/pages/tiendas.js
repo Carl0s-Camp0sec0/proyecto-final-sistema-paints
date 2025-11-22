@@ -26,13 +26,16 @@ async function cargarSucursales() {
             headers
         });
 
+        console.log('📡 Respuesta del servidor:', response.status, response.statusText);
+
         if (!response.ok) {
             throw new Error(`Error al cargar sucursales: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('📦 Datos recibidos:', data);
 
-        if (data.success && data.data) {
+        if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
             // Transformar datos del backend al formato esperado
             tiendas = data.data.map(sucursal => ({
                 id: sucursal.id,
@@ -54,10 +57,14 @@ async function cargarSucursales() {
             }));
 
             console.log(`✅ ${tiendas.length} sucursales cargadas desde el backend`);
+            console.log('🏪 Tiendas:', tiendas);
             return true;
+        } else {
+            console.warn('⚠️ No se encontraron sucursales en la respuesta');
+            cargarSucursalesRespaldo();
+            return false;
         }
 
-        return false;
     } catch (error) {
         console.error('❌ Error cargando sucursales:', error);
         showToast('Error al cargar sucursales. Usando datos de respaldo.', 'error');

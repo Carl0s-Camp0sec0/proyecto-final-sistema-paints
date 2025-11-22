@@ -113,7 +113,7 @@
                     </a></li>
                 </ul>
             </nav>
-            <button class="logout-btn" onclick="logout()">
+            <button class="logout-btn" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i>
                 Cerrar Sesión
             </button>
@@ -191,7 +191,7 @@
             <!-- Grid de Reportes -->
             <div class="reports-grid">
                 <!-- Reporte de Ventas -->
-                <div class="report-card" onclick="window.location.href='/frontend/pages/reportes/reporte-ventas.html'">
+                <div class="report-card" data-report-url="/frontend/pages/reportes/reporte-ventas.html">
                     <div class="report-icon" style="background: var(--success-green);">
                         <i class="fas fa-chart-line"></i>
                     </div>
@@ -201,9 +201,9 @@
                         Ver Reporte <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
-                
+
                 <!-- Reporte de Inventario -->
-                <div class="report-card" onclick="window.location.href='/frontend/pages/reportes/reporte-inventario.html'">
+                <div class="report-card" data-report-url="/frontend/pages/reportes/reporte-inventario.html">
                     <div class="report-icon" style="background: var(--gray-600);">
                         <i class="fas fa-boxes"></i>
                     </div>
@@ -213,9 +213,9 @@
                         Ver Reporte <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
-                
+
                 <!-- Reporte de Productos -->
-                <div class="report-card" onclick="window.location.href='/frontend/pages/reportes/reporte-productos.html'">
+                <div class="report-card" data-report-url="/frontend/pages/reportes/reporte-productos.html">
                     <div class="report-icon" style="background: var(--warning-yellow);">
                         <i class="fas fa-box"></i>
                     </div>
@@ -225,9 +225,9 @@
                         Ver Reporte <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
-                
+
                 <!-- Reporte de Clientes -->
-                <div class="report-card" onclick="window.location.href='/frontend/pages/reportes/reporte-clientes.html'">
+                <div class="report-card" data-report-url="/frontend/pages/reportes/reporte-clientes.html">
                     <div class="report-icon" style="background: var(--primary-blue);">
                         <i class="fas fa-users"></i>
                     </div>
@@ -237,9 +237,9 @@
                         Ver Reporte <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
-                
+
                 <!-- Buscar Factura -->
-                <div class="report-card" onclick="showFacturaSearch()">
+                <div class="report-card" data-report-action="factura-search">
                     <div class="report-icon" style="background: var(--secondary-blue);">
                         <i class="fas fa-search"></i>
                     </div>
@@ -251,7 +251,7 @@
                 </div>
 
                 <!-- Alertas de Stock -->
-                <div class="report-card" onclick="showReport('stock-minimo')">
+                <div class="report-card" data-report-action="stock-minimo">
                     <div class="report-icon" style="background: var(--error-red);">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
@@ -263,7 +263,7 @@
                 </div>
 
                 <!-- Productos Top -->
-                <div class="report-card" onclick="showReport('mas-vendidos')">
+                <div class="report-card" data-report-action="mas-vendidos">
                     <div class="report-icon" style="background: var(--info-color);">
                         <i class="fas fa-trophy"></i>
                     </div>
@@ -275,7 +275,7 @@
                 </div>
 
                 <!-- Análisis ABC -->
-                <div class="report-card" onclick="showReport('analisis-abc')">
+                <div class="report-card" data-report-action="analisis-abc">
                     <div class="report-icon" style="background: var(--warning-yellow);">
                         <i class="fas fa-chart-pie"></i>
                     </div>

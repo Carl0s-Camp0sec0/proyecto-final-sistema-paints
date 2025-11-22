@@ -8,29 +8,40 @@ let allProducts = [];
 // Cargar productos desde la API
 async function loadProductsFromAPI() {
     try {
+        console.log('🔄 Iniciando carga de productos desde API...');
         const response = await fetch(`${CONFIG.API_BASE_URL}/productos?limit=1000`);
         const result = await response.json();
 
-        if (result.success && result.data) {
-            allProducts = result.data.map(p => ({
-                id: p.id,
-                nombre: p.nombre,
-                categoria: { nombre: p.categoria?.nombre || 'Otros' },
-                marca: p.marca || 'Sin marca',
-                descripcion: p.descripcion || '',
-                precio_base: p.precio_base || 0,
-                precio_descuento: p.precio_descuento || null,
-                stock: p.variaciones && p.variaciones.length > 0
-                    ? p.variaciones.reduce((sum, v) => sum + (v.stock || 0), 0)
-                    : 0,
-                colores: p.detalle_pintura?.colores || [],
-                rating: 4.0 + Math.random() * 0.8, // Rating aleatorio entre 4.0 y 4.8
-                reviews: Math.floor(Math.random() * 50) + 5 // Reviews aleatorios entre 5 y 55
-            }));
+        console.log('📦 Respuesta de la API:', result);
+
+        if (result.success && result.data && result.data.length > 0) {
+            allProducts = result.data.map(p => {
+                // Calcular stock total desde inventario o variaciones
+                let stock = 0;
+                if (p.inventario && p.inventario.length > 0) {
+                    stock = p.inventario.reduce((sum, inv) => sum + (inv.stock_actual || 0), 0);
+                } else if (p.variaciones && p.variaciones.length > 0) {
+                    stock = p.variaciones.reduce((sum, v) => sum + (v.stock || 0), 0);
+                }
+
+                return {
+                    id: p.id,
+                    nombre: p.nombre,
+                    categoria: { nombre: p.categoria?.nombre || 'Otros' },
+                    marca: p.marca || 'Sin marca',
+                    descripcion: p.descripcion || '',
+                    precio_base: parseFloat(p.precio_base) || 0,
+                    precio_descuento: p.precio_descuento ? parseFloat(p.precio_descuento) : null,
+                    stock: stock,
+                    colores: p.detalle_pintura?.colores || [],
+                    rating: 4.0 + Math.random() * 0.8,
+                    reviews: Math.floor(Math.random() * 50) + 5
+                };
+            });
             console.log(`✅ Cargados ${allProducts.length} productos desde la API`);
+            console.log('📊 Primeros productos:', allProducts.slice(0, 3));
         } else {
             console.warn('⚠️ No se pudieron cargar productos de la API, usando productos de respaldo');
-            // Fallback to mock products if API fails
             allProducts = mockProducts;
         }
     } catch (error) {
@@ -288,14 +299,16 @@ function displayProducts(products) {
 
     if (!products || products.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
-                <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                <h3>No se encontraron productos</h3>
-                <p>Intenta ajustar los filtros de búsqueda</p>
-                <button class="btn btn-primary" onclick="clearFilters()" style="margin-top: 1rem;">
-                    <i class="fas fa-times"></i>
-                    Limpiar Filtros
-                </button>
+            <div class="products-grid">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--gray-500);">
+                    <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h3>No se encontraron productos</h3>
+                    <p>Intenta ajustar los filtros de búsqueda</p>
+                    <button class="btn btn-primary" onclick="clearFilters()" style="margin-top: 1rem;">
+                        <i class="fas fa-times"></i>
+                        Limpiar Filtros
+                    </button>
+                </div>
             </div>
         `;
         return;
