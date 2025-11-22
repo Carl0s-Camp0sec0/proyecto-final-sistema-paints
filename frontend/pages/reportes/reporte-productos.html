@@ -38,7 +38,7 @@
                 <h2 class="sidebar-title">Reportes</h2>
                 <p class="sidebar-subtitle">Productos</p>
             </div>
-            
+
             <nav>
                 <ul class="sidebar-nav">
                     <li><a href="/frontend/pages/admin/dashboard.html">
@@ -88,7 +88,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <p class="text-muted">Total Productos</p>
-                                <h2 style="color: var(--primary-blue);">1,247</h2>
+                                <h2 id="estadisticaTotalProductos" style="color: var(--primary-blue);">0</h2>
                             </div>
                             <div style="background: var(--primary-50); padding: 1rem; border-radius: 50%; color: var(--primary-blue);">
                                 <i class="fas fa-box" style="font-size: 1.5rem;"></i>
@@ -102,8 +102,8 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <p class="text-muted">Más Vendido</p>
-                                <h2 style="color: var(--success-green);">145</h2>
-                                <small class="text-muted">Pintura Látex Blanca</small>
+                                <h2 id="estadisticaMasVendidoCantidad" style="color: var(--success-green);">0</h2>
+                                <small id="estadisticaMasVendidoNombre" class="text-muted">N/A</small>
                             </div>
                             <div style="background: var(--success-100); padding: 1rem; border-radius: 50%; color: var(--success-green);">
                                 <i class="fas fa-trophy" style="font-size: 1.5rem;"></i>
@@ -117,7 +117,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <p class="text-muted">Productos Activos</p>
-                                <h2 style="color: var(--info-color);">1,156</h2>
+                                <h2 id="estadisticaProductosActivos" style="color: var(--info-color);">0</h2>
                             </div>
                             <div style="background: var(--info-100); padding: 1rem; border-radius: 50%; color: var(--info-700);">
                                 <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
@@ -131,7 +131,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <p class="text-muted">Sin Movimiento (30d)</p>
-                                <h2 style="color: var(--warning-yellow);">91</h2>
+                                <h2 id="estadisticaSinMovimiento" style="color: var(--warning-yellow);">0</h2>
                             </div>
                             <div style="background: var(--warning-100); padding: 1rem; border-radius: 50%; color: var(--warning-700);">
                                 <i class="fas fa-pause-circle" style="font-size: 1.5rem;"></i>
@@ -150,71 +150,67 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                         <div class="form-group">
                             <label class="form-label">Categoría</label>
-                            <select class="form-select">
-                                <option>Todas las Categorías</option>
-                                <option>Pinturas</option>
-                                <option>Accesorios</option>
-                                <option>Solventes</option>
-                                <option>Herramientas</option>
+                            <select id="selectCategoria" class="form-select">
+                                <option value="">Todas las Categorías</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label">Marca</label>
-                            <select class="form-select">
-                                <option>Todas las Marcas</option>
-                                <option>Sherwin-Williams</option>
-                                <option>Comex</option>
-                                <option>Benjamin Moore</option>
-                                <option>Pintuco</option>
+                            <select id="selectMarca" class="form-select">
+                                <option value="">Todas las Marcas</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Estado</label>
-                            <select class="form-select">
-                                <option>Todos los Estados</option>
-                                <option>Activo</option>
-                                <option>Inactivo</option>
-                                <option>Descontinuado</option>
+                            <select id="selectEstado" class="form-select">
+                                <option value="">Todos los Estados</option>
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                                <option value="descontinuado">Descontinuado</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Rotación</label>
-                            <select class="form-select">
-                                <option>Todas las Rotaciones</option>
-                                <option>Alta (>20 ventas/mes)</option>
-                                <option>Media (5-20 ventas/mes)</option>
-                                <option>Baja (<5 ventas/mes)</option>
-                                <option>Sin movimiento</option>
+                            <select id="selectRotacion" class="form-select">
+                                <option value="">Todas las Rotaciones</option>
+                                <option value="alta">Alta (>20 ventas/mes)</option>
+                                <option value="media">Media (5-20 ventas/mes)</option>
+                                <option value="baja">Baja (<5 ventas/mes)</option>
+                                <option value="sin_movimiento">Sin movimiento</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Rango de Precio</label>
-                            <select class="form-select">
-                                <option>Todos los Precios</option>
-                                <option>Alto (>Q 500)</option>
-                                <option>Medio (Q 100-500)</option>
-                                <option>Bajo (<Q 100)</option>
+                            <select id="selectRangoPrecio" class="form-select">
+                                <option value="">Todos los Precios</option>
+                                <option value="alto">Alto (>Q 500)</option>
+                                <option value="medio">Medio (Q 100-500)</option>
+                                <option value="bajo">Bajo (<Q 100)</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Búsqueda</label>
-                            <input type="text" class="form-input" placeholder="Nombre del producto...">
+                            <input id="inputBuscar" type="text" class="form-input" placeholder="Nombre del producto...">
                         </div>
                     </div>
-                    
-                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-                        <button class="btn btn-primary" onclick="buscarProductos()">
+
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button id="btnAplicarFiltros" class="btn btn-primary">
                             <i class="fas fa-filter"></i>
                             Aplicar Filtros
                         </button>
-                        <button class="btn btn-secondary" onclick="exportarReporte()">
+                        <button id="btnLimpiarFiltros" class="btn btn-outline">
+                            <i class="fas fa-eraser"></i>
+                            Limpiar Filtros
+                        </button>
+                        <button id="btnExportarPDF" class="btn btn-secondary">
                             <i class="fas fa-download"></i>
-                            Exportar
+                            Exportar PDF
                         </button>
                     </div>
                 </div>
@@ -238,51 +234,11 @@
                                         <th>Ingresos</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="tablaTopProductos">
                                     <tr>
-                                        <td>🥇</td>
-                                        <td>
-                                            <strong>Pintura Látex Blanca</strong><br>
-                                            <small class="text-muted">Sherwin-Williams</small>
+                                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                                            <i class="fas fa-spinner fa-spin"></i> Cargando productos más vendidos...
                                         </td>
-                                        <td><strong>145</strong></td>
-                                        <td><strong>Q 52,200</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td>🥈</td>
-                                        <td>
-                                            <strong>Brocha Premium 3"</strong><br>
-                                            <small class="text-muted">Professional</small>
-                                        </td>
-                                        <td><strong>89</strong></td>
-                                        <td><strong>Q 8,010</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td>🥉</td>
-                                        <td>
-                                            <strong>Aguarrás 1/2 Galón</strong><br>
-                                            <small class="text-muted">Industrial</small>
-                                        </td>
-                                        <td><strong>76</strong></td>
-                                        <td><strong>Q 6,840</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>
-                                            <strong>Rodillo 9"</strong><br>
-                                            <small class="text-muted">Premium</small>
-                                        </td>
-                                        <td><strong>65</strong></td>
-                                        <td><strong>Q 3,445</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td>5</td>
-                                        <td>
-                                            <strong>Comex Vinimex</strong><br>
-                                            <small class="text-muted">1 Galón</small>
-                                        </td>
-                                        <td><strong>52</strong></td>
-                                        <td><strong>Q 18,720</strong></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -306,51 +262,11 @@
                                         <th>Días sin venta</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="tablaProductosMenosVendidos">
                                     <tr>
-                                        <td style="color: var(--error-red);">⚠️</td>
-                                        <td>
-                                            <strong>Barniz Premium Mate</strong><br>
-                                            <small class="text-muted">Speciality</small>
+                                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                                            <i class="fas fa-spinner fa-spin"></i> Cargando productos menos vendidos...
                                         </td>
-                                        <td style="color: var(--error-red);">0</td>
-                                        <td>45 días</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="color: var(--warning-yellow);">⚠️</td>
-                                        <td>
-                                            <strong>Pincel Artístico #8</strong><br>
-                                            <small class="text-muted">ProArte</small>
-                                        </td>
-                                        <td style="color: var(--warning-yellow);">1</td>
-                                        <td>23 días</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>
-                                            <strong>Sellador Acrílico</strong><br>
-                                            <small class="text-muted">Base Agua</small>
-                                        </td>
-                                        <td>2</td>
-                                        <td>18 días</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>
-                                            <strong>Masilla Plástica</strong><br>
-                                            <small class="text-muted">1 Libra</small>
-                                        </td>
-                                        <td>3</td>
-                                        <td>15 días</td>
-                                    </tr>
-                                    <tr>
-                                        <td>5</td>
-                                        <td>
-                                            <strong>Thinner Especial</strong><br>
-                                            <small class="text-muted">1/4 Galón</small>
-                                        </td>
-                                        <td>4</td>
-                                        <td>12 días</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -378,167 +294,10 @@
                                     <th>% del Total</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tablaAnalisisCategoria">
                                 <tr>
-                                    <td><strong>Pinturas</strong></td>
-                                    <td>456</td>
-                                    <td>432</td>
-                                    <td>1,247</td>
-                                    <td><strong>Q 456,890</strong></td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <div style="width: 100px; height: 8px; background: var(--gray-200); border-radius: 4px;">
-                                                <div style="width: 85%; height: 100%; background: var(--success-green); border-radius: 4px;"></div>
-                                            </div>
-                                            <span>Alta</span>
-                                        </div>
-                                    </td>
-                                    <td>68.5%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Accesorios</strong></td>
-                                    <td>389</td>
-                                    <td>367</td>
-                                    <td>567</td>
-                                    <td><strong>Q 123,450</strong></td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <div style="width: 100px; height: 8px; background: var(--gray-200); border-radius: 4px;">
-                                                <div style="width: 65%; height: 100%; background: var(--warning-yellow); border-radius: 4px;"></div>
-                                            </div>
-                                            <span>Media</span>
-                                        </div>
-                                    </td>
-                                    <td>18.5%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Solventes</strong></td>
-                                    <td>234</td>
-                                    <td>201</td>
-                                    <td>189</td>
-                                    <td><strong>Q 67,230</strong></td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <div style="width: 100px; height: 8px; background: var(--gray-200); border-radius: 4px;">
-                                                <div style="width: 45%; height: 100%; background: var(--info-color); border-radius: 4px;"></div>
-                                            </div>
-                                            <span>Media</span>
-                                        </div>
-                                    </td>
-                                    <td>10.1%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Herramientas</strong></td>
-                                    <td>168</td>
-                                    <td>156</td>
-                                    <td>78</td>
-                                    <td><strong>Q 18,940</strong></td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <div style="width: 100px; height: 8px; background: var(--gray-200); border-radius: 4px;">
-                                                <div style="width: 25%; height: 100%; background: var(--error-red); border-radius: 4px;"></div>
-                                            </div>
-                                            <span>Baja</span>
-                                        </div>
-                                    </td>
-                                    <td>2.9%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Listado Completo -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>Listado Completo de Productos</h3>
-                    <div>
-                        <span class="text-muted">Mostrando 10 de 1,247 productos</span>
-                    </div>
-                </div>
-                <div class="card-content" style="padding: 0;">
-                    <div class="table-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Categoría</th>
-                                    <th>Precio</th>
-                                    <th>Stock Total</th>
-                                    <th>Ventas (30d)</th>
-                                    <th>Última Venta</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <strong>Pintura Látex Premium Blanca</strong><br>
-                                        <small class="text-muted">Sherwin-Williams - 1 Galón</small>
-                                    </td>
-                                    <td>Pinturas</td>
-                                    <td><strong>Q 360.00</strong></td>
-                                    <td>145</td>
-                                    <td><span style="color: var(--success-green); font-weight: bold;">48</span></td>
-                                    <td>Hoy</td>
-                                    <td><span class="status-badge status-activo">Activo</span></td>
-                                    <td>
-                                        <button class="btn-action btn-view" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Comex Vinimex Color Base</strong><br>
-                                        <small class="text-muted">Comex - 1 Galón</small>
-                                    </td>
-                                    <td>Pinturas</td>
-                                    <td><strong>Q 280.00</strong></td>
-                                    <td>89</td>
-                                    <td><span style="color: var(--success-green); font-weight: bold;">32</span></td>
-                                    <td>Ayer</td>
-                                    <td><span class="status-badge status-activo">Activo</span></td>
-                                    <td>
-                                        <button class="btn-action btn-view" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Brocha Professional 3"</strong><br>
-                                        <small class="text-muted">Premium Tools</small>
-                                    </td>
-                                    <td>Accesorios</td>
-                                    <td><strong>Q 90.00</strong></td>
-                                    <td>267</td>
-                                    <td><span style="color: var(--warning-yellow); font-weight: bold;">18</span></td>
-                                    <td>2 días</td>
-                                    <td><span class="status-badge status-activo">Activo</span></td>
-                                    <td>
-                                        <button class="btn-action btn-view" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>Barniz Marina Transparente</strong><br>
-                                        <small class="text-muted">Speciality - 1/4 Galón</small>
-                                    </td>
-                                    <td>Barnices</td>
-                                    <td><strong>Q 168.00</strong></td>
-                                    <td>12</td>
-                                    <td style="color: var(--error-red);">0</td>
-                                    <td>45 días</td>
-                                    <td><span class="status-badge status-pendiente">Revisar</span></td>
-                                    <td>
-                                        <button class="btn-action btn-view" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
+                                    <td colspan="7" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                                        <i class="fas fa-spinner fa-spin"></i> Cargando análisis por categoría...
                                     </td>
                                 </tr>
                             </tbody>
