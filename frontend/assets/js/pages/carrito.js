@@ -411,7 +411,6 @@ window.updateQuantity = updateQuantity;
 window.removeFromCart = removeFromCart;
 window.selectShipping = selectShipping;
 window.applyPromoCode = applyPromoCode;
-window.requestAdvice = requestAdvice;
 window.generateQuote = generateQuote;
 window.proceedToCheckout = proceedToCheckout;
 
