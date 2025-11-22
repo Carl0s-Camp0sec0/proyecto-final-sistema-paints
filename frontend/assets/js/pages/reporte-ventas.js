@@ -17,8 +17,6 @@ if (!auth.hasPermission([CONFIG.ROLES.ADMIN, CONFIG.ROLES.GERENTE])) {
 
 // Variables globales
 let datosReporte = null;
-let chartMetodosPago = null;
-let chartVentasDiarias = null;
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
@@ -210,7 +208,6 @@ async function generarReporte() {
         mostrarEstadisticas(datosReporte.resumen);
         await cargarTopProductos(filtros);
         mostrarTablaVentasSucursal(datosReporte.ventas_por_sucursal);
-        mostrarGraficos(datosReporte);
 
         Utils.showToast('Reporte generado exitosamente', 'success');
 
@@ -361,151 +358,6 @@ function mostrarTablaVentasSucursal(ventasSucursal) {
             </tr>
         `;
     }).join('');
-}
-
-/* ==================== GRÁFICOS ==================== */
-
-function mostrarGraficos(datos) {
-    mostrarGraficoMetodosPago(datos.desglose_medios_pago);
-    mostrarGraficoVentasDiarias(datos.ventas_por_dia);
-}
-
-function mostrarGraficoMetodosPago(desglose) {
-    const ctx = document.getElementById('chartMetodosPago');
-
-    // Destruir gráfico anterior si existe
-    if (chartMetodosPago) {
-        chartMetodosPago.destroy();
-    }
-
-    // Validar datos
-    if (!desglose || typeof desglose !== 'object') {
-        console.error('Error: Desglose de medios de pago inválido');
-        return;
-    }
-
-    // Preparar datos
-    const labels = Object.keys(desglose);
-    const data = Object.values(desglose);
-
-    // Validar que haya datos
-    if (labels.length === 0 || data.length === 0) {
-        console.warn('No hay datos de medios de pago para mostrar');
-        return;
-    }
-
-    const colores = [
-        'rgba(16, 185, 129, 0.8)',  // Verde (efectivo)
-        'rgba(59, 130, 246, 0.8)',   // Azul (tarjeta)
-        'rgba(245, 158, 11, 0.8)',   // Amarillo (cheque)
-        'rgba(139, 92, 246, 0.8)'    // Morado (transferencia)
-    ];
-
-    chartMetodosPago = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: data,
-                backgroundColor: colores.slice(0, labels.length),
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const porcentaje = ((value / total) * 100).toFixed(1);
-                            return `${label}: Q ${value.toFixed(2)} (${porcentaje}%)`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-function mostrarGraficoVentasDiarias(ventasPorDia) {
-    const ctx = document.getElementById('chartVentasDiarias');
-
-    // Destruir gráfico anterior si existe
-    if (chartVentasDiarias) {
-        chartVentasDiarias.destroy();
-    }
-
-    // Validar datos
-    if (!ventasPorDia || !Array.isArray(ventasPorDia)) {
-        console.error('Error: Ventas por día inválidas');
-        return;
-    }
-
-    // Validar que haya datos
-    if (ventasPorDia.length === 0) {
-        console.warn('No hay datos de ventas diarias para mostrar');
-        return;
-    }
-
-    // Preparar datos
-    const labels = ventasPorDia.map(v => {
-        const fecha = new Date(v.fecha);
-        return fecha.toLocaleDateString('es-GT', { month: 'short', day: 'numeric' });
-    });
-
-    const data = ventasPorDia.map(v => parseFloat(v.total_vendido || 0));
-
-    chartVentasDiarias = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Ventas Diarias',
-                data: data,
-                borderColor: 'rgba(59, 130, 246, 1)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: 'rgba(59, 130, 246, 1)'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Ventas: ${Utils.formatCurrency(context.parsed.y)}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'Q ' + value.toFixed(0);
-                        }
-                    }
-                }
-            }
-        }
-    });
 }
 
 /* ==================== EXPORTACIONES ==================== */
@@ -667,17 +519,6 @@ function limpiarFiltros() {
     // Limpiar tablas
     document.getElementById('topProductosVendidos').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">Genera un reporte para ver los datos</td></tr>';
     document.getElementById('ventasPorSucursal').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">Genera un reporte para ver los datos</td></tr>';
-
-    // Limpiar gráficos
-    if (chartMetodosPago) {
-        chartMetodosPago.destroy();
-        chartMetodosPago = null;
-    }
-
-    if (chartVentasDiarias) {
-        chartVentasDiarias.destroy();
-        chartVentasDiarias = null;
-    }
 
     Utils.showToast('Filtros limpiados', 'info');
 }
