@@ -24,6 +24,22 @@ function loadUserData() {
     document.getElementById('cashierName').textContent = auth.user.nombre_completo;
 }
 
+// Cargar siguiente correlativo
+async function loadNextCorrelativo() {
+    try {
+        const response = await api.getSiguienteCorrelativo(1); // Sucursal ID 1
+        if (response.success) {
+            const correlativo = String(response.data.siguiente_correlativo).padStart(3, '0');
+            document.getElementById('nextCorrelativo').textContent = correlativo;
+        } else {
+            document.getElementById('nextCorrelativo').textContent = '???';
+        }
+    } catch (error) {
+        console.error('Error cargando correlativo:', error);
+        document.getElementById('nextCorrelativo').textContent = '???';
+    }
+}
+
 // Cargar menú según rol
 function loadSidebarMenu() {
     const menuItems = [];
@@ -581,6 +597,9 @@ async function processInvoice() {
 
             // Resetear método de pago
             updatePaymentDetails();
+
+            // Actualizar correlativo para la próxima factura
+            loadNextCorrelativo();
         } else {
             Utils.showToast('Error: ' + (response.message || 'No se pudo crear la factura'), 'error');
         }
@@ -764,6 +783,7 @@ window.viewInvoice = viewInvoice;
 document.addEventListener('DOMContentLoaded', () => {
     loadUserData();
     loadSidebarMenu();
+    loadNextCorrelativo(); // Cargar correlativo al iniciar
     setupEventListeners();
     setupPaymentMethods();
     updatePaymentDetails();

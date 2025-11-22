@@ -353,24 +353,24 @@
                 </div>
                 
                 <!-- Panel de factura -->
-                <div class="card" style="display: flex; flex-direction: column;">
+                <div class="card" style="display: flex; flex-direction: column; max-height: 100%;">
                     <div class="card-header">
                         <h3><i class="fas fa-receipt"></i> Nueva Factura</h3>
                         <div style="font-size: 0.875rem; color: var(--gray-600);">
-                            Serie: A &nbsp;&nbsp; Correlativo: <span id="nextCorrelativo">001</span>
+                            Serie: A &nbsp;&nbsp; Correlativo: <span id="nextCorrelativo">Cargando...</span>
                         </div>
                     </div>
-                    
-                    <div class="card-content" style="flex: 1; display: flex; flex-direction: column;">
+
+                    <div class="card-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
                         <!-- Datos del Cliente -->
-                        <div style="margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1rem; flex-shrink: 0;">
                             <div class="form-group">
                                 <label style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <input type="checkbox" id="consumidorFinal" checked> 
+                                    <input type="checkbox" id="consumidorFinal" checked>
                                     <span>Consumidor Final</span>
                                 </label>
                             </div>
-                            
+
                             <div id="clientDataSection" class="hidden">
                                 <div class="form-group">
                                     <label class="form-label">NIT</label>
@@ -386,14 +386,14 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Productos en la factura -->
-                        <div style="flex: 1; border: 1px solid var(--gray-200); border-radius: var(--border-radius); overflow: hidden; display: flex; flex-direction: column;">
-                            <div style="background: var(--gray-50); padding: 0.75rem; border-bottom: 1px solid var(--gray-200); font-weight: 600;">
+                        <div style="flex: 1; border: 1px solid var(--gray-200); border-radius: var(--border-radius); overflow: hidden; display: flex; flex-direction: column; min-height: 0;">
+                            <div style="background: var(--gray-50); padding: 0.75rem; border-bottom: 1px solid var(--gray-200); font-weight: 600; flex-shrink: 0;">
                                 <i class="fas fa-shopping-cart"></i> Productos en la Factura
                                 <span id="itemCount" style="float: right; font-weight: normal; color: var(--gray-600);">0 productos</span>
                             </div>
-                            <div id="invoiceProducts" style="flex: 1; overflow-y: auto; min-height: 200px;">
+                            <div id="invoiceProducts" style="flex: 1; overflow-y: auto; min-height: 0;">
                                 <div style="padding: 2rem; text-align: center; color: var(--gray-500);">
                                     <i class="fas fa-shopping-cart" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
                                     <p>No hay productos agregados</p>
@@ -402,69 +402,72 @@
                             </div>
                         </div>
                         
-                        <!-- Acciones rápidas -->
-                        <div class="quick-actions" style="margin: 1rem 0;">
-                            <button class="btn btn-secondary btn-sm" onclick="clearInvoice()">
-                                <i class="fas fa-trash"></i> Limpiar
-                            </button>
-                            <button class="btn btn-secondary btn-sm" onclick="applyDiscount()">
-                                <i class="fas fa-percent"></i> Descuento
-                            </button>
-                        </div>
-                        
-                        <!-- Totales y método de pago -->
-                        <div class="invoice-summary">
-                            <div class="summary-line">
-                                <span>Subtotal:</span>
-                                <span id="invoiceSubtotal">Q0.00</span>
-                            </div>
-                            <div class="summary-line">
-                                <span>Descuento:</span>
-                                <span id="invoiceDiscount">Q0.00</span>
-                            </div>
-                            <div class="summary-line">
-                                <span>IVA (12%):</span>
-                                <span id="invoiceTax">Q0.00</span>
-                            </div>
-                            <div class="summary-line total">
-                                <span>Total:</span>
-                                <span id="invoiceTotal">Q0.00</span>
-                            </div>
-                        </div>
-                        
-                        <div class="payment-details">
-                            <label class="form-label">Método de Pago</label>
-                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                                <button class="btn btn-secondary payment-method active" data-method="efectivo">
-                                    <i class="fas fa-money-bill-wave"></i> Efectivo
+                        <!-- Sección inferior con scroll independiente -->
+                        <div style="flex-shrink: 0; overflow-y: auto; max-height: 50%;">
+                            <!-- Acciones rápidas -->
+                            <div class="quick-actions" style="margin: 1rem 0;">
+                                <button class="btn btn-secondary btn-sm" onclick="clearInvoice()">
+                                    <i class="fas fa-trash"></i> Limpiar
                                 </button>
-                                <button class="btn btn-secondary payment-method" data-method="tarjeta">
-                                    <i class="fas fa-credit-card"></i> Tarjeta
-                                </button>
-                                <button class="btn btn-secondary payment-method" data-method="cheque">
-                                    <i class="fas fa-money-check"></i> Cheque
+                                <button class="btn btn-secondary btn-sm" onclick="applyDiscount()">
+                                    <i class="fas fa-percent"></i> Descuento
                                 </button>
                             </div>
-                            
-                            <div id="paymentDetailsSection">
-                                <div class="form-group">
-                                    <label class="form-label">Monto Recibido</label>
-                                    <input type="number" class="form-input" id="cashAmount" 
-                                           placeholder="0.00" step="0.01">
+
+                            <!-- Totales y método de pago -->
+                            <div class="invoice-summary">
+                                <div class="summary-line">
+                                    <span>Subtotal:</span>
+                                    <span id="invoiceSubtotal">Q0.00</span>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">Vuelto</label>
-                                    <input type="number" class="form-input" id="changeAmount" 
-                                           readonly style="background: var(--gray-100);">
+                                <div class="summary-line">
+                                    <span>Descuento:</span>
+                                    <span id="invoiceDiscount">Q0.00</span>
+                                </div>
+                                <div class="summary-line">
+                                    <span>IVA (12%):</span>
+                                    <span id="invoiceTax">Q0.00</span>
+                                </div>
+                                <div class="summary-line total">
+                                    <span>Total:</span>
+                                    <span id="invoiceTotal">Q0.00</span>
                                 </div>
                             </div>
+
+                            <div class="payment-details">
+                                <label class="form-label">Método de Pago</label>
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                    <button class="btn btn-secondary payment-method active" data-method="efectivo">
+                                        <i class="fas fa-money-bill-wave"></i> Efectivo
+                                    </button>
+                                    <button class="btn btn-secondary payment-method" data-method="tarjeta">
+                                        <i class="fas fa-credit-card"></i> Tarjeta
+                                    </button>
+                                    <button class="btn btn-secondary payment-method" data-method="cheque">
+                                        <i class="fas fa-money-check"></i> Cheque
+                                    </button>
+                                </div>
+
+                                <div id="paymentDetailsSection">
+                                    <div class="form-group">
+                                        <label class="form-label">Monto Recibido</label>
+                                        <input type="number" class="form-input" id="cashAmount"
+                                               placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Vuelto</label>
+                                        <input type="number" class="form-input" id="changeAmount"
+                                               readonly style="background: var(--gray-100);">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;"
+                                    onclick="processInvoice()" disabled id="processBtn">
+                                <i class="fas fa-cash-register"></i>
+                                Procesar Venta
+                            </button>
                         </div>
-                        
-                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" 
-                                onclick="processInvoice()" disabled id="processBtn">
-                            <i class="fas fa-cash-register"></i>
-                            Procesar Venta
-                        </button>
                     </div>
                 </div>
             </div>

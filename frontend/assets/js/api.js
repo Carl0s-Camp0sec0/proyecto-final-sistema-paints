@@ -137,6 +137,10 @@ class ApiClient {
         return this.request(`/facturas/numero/${numeroFactura}`);
     }
 
+    async getSiguienteCorrelativo(sucursalId) {
+        return this.request(`/facturas/siguiente-correlativo?sucursal_id=${sucursalId}`);
+    }
+
     async getEstadisticasVentas(params = {}) {
         const queryString = new URLSearchParams(params).toString();
         return this.request(`/facturas/estadisticas?${queryString}`);

@@ -306,6 +306,61 @@ router.post('/',
 );
 
 /**
+ * @route   GET /api/facturas/siguiente-correlativo
+ * @desc    Obtener siguiente número correlativo para una sucursal
+ * @access  Private
+ */
+router.get('/siguiente-correlativo',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      const { sucursal_id } = req.query;
+
+      if (!sucursal_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'sucursal_id es requerido'
+        });
+      }
+
+      console.log(`🔢 Obteniendo siguiente correlativo para sucursal ${sucursal_id}...`);
+
+      // Obtener o crear serie de factura para la sucursal
+      let [serieFactura] = await SerieFactura.findOrCreate({
+        where: { sucursal_id, letra_serie: 'A' },
+        defaults: {
+          descripcion: 'Serie principal',
+          correlativo_actual: 0,
+          activo: true
+        }
+      });
+
+      const siguienteCorrelativo = serieFactura.getSiguienteCorrelativo();
+      const numeroFactura = serieFactura.generarNumeroFactura(siguienteCorrelativo);
+
+      console.log(`✅ Siguiente correlativo: ${numeroFactura}`);
+
+      res.json({
+        success: true,
+        data: {
+          letra_serie: serieFactura.letra_serie,
+          siguiente_correlativo: siguienteCorrelativo,
+          numero_factura: numeroFactura
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error obteniendo siguiente correlativo:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
  * @route   GET /api/facturas/:id
  * @desc    Obtener factura por ID
  * @access  Private

@@ -262,8 +262,10 @@ class FacturaController {
         });
       }
 
-      // Calcular total
-      const total = subtotal - parseFloat(descuento);
+      // Calcular IVA (12%) y total
+      const afterDiscount = subtotal - parseFloat(descuento);
+      const impuestos = afterDiscount * 0.12; // IVA del 12%
+      const total = afterDiscount + impuestos;
 
       // Validar medios de pago
       let totalPagado = 0;
@@ -276,7 +278,7 @@ class FacturaController {
           await transaction.rollback();
           return res.status(400).json({
             success: false,
-            message: `El total pagado (${totalPagado}) no coincide con el total de la factura (${total})`
+            message: `El total pagado (${totalPagado.toFixed(2)}) no coincide con el total de la factura (${total.toFixed(2)})`
           });
         }
       }
@@ -294,7 +296,7 @@ class FacturaController {
         usuario_id: req.usuario.id,
         subtotal,
         descuento: parseFloat(descuento),
-        impuestos: 0, // Por ahora sin impuestos
+        impuestos: impuestos,
         total,
         estado: 'activa',
         observaciones
@@ -348,26 +350,32 @@ class FacturaController {
         include: [
           { model: Cliente, as: 'cliente' },
           { model: Sucursal, as: 'sucursal' },
-          { 
-            model: FacturaDetalle, 
+          {
+            model: FacturaDetalle,
             as: 'detalles',
             include: [
               { model: Producto, as: 'producto' },
               { model: UnidadMedida, as: 'unidad_medida' }
             ]
           },
-          { 
-            model: FacturaPago, 
+          {
+            model: FacturaPago,
             as: 'pagos',
             include: [{ model: MedioPago, as: 'medio_pago' }]
           }
         ]
       });
 
+      // Generar número de factura formateado
+      const numeroFactura = `${factura.letra_serie}${String(factura.numero_correlativo).padStart(8, '0')}`;
+
       res.status(201).json({
         success: true,
         message: 'Factura creada exitosamente',
-        data: facturaCompleta
+        data: {
+          ...facturaCompleta.toJSON(),
+          numero_factura: numeroFactura
+        }
       });
 
     } catch (error) {
@@ -517,15 +525,15 @@ class FacturaController {
   // Obtener estadísticas de ventas
   static async estadisticasVentas(req, res) {
     try {
-      const { 
-        sucursal_id, 
-        fecha_inicio, 
+      const {
+        sucursal_id,
+        fecha_inicio,
         fecha_fin,
         agrupacion = 'dia' // dia, semana, mes
       } = req.query;
 
       const whereClause = { estado: 'activa' };
-      
+
       if (sucursal_id) whereClause.sucursal_id = sucursal_id;
       if (fecha_inicio && fecha_fin) {
         whereClause.fecha_creacion = {
@@ -574,6 +582,49 @@ class FacturaController {
 
     } catch (error) {
       console.error('Error obteniendo estadísticas de ventas:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor'
+      });
+    }
+  }
+
+  // Obtener siguiente correlativo para una sucursal
+  static async obtenerSiguienteCorrelativo(req, res) {
+    try {
+      const { sucursal_id } = req.query;
+
+      if (!sucursal_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'sucursal_id es requerido'
+        });
+      }
+
+      // Obtener o crear serie de factura para la sucursal
+      let [serieFactura] = await SerieFactura.findOrCreate({
+        where: { sucursal_id, letra_serie: 'A' },
+        defaults: {
+          descripcion: 'Serie principal',
+          correlativo_actual: 0,
+          activo: true
+        }
+      });
+
+      const siguienteCorrelativo = serieFactura.getSiguienteCorrelativo();
+      const numeroFactura = serieFactura.generarNumeroFactura(siguienteCorrelativo);
+
+      res.json({
+        success: true,
+        data: {
+          letra_serie: serieFactura.letra_serie,
+          siguiente_correlativo: siguienteCorrelativo,
+          numero_factura: numeroFactura
+        }
+      });
+
+    } catch (error) {
+      console.error('Error obteniendo siguiente correlativo:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor'
