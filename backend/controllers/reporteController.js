@@ -149,7 +149,7 @@ exports.getVentasPorPeriodo = async (req, res) => {
                 as: 'sucursal',
                 attributes: ['id', 'nombre']
             }],
-            group: ['sucursal.id'],
+            group: ['sucursal.id', 'sucursal.nombre'],
             raw: true
         });
 
@@ -1155,6 +1155,285 @@ exports.getInventarioPorTienda = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Error al obtener inventario por tienda',
+            error: error.message
+        });
+    }
+};
+
+/* ============================================
+   REPORTES DE CLIENTES
+   ============================================ */
+
+// Estadísticas generales de clientes
+exports.getClientesEstadisticas = async (req, res) => {
+    try {
+        const { periodo_dias = 30 } = req.query;
+
+        // Fecha límite para clientes activos y nuevos
+        const fechaLimite = new Date();
+        fechaLimite.setDate(fechaLimite.getDate() - parseInt(periodo_dias));
+
+        // Total de clientes
+        const totalClientes = await Cliente.count({
+            where: { estado: 'activo' }
+        });
+
+        // Clientes activos (con compras en el período)
+        const clientesActivos = await Factura.count({
+            where: {
+                fecha_creacion: { [Op.gte]: fechaLimite },
+                estado: 'activa'
+            },
+            distinct: true,
+            col: 'cliente_id'
+        });
+
+        // Nuevos clientes (registrados en el período)
+        const nuevosClientes = await Cliente.count({
+            where: {
+                fecha_creacion: { [Op.gte]: fechaLimite },
+                estado: 'activo'
+            }
+        });
+
+        // Ticket promedio
+        const ventasTotales = await Factura.sum('total', {
+            where: {
+                fecha_creacion: { [Op.gte]: fechaLimite },
+                estado: 'activa'
+            }
+        });
+
+        const numeroFacturas = await Factura.count({
+            where: {
+                fecha_creacion: { [Op.gte]: fechaLimite },
+                estado: 'activa'
+            }
+        });
+
+        const ticketPromedio = numeroFacturas > 0 ? ventasTotales / numeroFacturas : 0;
+
+        res.json({
+            success: true,
+            data: {
+                total_clientes: totalClientes,
+                clientes_activos: clientesActivos,
+                nuevos_clientes: nuevosClientes,
+                ticket_promedio: parseFloat(ticketPromedio.toFixed(2))
+            }
+        });
+
+    } catch (error) {
+        console.error('Error en getClientesEstadisticas:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener estadísticas de clientes',
+            error: error.message
+        });
+    }
+};
+
+// Top clientes por ventas
+exports.getClientesTopVentas = async (req, res) => {
+    try {
+        const {
+            fecha_inicio,
+            fecha_fin,
+            sucursal_id,
+            tipo_cliente,
+            limit = 10
+        } = req.query;
+
+        // Construir filtros para facturas
+        const whereFactura = { estado: 'activa' };
+
+        if (fecha_inicio && fecha_fin) {
+            whereFactura.fecha_creacion = {
+                [Op.between]: [new Date(fecha_inicio), new Date(fecha_fin + ' 23:59:59')]
+            };
+        }
+
+        if (sucursal_id) {
+            whereFactura.sucursal_id = sucursal_id;
+        }
+
+        // Construir filtros para clientes
+        const whereCliente = { estado: 'activo' };
+
+        if (tipo_cliente) {
+            whereCliente.tipo_cliente = tipo_cliente;
+        }
+
+        // Obtener top clientes
+        const topClientes = await Factura.findAll({
+            where: whereFactura,
+            attributes: [
+                'cliente_id',
+                [Sequelize.fn('COUNT', Sequelize.col('Factura.id')), 'total_compras'],
+                [Sequelize.fn('SUM', Sequelize.col('total')), 'total_vendido']
+            ],
+            include: [{
+                model: Cliente,
+                as: 'cliente',
+                where: whereCliente,
+                attributes: ['id', 'nombre', 'tipo_cliente']
+            }],
+            group: ['Factura.cliente_id', 'cliente.id'],
+            order: [[Sequelize.literal('total_vendido'), 'DESC']],
+            limit: parseInt(limit),
+            raw: false
+        });
+
+        // Formatear resultados
+        const clientes = topClientes.map(item => ({
+            cliente_id: item.cliente_id,
+            nombre: item.cliente.nombre,
+            tipo_cliente: item.cliente.tipo_cliente,
+            total_compras: parseInt(item.dataValues.total_compras),
+            total_vendido: parseFloat(item.dataValues.total_vendido)
+        }));
+
+        res.json({
+            success: true,
+            data: { clientes }
+        });
+
+    } catch (error) {
+        console.error('Error en getClientesTopVentas:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener top clientes',
+            error: error.message
+        });
+    }
+};
+
+// Segmentación de clientes
+exports.getClientesSegmentacion = async (req, res) => {
+    try {
+        const { fecha_inicio, fecha_fin, sucursal_id } = req.query;
+
+        // Definir segmentos basados en el total de compras
+        const segmentos = [
+            { nombre: 'VIP', min: 10000, max: 999999999, descripcion: 'Compras > Q10,000' },
+            { nombre: 'Premium', min: 5000, max: 9999.99, descripcion: 'Compras Q5,000 - Q10,000' },
+            { nombre: 'Regular', min: 1000, max: 4999.99, descripcion: 'Compras Q1,000 - Q5,000' },
+            { nombre: 'Ocasional', min: 0, max: 999.99, descripcion: 'Compras < Q1,000' }
+        ];
+
+        // Construir filtros
+        const whereFactura = { estado: 'activa' };
+
+        if (fecha_inicio && fecha_fin) {
+            whereFactura.fecha_creacion = {
+                [Op.between]: [new Date(fecha_inicio), new Date(fecha_fin + ' 23:59:59')]
+            };
+        }
+
+        if (sucursal_id) {
+            whereFactura.sucursal_id = sucursal_id;
+        }
+
+        // Obtener ventas por cliente
+        const ventasPorCliente = await Factura.findAll({
+            where: whereFactura,
+            attributes: [
+                'cliente_id',
+                [Sequelize.fn('COUNT', Sequelize.col('Factura.id')), 'num_compras'],
+                [Sequelize.fn('SUM', Sequelize.col('total')), 'total_vendido']
+            ],
+            group: ['cliente_id'],
+            raw: true
+        });
+
+        // Clasificar clientes en segmentos
+        const resultadosSegmentos = segmentos.map(segmento => {
+            const clientesSegmento = ventasPorCliente.filter(c => {
+                const total = parseFloat(c.total_vendido);
+                return total >= segmento.min && total <= segmento.max;
+            });
+
+            const cantidad = clientesSegmento.length;
+            const ingresosTotal = clientesSegmento.reduce((sum, c) => sum + parseFloat(c.total_vendido), 0);
+            const comprasTotal = clientesSegmento.reduce((sum, c) => sum + parseInt(c.num_compras), 0);
+
+            return {
+                nombre: segmento.nombre,
+                descripcion: segmento.descripcion,
+                cantidad: cantidad,
+                compra_promedio: cantidad > 0 ? parseFloat((ingresosTotal / cantidad).toFixed(2)) : 0,
+                frecuencia: cantidad > 0 ? parseFloat((comprasTotal / cantidad).toFixed(1)) : 0,
+                ingresos_totales: parseFloat(ingresosTotal.toFixed(2))
+            };
+        });
+
+        res.json({
+            success: true,
+            data: { segmentos: resultadosSegmentos }
+        });
+
+    } catch (error) {
+        console.error('Error en getClientesSegmentacion:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener segmentación de clientes',
+            error: error.message
+        });
+    }
+};
+
+// Clientes por tipo
+exports.getClientesPorTipo = async (req, res) => {
+    try {
+        const { fecha_inicio, fecha_fin, sucursal_id } = req.query;
+
+        // Construir filtros
+        const whereFactura = { estado: 'activa' };
+
+        if (fecha_inicio && fecha_fin) {
+            whereFactura.fecha_creacion = {
+                [Op.between]: [new Date(fecha_inicio), new Date(fecha_fin + ' 23:59:59')]
+            };
+        }
+
+        if (sucursal_id) {
+            whereFactura.sucursal_id = sucursal_id;
+        }
+
+        // Obtener ventas agrupadas por tipo de cliente
+        const ventasPorTipo = await Factura.findAll({
+            where: whereFactura,
+            attributes: [
+                [Sequelize.fn('COUNT', Sequelize.col('Factura.id')), 'num_compras'],
+                [Sequelize.fn('SUM', Sequelize.col('total')), 'total_vendido']
+            ],
+            include: [{
+                model: Cliente,
+                as: 'cliente',
+                attributes: ['tipo_cliente'],
+                where: { estado: 'activo' }
+            }],
+            group: ['cliente.tipo_cliente'],
+            raw: true
+        });
+
+        // Formatear resultados
+        const tipos = ventasPorTipo.map(item => ({
+            tipo: item['cliente.tipo_cliente'] || 'Sin tipo',
+            num_compras: parseInt(item.num_compras),
+            total_vendido: parseFloat(item.total_vendido)
+        }));
+
+        res.json({
+            success: true,
+            data: { tipos }
+        });
+
+    } catch (error) {
+        console.error('Error en getClientesPorTipo:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener clientes por tipo',
             error: error.message
         });
     }

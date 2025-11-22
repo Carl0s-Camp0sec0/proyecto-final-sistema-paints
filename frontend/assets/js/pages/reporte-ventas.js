@@ -44,7 +44,20 @@ function cargarDatosUsuario() {
 async function cargarSucursales() {
     try {
         const response = await api.get('/sistema/sucursales');
+
+        // Validar respuesta
+        if (!response || !response.success || !response.data || !response.data.sucursales) {
+            console.error('Error: Respuesta inválida del servidor');
+            return;
+        }
+
         const sucursales = response.data.sucursales;
+
+        // Validar que sucursales sea un array
+        if (!Array.isArray(sucursales)) {
+            console.error('Error: Sucursales no es un array');
+            return;
+        }
 
         const select = document.getElementById('sucursalSelect');
         select.innerHTML = '<option value="">Todas las Sucursales</option>';
@@ -314,9 +327,21 @@ function mostrarGraficoMetodosPago(desglose) {
         chartMetodosPago.destroy();
     }
 
+    // Validar datos
+    if (!desglose || typeof desglose !== 'object') {
+        console.error('Error: Desglose de medios de pago inválido');
+        return;
+    }
+
     // Preparar datos
     const labels = Object.keys(desglose);
     const data = Object.values(desglose);
+
+    // Validar que haya datos
+    if (labels.length === 0 || data.length === 0) {
+        console.warn('No hay datos de medios de pago para mostrar');
+        return;
+    }
 
     const colores = [
         'rgba(16, 185, 129, 0.8)',  // Verde (efectivo)
@@ -365,6 +390,18 @@ function mostrarGraficoVentasDiarias(ventasPorDia) {
     // Destruir gráfico anterior si existe
     if (chartVentasDiarias) {
         chartVentasDiarias.destroy();
+    }
+
+    // Validar datos
+    if (!ventasPorDia || !Array.isArray(ventasPorDia)) {
+        console.error('Error: Ventas por día inválidas');
+        return;
+    }
+
+    // Validar que haya datos
+    if (ventasPorDia.length === 0) {
+        console.warn('No hay datos de ventas diarias para mostrar');
+        return;
     }
 
     // Preparar datos

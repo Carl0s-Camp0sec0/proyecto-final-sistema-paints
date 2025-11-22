@@ -47,31 +47,50 @@ async function cargarFiltros() {
     try {
         // Cargar sucursales
         const sucursalesResponse = await api.get('/sistema/sucursales');
-        const sucursales = sucursalesResponse.data.sucursales;
 
-        const sucursalSelects = document.querySelectorAll('select.form-select');
-        if (sucursalSelects.length > 0) {
-            sucursalSelects[0].innerHTML = '<option value="">Todas las Sucursales</option>';
-            sucursales.forEach(suc => {
-                const option = document.createElement('option');
-                option.value = suc.id;
-                option.textContent = suc.nombre;
-                sucursalSelects[0].appendChild(option);
-            });
+        // Validar respuesta de sucursales
+        if (sucursalesResponse && sucursalesResponse.success && sucursalesResponse.data && sucursalesResponse.data.sucursales) {
+            const sucursales = sucursalesResponse.data.sucursales;
+
+            // Validar que sea un array
+            if (Array.isArray(sucursales)) {
+                const sucursalSelects = document.querySelectorAll('select.form-select');
+                if (sucursalSelects.length > 0) {
+                    sucursalSelects[0].innerHTML = '<option value="">Todas las Sucursales</option>';
+                    sucursales.forEach(suc => {
+                        const option = document.createElement('option');
+                        option.value = suc.id;
+                        option.textContent = suc.nombre;
+                        sucursalSelects[0].appendChild(option);
+                    });
+                }
+            }
+        } else {
+            console.error('Error: Respuesta inválida al cargar sucursales');
         }
 
         // Cargar categorías
         const categoriasResponse = await api.get('/sistema/categorias');
-        const categorias = categoriasResponse.data.categorias;
 
-        if (sucursalSelects.length > 1) {
-            sucursalSelects[1].innerHTML = '<option value="">Todas las Categorías</option>';
-            categorias.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat.id;
-                option.textContent = cat.nombre;
-                sucursalSelects[1].appendChild(option);
-            });
+        // Validar respuesta de categorías
+        if (categoriasResponse && categoriasResponse.success && categoriasResponse.data && categoriasResponse.data.categorias) {
+            const categorias = categoriasResponse.data.categorias;
+
+            // Validar que sea un array
+            if (Array.isArray(categorias)) {
+                const sucursalSelects = document.querySelectorAll('select.form-select');
+                if (sucursalSelects.length > 1) {
+                    sucursalSelects[1].innerHTML = '<option value="">Todas las Categorías</option>';
+                    categorias.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.nombre;
+                        sucursalSelects[1].appendChild(option);
+                    });
+                }
+            }
+        } else {
+            console.error('Error: Respuesta inválida al cargar categorías');
         }
 
     } catch (error) {

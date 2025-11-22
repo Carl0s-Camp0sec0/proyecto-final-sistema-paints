@@ -50,4 +50,24 @@ router.get('/inventario/stock-bajo', reporteController.getProductosStockBajo);
 // GET /api/reportes/inventario/por-tienda?categoria_id=1
 router.get('/inventario/por-tienda', reporteController.getInventarioPorTienda);
 
+/* ============================================
+   RUTAS DE REPORTES DE CLIENTES
+   ============================================ */
+
+// Estadísticas generales de clientes
+// GET /api/reportes/clientes/estadisticas?periodo_dias=30
+router.get('/clientes/estadisticas', reporteController.getClientesEstadisticas);
+
+// Top clientes por ventas
+// GET /api/reportes/clientes/top-ventas?fecha_inicio=2024-01-01&fecha_fin=2024-01-31&sucursal_id=1&tipo_cliente=empresa&limit=10
+router.get('/clientes/top-ventas', reporteController.getClientesTopVentas);
+
+// Segmentación de clientes
+// GET /api/reportes/clientes/segmentacion?fecha_inicio=2024-01-01&fecha_fin=2024-01-31&sucursal_id=1
+router.get('/clientes/segmentacion', reporteController.getClientesSegmentacion);
+
+// Clientes por tipo
+// GET /api/reportes/clientes/por-tipo?fecha_inicio=2024-01-01&fecha_fin=2024-01-31&sucursal_id=1
+router.get('/clientes/por-tipo', reporteController.getClientesPorTipo);
+
 module.exports = router;

@@ -41,7 +41,20 @@ async function cargarFiltros() {
     try {
         // Cargar categorías
         const categoriasResponse = await api.get('/sistema/categorias');
+
+        // Validar respuesta
+        if (!categoriasResponse || !categoriasResponse.success || !categoriasResponse.data || !categoriasResponse.data.categorias) {
+            console.error('Error: Respuesta inválida al cargar categorías');
+            return;
+        }
+
         const categorias = categoriasResponse.data.categorias;
+
+        // Validar que sea un array
+        if (!Array.isArray(categorias)) {
+            console.error('Error: Categorías no es un array');
+            return;
+        }
 
         const categoriaSelect = document.querySelector('select.form-select');
         if (categoriaSelect) {
