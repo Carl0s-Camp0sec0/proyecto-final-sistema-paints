@@ -11,6 +11,8 @@ const facturasRoutes = require('./facturas');
 const reportesRoutes = require('./reportes');
 const usuariosRoutes = require('./usuarios');
 const proveedoresRoutes = require('./proveedores');
+const cotizacionesRoutes = require('./cotizaciones');
+const carritoRoutes = require('./carrito');
 
 // Configurar rutas
 router.use('/auth', authRoutes);
@@ -22,6 +24,8 @@ router.use('/facturas', facturasRoutes);
 router.use('/reportes', reportesRoutes);
 router.use('/usuarios', usuariosRoutes);
 router.use('/proveedores', proveedoresRoutes);
+router.use('/cotizaciones', cotizacionesRoutes);
+router.use('/carrito', carritoRoutes);
 
 // Ruta de prueba
 router.get('/test', (req, res) => {
@@ -38,7 +42,11 @@ router.get('/test', (req, res) => {
       'GET /api/facturas',
       'GET /api/reportes/ventas/periodo',
       'GET /api/reportes/productos/top-ingresos',
-      'GET /api/reportes/inventario/general'
+      'GET /api/reportes/inventario/general',
+      'GET /api/cotizaciones',
+      'POST /api/cotizaciones',
+      'GET /api/carrito',
+      'POST /api/carrito'
     ]
   });
 });
