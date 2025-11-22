@@ -38,7 +38,7 @@
                 <h2 class="sidebar-title">Reportes</h2>
                 <p class="sidebar-subtitle">Inventario</p>
             </div>
-            
+
             <nav>
                 <ul class="sidebar-nav">
                     <li><a href="/frontend/pages/admin/dashboard.html">
@@ -177,10 +177,14 @@
                         </div>
                     </div>
 
-                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
                         <button id="btnAplicarFiltros" class="btn btn-primary">
                             <i class="fas fa-filter"></i>
                             Aplicar Filtros
+                        </button>
+                        <button id="btnLimpiarFiltros" class="btn btn-outline">
+                            <i class="fas fa-eraser"></i>
+                            Limpiar Filtros
                         </button>
                         <button id="btnExportarPDF" class="btn btn-secondary">
                             <i class="fas fa-file-pdf"></i>
