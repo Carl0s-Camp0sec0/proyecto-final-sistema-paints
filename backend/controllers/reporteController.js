@@ -250,11 +250,11 @@ exports.getProductosTopIngresos = async (req, res) => {
                 },
                 {
                     model: UnidadMedida,
-                    as: 'unidadMedida',
+                    as: 'unidad_medida',
                     attributes: ['id', 'nombre', 'abreviatura']
                 }
             ],
-            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidadMedida.id', 'unidadMedida.nombre', 'unidadMedida.abreviatura'],
+            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidad_medida.id', 'unidad_medida.nombre', 'unidad_medida.abreviatura'],
             order: [[Sequelize.fn('SUM', Sequelize.col('subtotal')), 'DESC']],
             limit: parseInt(limit),
             raw: false
@@ -273,7 +273,7 @@ exports.getProductosTopIngresos = async (req, res) => {
                 nombre: item.producto.nombre,
                 marca: item.producto.marca,
                 categoria: item.producto.categoria.nombre,
-                unidad_medida: item.unidadMedida.nombre,
+                unidad_medida: item.unidad_medida.nombre,
                 cantidad_vendida: parseInt(item.dataValues.cantidad_vendida),
                 total_vendido: parseFloat(totalVendido.toFixed(2)),
                 numero_facturas: parseInt(item.dataValues.numero_facturas),
@@ -350,11 +350,11 @@ exports.getProductosTopCantidad = async (req, res) => {
                 },
                 {
                     model: UnidadMedida,
-                    as: 'unidadMedida',
+                    as: 'unidad_medida',
                     attributes: ['id', 'nombre', 'abreviatura']
                 }
             ],
-            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidadMedida.id', 'unidadMedida.nombre', 'unidadMedida.abreviatura'],
+            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidad_medida.id', 'unidad_medida.nombre', 'unidad_medida.abreviatura'],
             order: [[Sequelize.fn('SUM', Sequelize.col('cantidad')), 'DESC']],
             limit: parseInt(limit),
             raw: false
@@ -366,7 +366,7 @@ exports.getProductosTopCantidad = async (req, res) => {
             nombre: item.producto.nombre,
             marca: item.producto.marca,
             categoria: item.producto.categoria.nombre,
-            unidad_medida: item.unidadMedida.nombre,
+            unidad_medida: item.unidad_medida.nombre,
             cantidad_vendida: parseInt(item.dataValues.cantidad_vendida),
             total_vendido: parseFloat(item.dataValues.total_vendido),
             numero_facturas: parseInt(item.dataValues.numero_facturas)
@@ -429,7 +429,7 @@ exports.getInventarioGeneral = async (req, res) => {
                 },
                 {
                     model: UnidadMedida,
-                    as: 'unidadMedida',
+                    as: 'unidad_medida',
                     attributes: ['nombre', 'abreviatura']
                 }
             ],
@@ -463,7 +463,7 @@ exports.getInventarioGeneral = async (req, res) => {
                 marca: item.producto.marca,
                 categoria: item.producto.categoria.nombre,
                 sucursal: item.sucursal.nombre,
-                unidad_medida: item.unidadMedida.nombre,
+                unidad_medida: item.unidad_medida.nombre,
                 stock_actual: stock,
                 stock_minimo: stockMin,
                 stock_reservado: parseInt(item.stock_reservado),
@@ -548,11 +548,11 @@ exports.getProductosMenosVendidos = async (req, res) => {
                 },
                 {
                     model: UnidadMedida,
-                    as: 'unidadMedida',
+                    as: 'unidad_medida',
                     attributes: ['id', 'nombre']
                 }
             ],
-            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidadMedida.id', 'unidadMedida.nombre'],
+            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidad_medida.id', 'unidad_medida.nombre'],
             order: [[Sequelize.fn('SUM', Sequelize.col('cantidad')), 'ASC']],
             limit: parseInt(limit),
             raw: false
@@ -569,7 +569,7 @@ exports.getProductosMenosVendidos = async (req, res) => {
                 nombre: item.producto.nombre,
                 marca: item.producto.marca,
                 categoria: item.producto.categoria.nombre,
-                unidad_medida: item.unidadMedida.nombre,
+                unidad_medida: item.unidad_medida.nombre,
                 cantidad_vendida: parseInt(item.dataValues.cantidad_vendida),
                 total_vendido: parseFloat(item.dataValues.total_vendido),
                 ultima_venta: item.dataValues.ultima_venta,
@@ -630,7 +630,7 @@ exports.getProductosSinStock = async (req, res) => {
                 },
                 {
                     model: UnidadMedida,
-                    as: 'unidadMedida',
+                    as: 'unidad_medida',
                     attributes: ['nombre']
                 }
             ],
@@ -670,7 +670,7 @@ exports.getProductosSinStock = async (req, res) => {
                     marca: item.producto.marca,
                     categoria: item.producto.categoria.nombre,
                     sucursal: item.sucursal.nombre,
-                    unidad_medida: item.unidadMedida.nombre,
+                    unidad_medida: item.unidad_medida.nombre,
                     stock_minimo: item.producto.stock_minimo,
                     ultima_venta: fechaUltimaVenta,
                     dias_sin_stock: diasSinStock,
@@ -735,7 +735,7 @@ exports.getFacturaPorNumero = async (req, res) => {
                         },
                         {
                             model: UnidadMedida,
-                            as: 'unidadMedida'
+                            as: 'unidad_medida'
                         }
                     ]
                 },
@@ -810,7 +810,7 @@ exports.getFacturaPorNumero = async (req, res) => {
                     nombre: d.producto.nombre,
                     categoria: d.producto.categoria.nombre,
                     cantidad: parseInt(d.cantidad),
-                    unidad_medida: d.unidadMedida.nombre,
+                    unidad_medida: d.unidad_medida.nombre,
                     precio_unitario: parseFloat(d.precio_unitario),
                     descuento_porcentaje: parseFloat(d.descuento_porcentaje),
                     subtotal: parseFloat(d.subtotal)
@@ -896,7 +896,7 @@ exports.getIngresosInventario = async (req, res) => {
                         },
                         {
                             model: UnidadMedida,
-                            as: 'unidadMedida',
+                            as: 'unidad_medida',
                             attributes: ['nombre']
                         }
                     ]
@@ -932,7 +932,7 @@ exports.getIngresosInventario = async (req, res) => {
                 marca: d.producto.marca,
                 categoria: d.producto.categoria.nombre,
                 cantidad: parseInt(d.cantidad),
-                unidad_medida: d.unidadMedida.nombre,
+                unidad_medida: d.unidad_medida.nombre,
                 costo_unitario: parseFloat(d.costo_unitario),
                 subtotal: parseFloat(d.subtotal)
             }))
@@ -993,7 +993,7 @@ exports.getProductosStockBajo = async (req, res) => {
                 },
                 {
                     model: UnidadMedida,
-                    as: 'unidadMedida',
+                    as: 'unidad_medida',
                     attributes: ['nombre']
                 }
             ]
@@ -1013,7 +1013,7 @@ exports.getProductosStockBajo = async (req, res) => {
                     marca: item.producto.marca,
                     categoria: item.producto.categoria.nombre,
                     sucursal: item.sucursal.nombre,
-                    unidad_medida: item.unidadMedida.nombre,
+                    unidad_medida: item.unidad_medida.nombre,
                     stock_actual: stockActual,
                     stock_minimo: stockMinimo,
                     deficit: deficit,
@@ -1081,7 +1081,7 @@ exports.getInventarioPorTienda = async (req, res) => {
                         },
                         {
                             model: UnidadMedida,
-                            as: 'unidadMedida',
+                            as: 'unidad_medida',
                             attributes: ['nombre']
                         }
                     ]
@@ -1106,7 +1106,7 @@ exports.getInventarioPorTienda = async (req, res) => {
                         nombre: item.producto.nombre,
                         marca: item.producto.marca,
                         categoria: item.producto.categoria.nombre,
-                        unidad_medida: item.unidadMedida.nombre,
+                        unidad_medida: item.unidad_medida.nombre,
                         stock_actual: stock,
                         precio_unitario: precio,
                         valor_inventario: parseFloat(valor.toFixed(2))
