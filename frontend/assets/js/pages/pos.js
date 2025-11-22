@@ -165,6 +165,12 @@ async function searchProducts(query) {
                     ? product.inventarios[0].unidad_medida_id
                     : null;
 
+                // No mostrar productos sin unidad de medida (sin inventario configurado)
+                if (!unidadMedidaId) {
+                    console.warn('⚠️ Producto sin inventario configurado:', product.nombre);
+                    return '';
+                }
+
                 return `
                     <div class="product-search-item" onclick="addToInvoice(${product.id}, '${product.nombre.replace(/'/g, "\\'")}', ${product.precio_base}, ${stock}, ${unidadMedidaId})">
                         <div class="product-info">
@@ -184,7 +190,18 @@ async function searchProducts(query) {
                         </div>
                     </div>
                 `;
-            }).join('');
+            }).filter(html => html.trim() !== '').join('');
+
+            if (resultsHTML.trim() === '') {
+                document.getElementById('productSearchResults').innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: var(--warning-yellow);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; opacity: 0.5; margin-bottom: 1rem;"></i>
+                        <p>Productos encontrados pero sin inventario configurado</p>
+                        <p style="font-size: 0.875rem;">Configure el inventario en la sección de Inventario</p>
+                    </div>
+                `;
+                return;
+            }
 
             document.getElementById('productSearchResults').innerHTML = resultsHTML;
         } else {
@@ -231,6 +248,12 @@ function scanBarcode() {
 
 // Agregar producto a la factura
 function addToInvoice(productId, productName, price, stock, unidadMedidaId) {
+    // Validar que el producto tenga unidad de medida
+    if (!unidadMedidaId || unidadMedidaId === 'null' || unidadMedidaId === 'undefined') {
+        Utils.showToast(`Error: ${productName} no tiene inventario configurado`, 'error');
+        return;
+    }
+
     const existingItem = invoiceItems.find(item => item.productId === productId);
 
     if (existingItem) {

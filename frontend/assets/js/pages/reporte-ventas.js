@@ -81,6 +81,11 @@ function configurarFechasPorDefecto() {
 
     document.getElementById('fechaInicio').valueAsDate = primerDia;
     document.getElementById('fechaFinal').valueAsDate = hoy;
+
+    // Generar reporte automáticamente al cargar la página
+    setTimeout(() => {
+        generarReporte();
+    }, 500);
 }
 
 function configurarFechas() {
@@ -162,7 +167,25 @@ async function generarReporte() {
 
     } catch (error) {
         console.error('Error al generar reporte:', error);
-        Utils.showToast('Error al generar el reporte: ' + error.message, 'error');
+
+        // Mostrar mensaje de error más descriptivo
+        let errorMessage = 'Error al generar el reporte';
+        if (error.message) {
+            errorMessage += ': ' + error.message;
+        }
+        if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+        }
+
+        Utils.showToast(errorMessage, 'error');
+
+        // Mostrar estado vacío en caso de error
+        mostrarEstadisticas({
+            total_general: 0,
+            numero_facturas: 0,
+            venta_promedio: 0,
+            facturas_anuladas: 0
+        });
     } finally {
         mostrarLoading(false);
     }
@@ -210,10 +233,15 @@ async function cargarTopProductos(filtros) {
 /* ==================== MOSTRAR DATOS ==================== */
 
 function mostrarEstadisticas(resumen) {
-    document.getElementById('totalFacturado').textContent = Utils.formatCurrency(resumen.total_general);
-    document.getElementById('numeroFacturas').textContent = resumen.numero_facturas;
-    document.getElementById('ventaPromedio').textContent = Utils.formatCurrency(resumen.venta_promedio);
-    document.getElementById('facturasAnuladas').textContent = resumen.facturas_anuladas;
+    document.getElementById('totalFacturado').textContent = Utils.formatCurrency(resumen.total_general || 0);
+    document.getElementById('numeroFacturas').textContent = resumen.numero_facturas || 0;
+    document.getElementById('ventaPromedio').textContent = Utils.formatCurrency(resumen.venta_promedio || 0);
+    document.getElementById('facturasAnuladas').textContent = resumen.facturas_anuladas || 0;
+
+    // Mostrar mensaje si no hay ventas
+    if (!resumen.numero_facturas || resumen.numero_facturas === 0) {
+        Utils.showToast('No hay ventas en el período seleccionado', 'info');
+    }
 }
 
 function mostrarTablaTopProductos(productos) {
