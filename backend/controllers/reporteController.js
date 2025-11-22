@@ -245,16 +245,16 @@ exports.getProductosTopIngresos = async (req, res) => {
                     include: [{
                         model: Categoria,
                         as: 'categoria',
-                        attributes: ['nombre']
+                        attributes: ['id', 'nombre']
                     }]
                 },
                 {
                     model: UnidadMedida,
                     as: 'unidadMedida',
-                    attributes: ['nombre', 'abreviatura']
+                    attributes: ['id', 'nombre', 'abreviatura']
                 }
             ],
-            group: ['producto.id', 'unidadMedida.id'],
+            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidadMedida.id', 'unidadMedida.nombre', 'unidadMedida.abreviatura'],
             order: [[Sequelize.fn('SUM', Sequelize.col('subtotal')), 'DESC']],
             limit: parseInt(limit),
             raw: false
@@ -345,16 +345,16 @@ exports.getProductosTopCantidad = async (req, res) => {
                     include: [{
                         model: Categoria,
                         as: 'categoria',
-                        attributes: ['nombre']
+                        attributes: ['id', 'nombre']
                     }]
                 },
                 {
                     model: UnidadMedida,
                     as: 'unidadMedida',
-                    attributes: ['nombre', 'abreviatura']
+                    attributes: ['id', 'nombre', 'abreviatura']
                 }
             ],
-            group: ['producto.id', 'unidadMedida.id'],
+            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidadMedida.id', 'unidadMedida.nombre', 'unidadMedida.abreviatura'],
             order: [[Sequelize.fn('SUM', Sequelize.col('cantidad')), 'DESC']],
             limit: parseInt(limit),
             raw: false
@@ -543,16 +543,16 @@ exports.getProductosMenosVendidos = async (req, res) => {
                     include: [{
                         model: Categoria,
                         as: 'categoria',
-                        attributes: ['nombre']
+                        attributes: ['id', 'nombre']
                     }]
                 },
                 {
                     model: UnidadMedida,
                     as: 'unidadMedida',
-                    attributes: ['nombre']
+                    attributes: ['id', 'nombre']
                 }
             ],
-            group: ['producto.id', 'unidadMedida.id'],
+            group: ['producto.id', 'producto.nombre', 'producto.marca', 'categoria.id', 'categoria.nombre', 'unidadMedida.id', 'unidadMedida.nombre'],
             order: [[Sequelize.fn('SUM', Sequelize.col('cantidad')), 'ASC']],
             limit: parseInt(limit),
             raw: false
@@ -1278,7 +1278,7 @@ exports.getClientesTopVentas = async (req, res) => {
                 where: whereCliente,
                 attributes: ['id', 'nombre', 'tipo_cliente']
             }],
-            group: ['Factura.cliente_id', 'cliente.id'],
+            group: ['Factura.cliente_id', 'cliente.id', 'cliente.nombre', 'cliente.tipo_cliente'],
             order: [[Sequelize.literal('total_vendido'), 'DESC']],
             limit: parseInt(limit),
             raw: false
