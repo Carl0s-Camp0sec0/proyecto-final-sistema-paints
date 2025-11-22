@@ -62,6 +62,30 @@ class ApiClient {
         return this.request(`/sistema/unidades-medida${params}`);
     }
 
+    async getCategoria(id) {
+        return this.request(`/sistema/categorias/${id}`);
+    }
+
+    async createCategoria(categoryData) {
+        return this.request('/sistema/categorias', {
+            method: 'POST',
+            body: JSON.stringify(categoryData)
+        });
+    }
+
+    async updateCategoria(id, categoryData) {
+        return this.request(`/sistema/categorias/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(categoryData)
+        });
+    }
+
+    async deleteCategoria(id) {
+        return this.request(`/sistema/categorias/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
     // === MÉTODOS DE PRODUCTOS ===
     async getProductos(params = {}) {
         const queryString = new URLSearchParams(params).toString();
@@ -174,6 +198,83 @@ class ApiClient {
         return this.request(`/usuarios/${id}`, {
             method: 'DELETE'
         });
+    }
+
+    // === MÉTODOS DE CARRITO ===
+    async getCarrito() {
+        return this.request('/carrito');
+    }
+
+    async agregarAlCarrito(data) {
+        return this.request('/carrito', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async actualizarItemCarrito(id, cantidad) {
+        return this.request(`/carrito/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ cantidad })
+        });
+    }
+
+    async eliminarItemCarrito(id) {
+        return this.request(`/carrito/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async vaciarCarrito() {
+        return this.request('/carrito', {
+            method: 'DELETE'
+        });
+    }
+
+    // === MÉTODOS DE REPORTES ===
+    async getReporteVentasPeriodo(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/ventas/periodo?${queryString}`);
+    }
+
+    async getReporteProductosTopIngresos(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/productos/top-ingresos?${queryString}`);
+    }
+
+    async getReporteProductosTopCantidad(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/productos/top-cantidad?${queryString}`);
+    }
+
+    async getReporteInventarioGeneral() {
+        return this.request('/reportes/inventario/general');
+    }
+
+    async getReporteProductosMenosVendidos(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/productos/menos-vendidos?${queryString}`);
+    }
+
+    async getReporteProductosSinStock() {
+        return this.request('/reportes/inventario/sin-stock');
+    }
+
+    async getReporteProductosStockBajo() {
+        return this.request('/reportes/inventario/stock-bajo');
+    }
+
+    async getReporteInventarioPorTienda(sucursalId) {
+        return this.request(`/reportes/inventario/por-tienda?sucursal_id=${sucursalId}`);
+    }
+
+    async getReporteFactura(numeroFactura) {
+        return this.request(`/reportes/facturas/${numeroFactura}`);
+    }
+
+    async getReporteIngresosInventario(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.request(`/reportes/inventario/ingresos?${queryString}`);
     }
 }
 

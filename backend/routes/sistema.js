@@ -151,6 +151,44 @@ router.get('/medios-pago',
 );
 
 /**
+ * @route   GET /api/sistema/categorias/:id
+ * @desc    Obtener categoría por ID
+ * @access  Private
+ */
+router.get('/categorias/:id',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`📋 Obteniendo categoría ${id}...`);
+
+      const categoria = await Categoria.findByPk(id);
+
+      if (!categoria) {
+        return res.status(404).json({
+          success: false,
+          message: 'Categoría no encontrada'
+        });
+      }
+
+      console.log(`✅ Categoría encontrada: ${categoria.nombre}`);
+
+      res.json({
+        success: true,
+        data: categoria
+      });
+    } catch (error) {
+      console.error('❌ Error obteniendo categoría:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
  * @route   POST /api/sistema/categorias
  * @desc    Crear nueva categoría
  * @access  Private (Admin, Digitador)

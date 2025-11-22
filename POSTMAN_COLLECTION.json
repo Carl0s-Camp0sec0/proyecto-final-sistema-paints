@@ -1,0 +1,838 @@
+{
+	"info": {
+		"_postman_id": "sistema-paints-api",
+		"name": "Sistema Paints - API Collection",
+		"description": "Colección completa de endpoints del Sistema Paints para pruebas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "AUTH - Autenticación",
+			"item": [
+				{
+					"name": "Login Usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@paints.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login Cliente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"cliente@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clientes/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["clientes", "login"]
+						}
+					}
+				},
+				{
+					"name": "Registro Cliente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre_completo\": \"Juan Pérez\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"password123\",\n  \"telefono\": \"12345678\",\n  \"nit\": \"12345678\",\n  \"direccion\": \"Ciudad de Guatemala\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clientes/registro",
+							"host": ["{{baseUrl}}"],
+							"path": ["clientes", "registro"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "SISTEMA - Configuración",
+			"item": [
+				{
+					"name": "Listar Categorías",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/sistema/categorias",
+							"host": ["{{baseUrl}}"],
+							"path": ["sistema", "categorias"]
+						}
+					}
+				},
+				{
+					"name": "Obtener Categoría por ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/sistema/categorias/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["sistema", "categorias", "1"]
+						}
+					}
+				},
+				{
+					"name": "Crear Categoría",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Pinturas\",\n  \"descripcion\": \"Pinturas para exteriores e interiores\",\n  \"requiere_medidas\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sistema/categorias",
+							"host": ["{{baseUrl}}"],
+							"path": ["sistema", "categorias"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Categoría",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Pinturas Premium\",\n  \"descripcion\": \"Pinturas de alta calidad\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sistema/categorias/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["sistema", "categorias", "1"]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Categoría",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/sistema/categorias/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["sistema", "categorias", "1"]
+						}
+					}
+				},
+				{
+					"name": "Listar Sucursales",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/sistema/sucursales",
+							"host": ["{{baseUrl}}"],
+							"path": ["sistema", "sucursales"]
+						}
+					}
+				},
+				{
+					"name": "Listar Unidades de Medida",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/sistema/unidades-medida",
+							"host": ["{{baseUrl}}"],
+							"path": ["sistema", "unidades-medida"]
+						}
+					}
+				},
+				{
+					"name": "Listar Medios de Pago",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/sistema/medios-pago",
+							"host": ["{{baseUrl}}"],
+							"path": ["sistema", "medios-pago"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "PRODUCTOS",
+			"item": [
+				{
+					"name": "Listar Productos",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/productos?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["productos"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "categoria_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "buscar",
+									"value": "pintura",
+									"disabled": true
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Producto por ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/productos/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["productos", "1"]
+						}
+					}
+				},
+				{
+					"name": "Crear Producto",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoria_id\": 1,\n  \"nombre\": \"Pintura Latex Blanco\",\n  \"marca\": \"Paints Pro\",\n  \"descripcion\": \"Pintura de alta calidad para interiores\",\n  \"codigo_producto\": \"PL-BLANCO-001\",\n  \"precio_base\": 250.00,\n  \"descuento_porcentaje\": 0,\n  \"stock_minimo\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/productos",
+							"host": ["{{baseUrl}}"],
+							"path": ["productos"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Producto",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Pintura Latex Blanco Premium\",\n  \"precio_base\": 275.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/productos/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["productos", "1"]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Producto",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/productos/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["productos", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "CLIENTES",
+			"item": [
+				{
+					"name": "Listar Clientes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/clientes?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["clientes"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Crear Cliente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre_completo\": \"María García\",\n  \"nit\": \"87654321\",\n  \"email\": \"maria@example.com\",\n  \"telefono\": \"55551234\",\n  \"direccion\": \"Zona 10, Guatemala\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clientes",
+							"host": ["{{baseUrl}}"],
+							"path": ["clientes"]
+						}
+					}
+				},
+				{
+					"name": "Obtener Perfil Cliente",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/clientes/perfil",
+							"host": ["{{baseUrl}}"],
+							"path": ["clientes", "perfil"]
+						}
+					}
+				},
+				{
+					"name": "Sucursal Más Cercana",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/clientes/sucursal-cercana?latitud=14.6349&longitud=-90.5069",
+							"host": ["{{baseUrl}}"],
+							"path": ["clientes", "sucursal-cercana"],
+							"query": [
+								{
+									"key": "latitud",
+									"value": "14.6349"
+								},
+								{
+									"key": "longitud",
+									"value": "-90.5069"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "CARRITO",
+			"item": [
+				{
+					"name": "Obtener Carrito",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/carrito",
+							"host": ["{{baseUrl}}"],
+							"path": ["carrito"]
+						}
+					}
+				},
+				{
+					"name": "Agregar al Carrito",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sucursal_id\": 1,\n  \"producto_id\": 1,\n  \"unidad_medida_id\": 1,\n  \"cantidad\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/carrito",
+							"host": ["{{baseUrl}}"],
+							"path": ["carrito"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Item del Carrito",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cantidad\": 3\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/carrito/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["carrito", "1"]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Item del Carrito",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/carrito/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["carrito", "1"]
+						}
+					}
+				},
+				{
+					"name": "Vaciar Carrito",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/carrito",
+							"host": ["{{baseUrl}}"],
+							"path": ["carrito"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "INVENTARIO",
+			"item": [
+				{
+					"name": "Obtener Inventario de Sucursal",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/inventario/sucursal/1?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["inventario", "sucursal", "1"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "REPORTES",
+			"item": [
+				{
+					"name": "Reporte Productos Stock Bajo",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reportes/inventario/stock-bajo",
+							"host": ["{{baseUrl}}"],
+							"path": ["reportes", "inventario", "stock-bajo"]
+						}
+					}
+				},
+				{
+					"name": "Reporte Productos Sin Stock",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reportes/inventario/sin-stock",
+							"host": ["{{baseUrl}}"],
+							"path": ["reportes", "inventario", "sin-stock"]
+						}
+					}
+				},
+				{
+					"name": "Reporte Productos Top Ingresos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reportes/productos/top-ingresos?limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["reportes", "productos", "top-ingresos"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Reporte Productos Top Cantidad",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reportes/productos/top-cantidad?limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["reportes", "productos", "top-cantidad"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Reporte Inventario General",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reportes/inventario/general",
+							"host": ["{{baseUrl}}"],
+							"path": ["reportes", "inventario", "general"]
+						}
+					}
+				},
+				{
+					"name": "Reporte Ventas por Período",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reportes/ventas/periodo?fecha_inicio=2025-01-01&fecha_fin=2025-01-31",
+							"host": ["{{baseUrl}}"],
+							"path": ["reportes", "ventas", "periodo"],
+							"query": [
+								{
+									"key": "fecha_inicio",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "fecha_fin",
+									"value": "2025-01-31"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Reporte Factura por Número",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reportes/facturas/A-00000001",
+							"host": ["{{baseUrl}}"],
+							"path": ["reportes", "facturas", "A-00000001"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "FACTURAS",
+			"item": [
+				{
+					"name": "Listar Facturas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/facturas?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["facturas"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Crear Factura",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cliente_id\": 1,\n  \"sucursal_id\": 1,\n  \"medio_pago_id\": 1,\n  \"detalles\": [\n    {\n      \"producto_id\": 1,\n      \"unidad_medida_id\": 1,\n      \"cantidad\": 2,\n      \"precio_unitario\": 250.00\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/facturas",
+							"host": ["{{baseUrl}}"],
+							"path": ["facturas"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "USUARIOS",
+			"item": [
+				{
+					"name": "Listar Usuarios",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/usuarios",
+							"host": ["{{baseUrl}}"],
+							"path": ["usuarios"]
+						}
+					}
+				},
+				{
+					"name": "Crear Usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre_completo\": \"Carlos López\",\n  \"email\": \"carlos@paints.com\",\n  \"password\": \"password123\",\n  \"rol_id\": 2,\n  \"sucursal_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/usuarios",
+							"host": ["{{baseUrl}}"],
+							"path": ["usuarios"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
