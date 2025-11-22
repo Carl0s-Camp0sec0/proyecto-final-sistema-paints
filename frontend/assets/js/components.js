@@ -174,7 +174,11 @@ const Components = {
     },
 
     // Tabla de inventario
-    inventoryTable(items) {
+    inventoryTable(items, options = {}) {
+        const showActions = options.showActions !== false; // Por defecto true
+        const editCallback = options.editCallback || 'viewProductDetails';
+        const deleteCallback = options.deleteCallback || null;
+
         if (!items || items.length === 0) {
             return `
                 <div class="table-container">
@@ -213,16 +217,20 @@ const Components = {
                     <td>
                         ${item.producto.categoria?.nombre || 'N/A'}
                     </td>
+                    ${showActions ? `
                     <td>
                         <div class="table-actions">
-                            <button class="btn btn-sm btn-secondary" onclick="App.editProduct(${item.producto.id})">
-                                <i class="fas fa-edit"></i>
+                            <button class="btn btn-sm btn-secondary" onclick="${editCallback}(${item.producto.id})">
+                                <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="App.deleteProduct(${item.producto.id})">
+                            ${deleteCallback ? `
+                            <button class="btn btn-sm btn-danger" onclick="${deleteCallback}(${item.producto.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
+                            ` : ''}
                         </div>
                     </td>
+                    ` : ''}
                 </tr>
             `;
         }).join('');
@@ -237,7 +245,7 @@ const Components = {
                             <th>Existencias</th>
                             <th>Estado</th>
                             <th>Categoría</th>
-                            <th>Acciones</th>
+                            ${showActions ? '<th>Acciones</th>' : ''}
                         </tr>
                     </thead>
                     <tbody>
