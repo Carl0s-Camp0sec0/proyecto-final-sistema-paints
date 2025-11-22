@@ -413,17 +413,143 @@ function processOrder() {
 // Descargar comprobante
 function downloadInvoice() {
     const lastOrder = localStorage.getItem('paints_last_order');
-    if (lastOrder) {
-        const order = JSON.parse(lastOrder);
+    if (!lastOrder) {
+        Utils.showToast('No se encontró información del pedido', 'error');
+        return;
+    }
 
-        // En un sistema real, aquí se generaría y descargaría el PDF
+    try {
+        const order = JSON.parse(lastOrder);
         Utils.showToast('Generando comprobante de compra...', 'info');
+
+        // Crear PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Header del PDF
+        doc.setFillColor(37, 99, 235);
+        doc.rect(0, 0, 210, 45, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(28);
+        doc.setFont(undefined, 'bold');
+        doc.text('PAINTS', 20, 20);
+
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'normal');
+        doc.text('Sistema de Gestión para Cadena de Pinturas', 20, 30);
+        doc.text('COMPROBANTE DE COMPRA', 20, 38);
+
+        // Información del pedido
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text('Información del Pedido', 20, 55);
+
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+        doc.text(`Número de Pedido: ${order.orderNumber || 'N/A'}`, 20, 65);
+        doc.text(`Fecha: ${order.date || new Date().toLocaleDateString('es-GT')}`, 20, 72);
+        doc.text(`Cliente: ${order.customerName || 'Cliente'}`, 20, 79);
+        doc.text(`Email: ${order.customerEmail || 'N/A'}`, 20, 86);
+
+        // Detalles de productos
+        doc.setFont(undefined, 'bold');
+        doc.text('Productos', 20, 98);
+
+        const productosData = order.items || [];
+        const tableData = productosData.map(item => [
+            item.name || 'Producto',
+            item.quantity || 1,
+            Utils.formatCurrency(item.price || 0),
+            Utils.formatCurrency((item.quantity || 1) * (item.price || 0))
+        ]);
+
+        doc.autoTable({
+            startY: 103,
+            head: [['Producto', 'Cantidad', 'Precio Unit.', 'Subtotal']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [37, 99, 235],
+                textColor: 255,
+                fontStyle: 'bold'
+            },
+            columnStyles: {
+                0: { cellWidth: 80 },
+                1: { cellWidth: 30, halign: 'center' },
+                2: { cellWidth: 40, halign: 'right' },
+                3: { cellWidth: 40, halign: 'right' }
+            },
+            margin: { left: 20, right: 20 }
+        });
+
+        // Resumen de totales
+        let finalY = doc.lastAutoTable.finalY + 10;
+
+        doc.setFontSize(10);
+        doc.text('Subtotal:', 130, finalY);
+        doc.text(Utils.formatCurrency(order.subtotal || 0), 190, finalY, { align: 'right' });
+
+        if (order.discount) {
+            finalY += 7;
+            doc.text('Descuento:', 130, finalY);
+            doc.text(`-${Utils.formatCurrency(order.discount)}`, 190, finalY, { align: 'right' });
+        }
+
+        if (order.shipping) {
+            finalY += 7;
+            doc.text('Envío:', 130, finalY);
+            doc.text(Utils.formatCurrency(order.shipping), 190, finalY, { align: 'right' });
+        }
+
+        finalY += 7;
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(12);
+        doc.text('TOTAL:', 130, finalY);
+        doc.text(Utils.formatCurrency(order.total || 0), 190, finalY, { align: 'right' });
+
+        // Información de pago
+        finalY += 15;
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(11);
+        doc.text('Método de Pago', 20, finalY);
+
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+        finalY += 7;
+        doc.text(`${order.paymentMethod || 'Efectivo'}`, 20, finalY);
+
+        // Información de envío
+        if (order.shippingAddress) {
+            finalY += 12;
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(11);
+            doc.text('Dirección de Envío', 20, finalY);
+
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            finalY += 7;
+            doc.text(order.shippingAddress, 20, finalY, { maxWidth: 170 });
+        }
+
+        // Footer
+        const pageHeight = doc.internal.pageSize.height;
+        doc.setFontSize(9);
+        doc.setTextColor(128, 128, 128);
+        doc.text('Gracias por su compra - www.paints.com', 105, pageHeight - 15, { align: 'center' });
+        doc.text(`Documento generado: ${new Date().toLocaleString('es-GT')}`, 105, pageHeight - 10, { align: 'center' });
+
+        // Guardar PDF
+        doc.save(`Comprobante-${order.orderNumber || 'Pedido'}.pdf`);
 
         setTimeout(() => {
             Utils.showToast('Comprobante descargado exitosamente', 'success');
-        }, 1500);
-    } else {
-        Utils.showToast('No se encontró información del pedido', 'error');
+        }, 500);
+
+    } catch (error) {
+        console.error('Error al generar PDF:', error);
+        Utils.showToast('Error al generar el comprobante', 'error');
     }
 }
 

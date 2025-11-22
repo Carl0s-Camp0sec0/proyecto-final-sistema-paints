@@ -92,17 +92,6 @@ function displayCart() {
             <div class="cart-items">
                 <h2 style="margin-bottom: 1.5rem;">Productos (${cartItems.length})</h2>
                 ${cartItemsHTML}
-
-                <div style="margin-top: 2rem; padding: 1rem; background: var(--gray-50); border-radius: var(--border-radius);">
-                    <h4>¿Necesitas ayuda con tu compra?</h4>
-                    <p style="margin: 0.5rem 0; color: var(--gray-600);">
-                        Nuestros expertos pueden asesorarte para elegir los productos correctos.
-                    </p>
-                    <button class="btn btn-secondary" onclick="requestAdvice()">
-                        <i class="fas fa-comment"></i>
-                        Solicitar Asesoría
-                    </button>
-                </div>
             </div>
 
             <div class="cart-summary">
@@ -258,18 +247,6 @@ function applyPromoCode() {
         displayCart();
     } else {
         Utils.showToast('Código promocional inválido', 'error');
-    }
-}
-
-// Solicitar asesoría
-function requestAdvice() {
-    if (auth.isAuthenticated()) {
-        Utils.showToast('Un asesor se contactará contigo pronto', 'success');
-    } else {
-        Utils.showToast('Inicia sesión para solicitar asesoría personalizada', 'info');
-        setTimeout(() => {
-            window.location.href = '/frontend/pages/public/login-cliente.html';
-        }, 2000);
     }
 }
 
