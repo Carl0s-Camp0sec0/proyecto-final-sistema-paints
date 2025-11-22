@@ -749,14 +749,23 @@ function setupEventListeners() {
         const deleteBtn = e.target.closest('.delete-product-btn');
 
         if (viewBtn) {
+            e.preventDefault();
+            e.stopPropagation();
             const productId = viewBtn.dataset.id;
+            console.log('Ver producto:', productId);
             viewProductDetails(productId);
         } else if (editBtn) {
+            e.preventDefault();
+            e.stopPropagation();
             const productId = editBtn.dataset.id;
+            console.log('Editar producto:', productId);
             editProduct(productId);
         } else if (deleteBtn) {
+            e.preventDefault();
+            e.stopPropagation();
             const productId = deleteBtn.dataset.id;
             const productName = deleteBtn.dataset.name;
+            console.log('Eliminar producto:', productId, productName);
             deleteProduct(productId, productName);
         }
     });

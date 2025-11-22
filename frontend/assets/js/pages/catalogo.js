@@ -404,6 +404,7 @@ function displayProducts(products) {
 
 // Agregar al carrito
 function addToCart(productId, productName, price) {
+    console.log('Agregar al carrito:', productId, productName, price);
     const product = allProducts.find(p => p.id === productId);
     if (!product || product.stock === 0) {
         showToast('Producto no disponible', 'error');
@@ -428,8 +429,12 @@ function addToCart(productId, productName, price) {
     showToast(`${productName} agregado al carrito`, 'success');
 }
 
+// Hacer la función global para que funcione con onclick
+window.addToCart = addToCart;
+
 // Ver producto
 function viewProduct(productId) {
+    console.log('Ver producto catálogo:', productId);
     const product = allProducts.find(p => p.id === productId);
     if (!product) {
         showToast('Producto no encontrado', 'error');
@@ -438,6 +443,9 @@ function viewProduct(productId) {
 
     openProductModal(product);
 }
+
+// Hacer la función global para que funcione con onclick
+window.viewProduct = viewProduct;
 
 // Abrir modal de producto
 function openProductModal(product) {
@@ -727,8 +735,38 @@ document.addEventListener('keydown', function(event) {
 
 // Agregar a favoritos
 function addToWishlist(productId) {
-    showToast('Agregado a favoritos', 'success');
+    console.log('Agregar a favoritos:', productId);
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) {
+        showToast('Producto no encontrado', 'error');
+        return;
+    }
+
+    // Obtener favoritos del localStorage
+    let wishlist = localStorage.getItem('paints_wishlist');
+    wishlist = wishlist ? JSON.parse(wishlist) : [];
+
+    // Verificar si ya está en favoritos
+    const exists = wishlist.find(item => item.id === productId);
+    if (exists) {
+        showToast('El producto ya está en favoritos', 'info');
+        return;
+    }
+
+    // Agregar a favoritos
+    wishlist.push({
+        id: productId,
+        name: product.nombre,
+        price: product.precio_descuento || product.precio_base,
+        addedAt: new Date().toISOString()
+    });
+
+    localStorage.setItem('paints_wishlist', JSON.stringify(wishlist));
+    showToast(`${product.nombre} agregado a favoritos`, 'success');
 }
+
+// Hacer la función global para que funcione con onclick
+window.addToWishlist = addToWishlist;
 
 // Ir al carrito
 function goToCart() {
