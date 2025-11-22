@@ -42,7 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 password: password,
                 telefono: formData.get('telefono')?.trim() || null,
                 nit: formData.get('nit')?.trim() || 'CF',
-                direccion: formData.get('direccion')?.trim() || null
+                direccion: formData.get('direccion')?.trim() || null,
+                recibe_promociones: formData.get('recibe_promociones') === 'on' || false
             };
 
             const submitBtn = e.target.querySelector('button[type="submit"]');

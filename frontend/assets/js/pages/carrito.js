@@ -268,7 +268,7 @@ function requestAdvice() {
     } else {
         Utils.showToast('Inicia sesión para solicitar asesoría personalizada', 'info');
         setTimeout(() => {
-            window.location.href = '/frontend/pages/public/login.html';
+            window.location.href = '/frontend/pages/public/login-cliente.html';
         }, 2000);
     }
 }
@@ -387,7 +387,18 @@ function proceedToCheckout() {
     }
 
     if (auth.isAuthenticated()) {
-        // Redirigir al proceso de pago
+        const user = auth.getUser();
+
+        // Verificar que sea un cliente
+        if (user.tipo !== 'cliente') {
+            Utils.showToast('Debes iniciar sesión como cliente para comprar', 'error');
+            setTimeout(() => {
+                window.location.href = '/frontend/pages/public/login-cliente.html';
+            }, 2000);
+            return;
+        }
+
+        // Preparar datos del pedido
         const orderData = {
             items: cartItems,
             shipping: selectedShipping,
@@ -399,19 +410,14 @@ function proceedToCheckout() {
         localStorage.setItem('paints_checkout_data', JSON.stringify(orderData));
         Utils.showToast('Redirigiendo al proceso de pago...', 'info');
 
-        // Si es recogida en tienda, ir al POS
-        if (selectedShipping === 'pickup') {
-            setTimeout(() => {
-                window.location.href = '/frontend/pages/ventas/pos.html';
-            }, 1500);
-        } else {
-            // Para entrega, implementar checkout online
-            Utils.showToast('Proceso de pago online en desarrollo', 'info');
-        }
-    } else {
-        Utils.showToast('Inicia sesión para continuar con la compra', 'info');
+        // Redirigir al checkout para clientes
         setTimeout(() => {
-            window.location.href = '/frontend/pages/public/login.html';
+            window.location.href = '/frontend/pages/public/checkout.html';
+        }, 1000);
+    } else {
+        Utils.showToast('Inicia sesión como cliente para continuar con la compra', 'info');
+        setTimeout(() => {
+            window.location.href = '/frontend/pages/public/login-cliente.html';
         }, 2000);
     }
 }

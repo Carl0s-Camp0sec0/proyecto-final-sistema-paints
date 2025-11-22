@@ -173,34 +173,87 @@
         </div>
     </section>
 
-    <!-- Catalog Preview Section -->
-    <section id="catalogo-preview" class="features-section">
+    <!-- Features Section -->
+    <section id="features" class="features-section">
         <div class="features-container">
             <div style="text-align: center; margin-bottom: 3rem;">
                 <h2 style="font-size: 2.5rem; color: var(--gray-800); margin-bottom: 1rem;">
-                    Nuestros Productos
+                    ¿Por qué elegirnos?
                 </h2>
                 <p style="font-size: 1.1rem; color: var(--gray-600);">
-                    Descubre nuestra amplia variedad de pinturas y accesorios de las mejores marcas
+                    Somos tu mejor opción en pinturas y accesorios en Guatemala
                 </p>
             </div>
 
-            <!-- Carrusel de productos -->
-            <div style="position: relative; overflow: hidden; padding: 2rem 0;">
-                <div id="carruselProductos" style="display: flex; transition: transform 0.5s ease; gap: 2rem;">
-                    <!-- Los productos se cargarán dinámicamente -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-paint-roller"></i>
+                    </div>
+                    <h3 style="color: var(--gray-800); margin-bottom: 1rem;">Amplio Catálogo</h3>
+                    <p style="color: var(--gray-600); line-height: 1.6;">
+                        Más de 500 productos de las mejores marcas nacionales e internacionales.
+                        Encuentra todo lo que necesitas para tus proyectos.
+                    </p>
                 </div>
 
-                <!-- Controles del carrusel -->
-                <button onclick="moverCarrusel(-1)" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; padding: 1rem; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;">
-                    <i class="fas fa-chevron-left" style="color: var(--primary-blue);"></i>
-                </button>
-                <button onclick="moverCarrusel(1)" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; padding: 1rem; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;">
-                    <i class="fas fa-chevron-right" style="color: var(--primary-blue);"></i>
-                </button>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 style="color: var(--gray-800); margin-bottom: 1rem;">Calidad Garantizada</h3>
+                    <p style="color: var(--gray-600); line-height: 1.6;">
+                        Trabajamos solo con marcas reconocidas y productos de primera calidad.
+                        Tu satisfacción es nuestra prioridad.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h3 style="color: var(--gray-800); margin-bottom: 1rem;">Entrega a Domicilio</h3>
+                    <p style="color: var(--gray-600); line-height: 1.6;">
+                        Servicio de entrega rápida y segura a toda Guatemala.
+                        También puedes recoger en cualquiera de nuestras sucursales.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 style="color: var(--gray-800); margin-bottom: 1rem;">Asesoría Personalizada</h3>
+                    <p style="color: var(--gray-600); line-height: 1.6;">
+                        Nuestro equipo de expertos está listo para ayudarte a elegir
+                        los productos perfectos para tu proyecto.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 style="color: var(--gray-800); margin-bottom: 1rem;">Mejores Precios</h3>
+                    <p style="color: var(--gray-600); line-height: 1.6;">
+                        Precios competitivos y promociones especiales todo el año.
+                        Aprovecha nuestras ofertas y descuentos exclusivos.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3 style="color: var(--gray-800); margin-bottom: 1rem;">Múltiples Sucursales</h3>
+                    <p style="color: var(--gray-600); line-height: 1.6;">
+                        Contamos con varias sucursales estratégicamente ubicadas
+                        para estar siempre cerca de ti.
+                    </p>
+                </div>
             </div>
 
-            <div style="text-align: center; margin-top: 2rem;">
+            <div style="text-align: center; margin-top: 3rem;">
                 <a href="/frontend/pages/public/catalogo.html" class="btn btn-primary btn-lg">
                     <i class="fas fa-eye"></i> Ver Catálogo Completo
                 </a>
