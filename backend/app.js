@@ -8,7 +8,55 @@ const path = require('path');
 const app = express();
 
 // === MIDDLEWARE DE SEGURIDAD ===
-app.use(helmet());
+// Configuración de Helmet con CSP ajustada para desarrollo
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'", // Permitir scripts inline en desarrollo
+          "'unsafe-eval'", // Necesario para algunos frameworks
+          "https://cdnjs.cloudflare.com",
+          "https://unpkg.com",
+          "https://cdn.jsdelivr.net",
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'", // Permitir estilos inline
+          "https://fonts.googleapis.com",
+          "https://cdnjs.cloudflare.com",
+          "https://unpkg.com",
+        ],
+        fontSrc: [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "https://cdnjs.cloudflare.com",
+          "data:", // Para fuentes en base64
+        ],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "blob:",
+          "https:",
+          "http:", // Para imágenes de mapas y otros recursos
+        ],
+        connectSrc: [
+          "'self'",
+          "http://localhost:3000",
+          "http://127.0.0.1:3000",
+          "https://nominatim.openstreetmap.org", // Para geocodificación
+          "https://*.tile.openstreetmap.org", // Para mapas
+        ],
+        frameSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Desactivar para permitir recursos externos
+  })
+);
 
 // === CONFIGURACIÓN DE CORS PARA LIVE SERVER ===
 const corsOptions = {
