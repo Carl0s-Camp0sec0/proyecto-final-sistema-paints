@@ -15,13 +15,13 @@ router.get('/',
   async (req, res) => {
     try {
       console.log('🛍️ Listando productos...');
-      
-      const { 
-        page = 1, 
-        limit = 10, 
-        categoria_id, 
-        buscar, 
-        sucursal_id 
+
+      const {
+        page = 1,
+        limit = 10,
+        categoria_id,
+        buscar,
+        sucursal_id
       } = req.query;
 
       const offset = (page - 1) * limit;
@@ -58,23 +58,19 @@ router.get('/',
             as: 'unidad_medida',
             attributes: ['id', 'nombre', 'abreviatura']
           }]
-        }
-      ];
-
-      // Si se especifica sucursal, incluir inventario
-      if (sucursal_id) {
-        include.push({
+        },
+        {
           model: InventarioSucursal,
           as: 'inventarios',
-          where: { sucursal_id },
           required: false,
+          where: sucursal_id ? { sucursal_id } : {},
           include: [{
             model: UnidadMedida,
             as: 'unidad_medida',
             attributes: ['id', 'nombre', 'abreviatura']
           }]
-        });
-      }
+        }
+      ];
 
       const productos = await Producto.findAndCountAll({
         where: whereClause,
@@ -84,11 +80,26 @@ router.get('/',
         order: [['nombre', 'ASC']]
       });
 
+      // Calcular stock total para cada producto
+      const productosConStock = productos.rows.map(producto => {
+        const productoJSON = producto.toJSON();
+
+        // Calcular stock total sumando inventarios de todas las sucursales
+        let stockTotal = 0;
+        if (productoJSON.inventarios && productoJSON.inventarios.length > 0) {
+          stockTotal = productoJSON.inventarios.reduce((sum, inv) => sum + (inv.stock_actual || 0), 0);
+        }
+
+        productoJSON.stock_actual = stockTotal;
+
+        return productoJSON;
+      });
+
       console.log(`✅ ${productos.count} productos encontrados`);
 
       res.json({
         success: true,
-        data: productos.rows,
+        data: productosConStock,
         pagination: {
           page: parseInt(page),
           limit: parseInt(limit),

@@ -227,7 +227,7 @@
                     <li><a href="/frontend/pages/admin/usuarios.html"><i class="fas fa-users"></i> Usuarios</a></li>
                 </ul>
             </nav>
-            <button class="logout-btn" onclick="logout()">
+            <button class="logout-btn" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i>
                 Cerrar Sesión
             </button>
@@ -240,15 +240,15 @@
                     <h1 class="card-title">Gestión de Productos</h1>
                     <div style="display: flex; align-items: center; gap: 1rem;">
                         <div class="view-toggle">
-                            <button class="view-btn active" id="gridViewBtn" onclick="toggleView('grid')">
+                            <button class="view-btn active" id="gridViewBtn" data-view="grid">
                                 <i class="fas fa-th"></i>
                             </button>
-                            <button class="view-btn" id="tableViewBtn" onclick="toggleView('table')">
+                            <button class="view-btn" id="tableViewBtn" data-view="table">
                                 <i class="fas fa-list"></i>
                             </button>
                         </div>
                         <div id="productActions">
-                            <button class="btn btn-primary" onclick="showAddProductModal()">
+                            <button class="btn btn-primary" id="addProductBtn">
                                 <i class="fas fa-plus"></i>
                                 Nuevo Producto
                             </button>
@@ -292,11 +292,11 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-primary" onclick="applyFilters()">
+                                <button class="btn btn-primary" id="applyFiltersBtn">
                                     <i class="fas fa-search"></i>
                                     Buscar
                                 </button>
-                                <button class="btn btn-secondary" onclick="clearFilters()">
+                                <button class="btn btn-secondary" id="clearFiltersBtn">
                                     <i class="fas fa-undo"></i>
                                     Limpiar
                                 </button>
@@ -367,7 +367,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalTitle">Nuevo Producto</h3>
-                <button type="button" onclick="closeProductModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">
+                <button type="button" class="close-modal-btn" data-modal="productModal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -406,7 +406,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Tipo de Producto *</label>
-                            <select class="form-select" id="productType" required onchange="handleProductTypeChange()">
+                            <select class="form-select" id="productType" required>
                                 <option value="">Seleccionar Tipo</option>
                                 <option value="accesorio">Accesorio</option>
                                 <option value="solvente">Solvente</option>
@@ -469,7 +469,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancelar</button>
+                <button type="button" class="btn btn-secondary close-modal-btn" data-modal="productModal">Cancelar</button>
                 <button type="submit" class="btn btn-primary" form="productForm">
                     <i class="fas fa-save"></i>
                     Guardar Producto
@@ -483,7 +483,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3>Detalles del Producto</h3>
-                <button type="button" onclick="closeDetailsModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">
+                <button type="button" class="close-modal-btn" data-modal="detailsModal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -491,7 +491,7 @@
                 <!-- Se llena dinámicamente -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeDetailsModal()">Cerrar</button>
+                <button type="button" class="btn btn-secondary close-modal-btn" data-modal="detailsModal">Cerrar</button>
             </div>
         </div>
     </div>

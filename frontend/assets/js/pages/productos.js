@@ -122,13 +122,13 @@ function displayProductsGrid(products) {
                         <span class="stock-badge stock-${stockStatus.class}">${stockStatus.text}</span>
                     </div>
                     <div class="product-actions">
-                        <button class="btn btn-sm btn-secondary" onclick="viewProductDetails(${product.id})" title="Ver detalles">
+                        <button class="btn btn-sm btn-secondary view-product-btn" data-id="${product.id}" title="Ver detalles">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-primary" onclick="editProduct(${product.id})" title="Editar">
+                        <button class="btn btn-sm btn-primary edit-product-btn" data-id="${product.id}" title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id}, '${product.nombre.replace(/'/g, "\\'")}')" title="Eliminar">
+                        <button class="btn btn-sm btn-danger delete-product-btn" data-id="${product.id}" data-name="${product.nombre}" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -188,13 +188,13 @@ function displayProductsTable(products) {
                 </td>
                 <td>
                     <div style="display: flex; gap: 0.25rem;">
-                        <button class="btn btn-sm btn-secondary" onclick="viewProductDetails(${product.id})" title="Ver">
+                        <button class="btn btn-sm btn-secondary view-product-btn" data-id="${product.id}" title="Ver">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-primary" onclick="editProduct(${product.id})" title="Editar">
+                        <button class="btn btn-sm btn-primary edit-product-btn" data-id="${product.id}" title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id}, '${product.nombre.replace(/'/g, "\\'")}')" title="Eliminar">
+                        <button class="btn btn-sm btn-danger delete-product-btn" data-id="${product.id}" data-name="${product.nombre}" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -396,28 +396,28 @@ function handleProductTypeChange() {
 // Mostrar paginación
 function displayPagination() {
     const container = document.getElementById('paginationContainer');
-    
+
     if (totalPages <= 1) {
         container.innerHTML = '';
         return;
     }
 
     let paginationHTML = '<div style="display: flex; justify-content: center; gap: 0.5rem;">';
-    
+
     // Botón anterior
     if (currentPage > 1) {
-        paginationHTML += `<button class="btn btn-secondary" onclick="loadProducts(${currentPage - 1})">Anterior</button>`;
+        paginationHTML += `<button class="btn btn-secondary pagination-btn" data-page="${currentPage - 1}">Anterior</button>`;
     }
-    
+
     // Números de página
     for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
         const activeClass = i === currentPage ? 'btn-primary' : 'btn-secondary';
-        paginationHTML += `<button class="btn ${activeClass}" onclick="loadProducts(${i})">${i}</button>`;
+        paginationHTML += `<button class="btn ${activeClass} pagination-btn" data-page="${i}">${i}</button>`;
     }
-    
+
     // Botón siguiente
     if (currentPage < totalPages) {
-        paginationHTML += `<button class="btn btn-secondary" onclick="loadProducts(${currentPage + 1})">Siguiente</button>`;
+        paginationHTML += `<button class="btn btn-secondary pagination-btn" data-page="${currentPage + 1}">Siguiente</button>`;
     }
 
     paginationHTML += '</div>';
@@ -705,6 +705,35 @@ function setupEventListeners() {
         });
     });
 
+    // Botones de filtros
+    document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
+    document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
+
+    // Botón agregar producto
+    document.getElementById('addProductBtn').addEventListener('click', showAddProductModal);
+
+    // Botones de vista
+    document.getElementById('gridViewBtn').addEventListener('click', () => toggleView('grid'));
+    document.getElementById('tableViewBtn').addEventListener('click', () => toggleView('table'));
+
+    // Botón de logout
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Cambio de tipo de producto
+    document.getElementById('productType').addEventListener('change', handleProductTypeChange);
+
+    // Cerrar modales con botones específicos
+    document.querySelectorAll('.close-modal-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const modalId = e.currentTarget.dataset.modal;
+            if (modalId === 'productModal') {
+                closeProductModal();
+            } else if (modalId === 'detailsModal') {
+                closeDetailsModal();
+            }
+        });
+    });
+
     // Cerrar modales al hacer click fuera
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-overlay')) {
@@ -712,20 +741,38 @@ function setupEventListeners() {
             closeDetailsModal();
         }
     });
+
+    // Event delegation para botones de acciones de productos
+    document.addEventListener('click', (e) => {
+        const viewBtn = e.target.closest('.view-product-btn');
+        const editBtn = e.target.closest('.edit-product-btn');
+        const deleteBtn = e.target.closest('.delete-product-btn');
+
+        if (viewBtn) {
+            const productId = viewBtn.dataset.id;
+            viewProductDetails(productId);
+        } else if (editBtn) {
+            const productId = editBtn.dataset.id;
+            editProduct(productId);
+        } else if (deleteBtn) {
+            const productId = deleteBtn.dataset.id;
+            const productName = deleteBtn.dataset.name;
+            deleteProduct(productId, productName);
+        }
+    });
+
+    // Event delegation para paginación
+    document.addEventListener('click', (e) => {
+        const paginationBtn = e.target.closest('.pagination-btn');
+        if (paginationBtn) {
+            const page = parseInt(paginationBtn.dataset.page);
+            loadProducts(page);
+        }
+    });
 }
 
-// Hacer funciones disponibles globalmente
-window.toggleView = toggleView;
-window.showAddProductModal = showAddProductModal;
-window.closeProductModal = closeProductModal;
-window.closeDetailsModal = closeDetailsModal;
-window.handleProductTypeChange = handleProductTypeChange;
-window.viewProductDetails = viewProductDetails;
-window.editProduct = editProduct;
-window.deleteProduct = deleteProduct;
-window.applyFilters = applyFilters;
-window.clearFilters = clearFilters;
-window.loadProducts = loadProducts;
+// Ya no es necesario hacer funciones globales
+// Las funciones se llaman mediante event listeners en lugar de onclick inline
 
 // Inicializar página
 document.addEventListener('DOMContentLoaded', async () => {
