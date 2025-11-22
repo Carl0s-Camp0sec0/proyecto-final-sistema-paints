@@ -18,9 +18,20 @@ class AuthMiddleware {
     try {
       console.log('🔐 Verificando token...');
 
-      const token = req.header('Authorization')?.replace('Bearer ', '') ||
-                   req.header('x-auth-token') ||
-                   req.query.token;
+      // Intentar obtener token de múltiples fuentes
+      let token = req.header('Authorization')?.replace('Bearer ', '').trim() ||
+                  req.header('authorization')?.replace('Bearer ', '').trim() ||
+                  req.header('x-auth-token')?.trim() ||
+                  req.query.token?.trim();
+
+      // En desarrollo, logging más detallado
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📋 Headers de autorización:', {
+          authorization: req.header('Authorization'),
+          'x-auth-token': req.header('x-auth-token'),
+          query_token: req.query.token ? 'presente' : 'ausente'
+        });
+      }
 
       if (!token) {
         console.log('❌ No se proporcionó token');

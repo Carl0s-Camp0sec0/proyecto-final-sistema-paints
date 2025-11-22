@@ -361,6 +361,73 @@ router.get('/siguiente-correlativo',
 );
 
 /**
+ * @route   GET /api/facturas/estadisticas
+ * @desc    Obtener estadísticas de facturas
+ * @access  Private
+ */
+router.get('/estadisticas',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      console.log('📊 Obteniendo estadísticas de facturas...');
+
+      // Obtener totales
+      const totalFacturas = await Factura.count({
+        where: { estado: 'activa' }
+      });
+
+      const totalVentas = await Factura.sum('total', {
+        where: { estado: 'activa' }
+      });
+
+      // Facturas del mes actual
+      const inicioMes = new Date();
+      inicioMes.setDate(1);
+      inicioMes.setHours(0, 0, 0, 0);
+
+      const ventasMes = await Factura.sum('total', {
+        where: {
+          estado: 'activa',
+          fecha_creacion: {
+            [require('sequelize').Op.gte]: inicioMes
+          }
+        }
+      });
+
+      const facturasMes = await Factura.count({
+        where: {
+          estado: 'activa',
+          fecha_creacion: {
+            [require('sequelize').Op.gte]: inicioMes
+          }
+        }
+      });
+
+      console.log('✅ Estadísticas calculadas');
+
+      res.json({
+        success: true,
+        data: {
+          total_facturas: totalFacturas || 0,
+          total_ventas: parseFloat(totalVentas || 0).toFixed(2),
+          ventas_mes: parseFloat(ventasMes || 0).toFixed(2),
+          facturas_mes: facturasMes || 0,
+          promedio_venta: totalFacturas > 0 ? parseFloat((totalVentas || 0) / totalFacturas).toFixed(2) : '0.00'
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error obteniendo estadísticas:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
  * @route   GET /api/facturas/:id
  * @desc    Obtener factura por ID
  * @access  Private
