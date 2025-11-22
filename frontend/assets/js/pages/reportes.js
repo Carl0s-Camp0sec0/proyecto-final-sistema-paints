@@ -62,7 +62,7 @@ async function showStockMinimoReport(container) {
         if (productos.length === 0) {
             tableRows = `
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                    <td colspan="5" style="text-align: center; padding: 2rem; color: var(--gray-500);">
                         No hay productos con stock bajo en este momento
                     </td>
                 </tr>
@@ -83,7 +83,6 @@ async function showStockMinimoReport(container) {
                         </td>
                         <td>${producto.stock_minimo || 0}</td>
                         <td><span class="badge ${statusClass}">${stockStatus}</span></td>
-                        <td><button class="btn btn-sm btn-primary" onclick="solicitarReposicion(${producto.id})">Solicitar</button></td>
                     </tr>
                 `;
             }).join('');
@@ -113,7 +112,6 @@ async function showStockMinimoReport(container) {
                                     <th>Stock Actual</th>
                                     <th>Stock Mínimo</th>
                                     <th>Estado</th>
-                                    <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody>

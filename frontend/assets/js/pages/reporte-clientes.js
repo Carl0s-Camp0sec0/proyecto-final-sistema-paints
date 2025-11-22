@@ -34,9 +34,17 @@ function inicializarReporte() {
 }
 
 function cargarDatosUsuario() {
-    document.getElementById('userAvatar').textContent = auth.getUserInitials();
-    document.getElementById('userName').textContent = auth.user.nombre_completo;
-    document.getElementById('userRole').textContent = auth.user.rol;
+    // Actualizar avatar y nombre de usuario si existen los elementos
+    const userAvatar = document.querySelector('.user-avatar');
+    if (userAvatar) {
+        userAvatar.textContent = auth.getUserInitials();
+    }
+
+    const userInfo = document.querySelector('.user-info > div');
+    if (userInfo) {
+        userInfo.querySelector('div:first-child').textContent = auth.user.nombre_completo;
+        userInfo.querySelector('div:last-child').textContent = auth.user.rol;
+    }
 }
 
 async function cargarSucursales() {
@@ -66,16 +74,25 @@ async function cargarSucursales() {
 }
 
 function configurarEventos() {
-    // Botón Aplicar Filtros
-    const btnFiltros = document.querySelector('.btn-primary');
-    if (btnFiltros) {
-        btnFiltros.addEventListener('click', generarReporte);
+    // Botón Aplicar Filtros (dentro de la card de filtros)
+    const filtrosCard = document.querySelectorAll('.card')[4]; // Card de filtros
+    if (filtrosCard) {
+        const btnFiltros = filtrosCard.querySelector('.btn-primary');
+        if (btnFiltros) {
+            btnFiltros.addEventListener('click', generarReporte);
+        }
+
+        // Botón Exportar
+        const btnExportar = filtrosCard.querySelector('.btn-secondary');
+        if (btnExportar) {
+            btnExportar.addEventListener('click', exportarReporte);
+        }
     }
 
-    // Botón Exportar
-    const btnExportar = document.querySelector('.btn-secondary');
-    if (btnExportar) {
-        btnExportar.addEventListener('click', exportarReporte);
+    // Botón Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
     }
 }
 
