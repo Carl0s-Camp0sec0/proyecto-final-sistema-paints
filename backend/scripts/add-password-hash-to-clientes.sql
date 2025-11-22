@@ -2,7 +2,7 @@
 -- Fecha: 2025-11-22
 -- Descripción: Agrega el campo password_hash para permitir autenticación de clientes
 
-USE paints_db;
+USE sistema_paints;
 
 -- Agregar columna password_hash a la tabla clientes
 ALTER TABLE clientes
