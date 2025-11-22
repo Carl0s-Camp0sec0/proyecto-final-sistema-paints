@@ -8,55 +8,21 @@ const path = require('path');
 const app = express();
 
 // === MIDDLEWARE DE SEGURIDAD ===
-// Configuración de Helmet con CSP ajustada para desarrollo
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: [
-          "'self'",
-          "'unsafe-inline'", // Permitir scripts inline en desarrollo
-          "'unsafe-eval'", // Necesario para algunos frameworks
-          "https://cdnjs.cloudflare.com",
-          "https://unpkg.com",
-          "https://cdn.jsdelivr.net",
-        ],
-        styleSrc: [
-          "'self'",
-          "'unsafe-inline'", // Permitir estilos inline
-          "https://fonts.googleapis.com",
-          "https://cdnjs.cloudflare.com",
-          "https://unpkg.com",
-        ],
-        fontSrc: [
-          "'self'",
-          "https://fonts.gstatic.com",
-          "https://cdnjs.cloudflare.com",
-          "data:", // Para fuentes en base64
-        ],
-        imgSrc: [
-          "'self'",
-          "data:",
-          "blob:",
-          "https:",
-          "http:", // Para imágenes de mapas y otros recursos
-        ],
-        connectSrc: [
-          "'self'",
-          "http://localhost:3000",
-          "http://127.0.0.1:3000",
-          "https://nominatim.openstreetmap.org", // Para geocodificación
-          "https://*.tile.openstreetmap.org", // Para mapas
-        ],
-        frameSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
-      },
-    },
-    crossOriginEmbedderPolicy: false, // Desactivar para permitir recursos externos
-  })
-);
+// Desactivar CSP en desarrollo para evitar bloqueos
+if (process.env.NODE_ENV === 'production') {
+  // Solo activar Helmet en producción
+  app.use(helmet());
+} else {
+  // En desarrollo, desactivar CSP completamente
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // Desactivar CSP completamente en desarrollo
+      crossOriginEmbedderPolicy: false,
+      crossOriginResourcePolicy: false,
+      crossOriginOpenerPolicy: false,
+    })
+  );
+}
 
 // === CONFIGURACIÓN DE CORS PARA LIVE SERVER ===
 const corsOptions = {
@@ -109,15 +75,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW || 15) * 60 * 1000, // 15 minutos por defecto
-  max: parseInt(process.env.RATE_LIMIT_MAX || 100), // 100 requests por defecto
-  message: {
-    error: 'Demasiadas solicitudes desde esta IP, intenta de nuevo más tarde.'
-  }
-});
-app.use('/api/', limiter);
+// Rate limiting - Desactivado en desarrollo
+if (process.env.NODE_ENV === 'production') {
+  const limiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW || 15) * 60 * 1000, // 15 minutos por defecto
+    max: parseInt(process.env.RATE_LIMIT_MAX || 100), // 100 requests por defecto
+    message: {
+      error: 'Demasiadas solicitudes desde esta IP, intenta de nuevo más tarde.'
+    }
+  });
+  app.use('/api/', limiter);
+} else {
+  console.log('⚠️  Rate limiting desactivado en desarrollo');
+}
 
 // === MIDDLEWARE PARA PARSEAR DATOS ===
 app.use(express.json({ limit: '10mb' }));

@@ -137,7 +137,7 @@ class FacturaController {
             as: 'pagos',
             include: [{
               model: MedioPago,
-              as: 'medio_pago',
+              as: 'medioPago',
               attributes: ['id', 'nombre']
             }]
           }
@@ -361,7 +361,7 @@ class FacturaController {
           {
             model: FacturaPago,
             as: 'pagos',
-            include: [{ model: MedioPago, as: 'medio_pago' }]
+            include: [{ model: MedioPago, as: 'medioPago' }]
           }
         ]
       });
@@ -496,7 +496,7 @@ class FacturaController {
           {
             model: FacturaPago,
             as: 'pagos',
-            include: [{ model: MedioPago, as: 'medio_pago' }]
+            include: [{ model: MedioPago, as: 'medioPago' }]
           }
         ]
       });
@@ -561,14 +561,14 @@ class FacturaController {
           attributes: []
         }, {
           model: MedioPago,
-          as: 'medio_pago',
+          as: 'medioPago',
           attributes: ['nombre']
         }],
         attributes: [
           [sequelize.fn('SUM', sequelize.col('FacturaPago.monto')), 'total'],
           [sequelize.fn('COUNT', sequelize.col('FacturaPago.id')), 'cantidad_transacciones']
         ],
-        group: ['medio_pago.id', 'medio_pago.nombre'],
+        group: ['medioPago.id', 'medioPago.nombre'],
         raw: true
       });
 

@@ -411,7 +411,7 @@ router.get('/:id',
             include: [
               {
                 model: MedioPago,
-                as: 'medio_pago',
+                as: 'medioPago',
                 attributes: ['id', 'nombre']
               }
             ]
