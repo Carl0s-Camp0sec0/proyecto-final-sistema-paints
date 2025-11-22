@@ -4,6 +4,7 @@ const router = express.Router();
 // Importar modelos y controladores
 const { Producto, Categoria, UnidadMedida, ProductoDetallePintura, ProductoDetalleAccesorio, ProductoVariacion, InventarioSucursal } = require('../models');
 const AuthMiddleware = require('../middleware/auth');
+const ProductoController = require('../controllers/productoController');
 
 /**
  * @route   GET /api/productos
@@ -184,6 +185,36 @@ router.get('/:id',
       });
     }
   }
+);
+
+/**
+ * @route   POST /api/productos
+ * @desc    Crear nuevo producto
+ * @access  Private (Admin, Digitador)
+ */
+router.post('/',
+  AuthMiddleware.verificarToken,
+  ProductoController.crear
+);
+
+/**
+ * @route   PUT /api/productos/:id
+ * @desc    Actualizar producto
+ * @access  Private (Admin, Digitador)
+ */
+router.put('/:id',
+  AuthMiddleware.verificarToken,
+  ProductoController.actualizar
+);
+
+/**
+ * @route   DELETE /api/productos/:id
+ * @desc    Eliminar producto (soft delete)
+ * @access  Private (Admin)
+ */
+router.delete('/:id',
+  AuthMiddleware.verificarToken,
+  ProductoController.eliminar
 );
 
 module.exports = router;

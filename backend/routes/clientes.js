@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Cliente, Sucursal } = require('../models');
 const AuthMiddleware = require('../middleware/auth');
+const ClienteController = require('../controllers/clienteController');
 const jwt = require('jsonwebtoken');
 
 /**
@@ -455,6 +456,26 @@ router.get('/perfil',
       });
     }
   }
+);
+
+/**
+ * @route   PUT /api/clientes/:id
+ * @desc    Actualizar cliente
+ * @access  Private
+ */
+router.put('/:id',
+  AuthMiddleware.verificarToken,
+  ClienteController.actualizar
+);
+
+/**
+ * @route   DELETE /api/clientes/:id
+ * @desc    Eliminar cliente (soft delete)
+ * @access  Private (Solo Admin)
+ */
+router.delete('/:id',
+  AuthMiddleware.verificarToken,
+  ClienteController.eliminar
 );
 
 module.exports = router;

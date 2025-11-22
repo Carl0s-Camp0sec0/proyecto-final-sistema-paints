@@ -1,112 +1,100 @@
-// Datos de las tiendas según el proyecto
-const tiendas = [
-    {
-        id: 1,
-        nombre: "Paints Pradera Chimaltenango",
-        direccion: "Centro Comercial Pradera Chimaltenango, Local 205",
-        lat: 14.6579,
-        lng: -90.8172,
-        telefono: "7849-1234",
-        email: "chimaltenango@paints.com.gt",
-        horarios: {
-            lunes_viernes: "8:00 AM - 8:00 PM",
-            sabado: "8:00 AM - 6:00 PM",
-            domingo: "9:00 AM - 5:00 PM"
-        },
-        gerente: "María González",
-        servicios: ["Ventas", "Asesoría", "Mezcla de colores", "Delivery"]
-    },
-    {
-        id: 2,
-        nombre: "Paints Pradera Escuintla",
-        direccion: "Centro Comercial Pradera Escuintla, Local 118",
-        lat: 14.2833,
-        lng: -90.7833,
-        telefono: "7886-5678",
-        email: "escuintla@paints.com.gt",
-        horarios: {
-            lunes_viernes: "8:00 AM - 8:00 PM",
-            sabado: "8:00 AM - 6:00 PM",
-            domingo: "9:00 AM - 5:00 PM"
-        },
-        gerente: "Carlos Méndez",
-        servicios: ["Ventas", "Asesoría", "Mezcla de colores"]
-    },
-    {
-        id: 3,
-        nombre: "Paints Las Américas Mazatenango",
-        direccion: "Centro Comercial Las Américas, Mazatenango",
-        lat: 14.5342,
-        lng: -91.5031,
-        telefono: "7872-9012",
-        email: "mazatenango@paints.com.gt",
-        horarios: {
-            lunes_viernes: "8:00 AM - 8:00 PM",
-            sabado: "8:00 AM - 6:00 PM",
-            domingo: "9:00 AM - 5:00 PM"
-        },
-        gerente: "Ana Rodríguez",
-        servicios: ["Ventas", "Asesoría", "Capacitación"]
-    },
-    {
-        id: 4,
-        nombre: "Paints La Trinidad Coatepeque",
-        direccion: "Centro Comercial La Trinidad, Coatepeque",
-        lat: 14.7044,
-        lng: -92.0425,
-        telefono: "7775-3456",
-        email: "coatepeque@paints.com.gt",
-        horarios: {
-            lunes_viernes: "8:00 AM - 8:00 PM",
-            sabado: "8:00 AM - 6:00 PM",
-            domingo: "9:00 AM - 5:00 PM"
-        },
-        gerente: "Roberto Silva",
-        servicios: ["Ventas", "Asesoría", "Proyectos comerciales"]
-    },
-    {
-        id: 5,
-        nombre: "Paints Pradera Xela Quetzaltenango",
-        direccion: "Centro Comercial Pradera Xela, Quetzaltenango",
-        lat: 14.8353,
-        lng: -91.5183,
-        telefono: "7761-7890",
-        email: "xela@paints.com.gt",
-        horarios: {
-            lunes_viernes: "8:00 AM - 8:00 PM",
-            sabado: "8:00 AM - 6:00 PM",
-            domingo: "9:00 AM - 5:00 PM"
-        },
-        gerente: "Patricia López",
-        servicios: ["Ventas", "Asesoría", "Mezcla de colores", "Capacitación"]
-    },
-    {
-        id: 6,
-        nombre: "Paints Miraflores Ciudad de Guatemala",
-        direccion: "Centro Comercial Miraflores, Ciudad de Guatemala",
-        lat: 14.6118,
-        lng: -90.5392,
-        telefono: "2234-5678",
-        email: "miraflores@paints.com.gt",
-        horarios: {
-            lunes_viernes: "8:00 AM - 9:00 PM",
-            sabado: "8:00 AM - 9:00 PM",
-            domingo: "9:00 AM - 7:00 PM"
-        },
-        gerente: "Luis Morales",
-        servicios: ["Ventas", "Asesoría", "Mezcla de colores", "Delivery", "Servicio express"]
-    }
-];
-
 // Variables globales
+let tiendas = []; // Inicialmente vacío, se cargará desde el backend
 let mapa;
 let ubicacionUsuario = null;
 let marcadorUsuario = null;
 let marcadoresTiendas = [];
 let permisosUbicacionSolicitados = false;
 
+// Cargar sucursales desde el backend
+async function cargarSucursales() {
+    try {
+        console.log('📍 Cargando sucursales desde el backend...');
+
+        // Intentar obtener token (si hay sesión activa)
+        const token = localStorage.getItem('token');
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        // Si hay token, agregarlo (aunque el endpoint podría ser público)
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${API_CONFIG.BASE_URL}/sistema/sucursales`, {
+            headers
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al cargar sucursales: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.data) {
+            // Transformar datos del backend al formato esperado
+            tiendas = data.data.map(sucursal => ({
+                id: sucursal.id,
+                nombre: sucursal.nombre,
+                direccion: sucursal.direccion,
+                lat: parseFloat(sucursal.latitud),
+                lng: parseFloat(sucursal.longitud),
+                telefono: sucursal.telefono || 'No disponible',
+                email: sucursal.email || 'No disponible',
+                horarios: {
+                    lunes_viernes: sucursal.horario_apertura && sucursal.horario_cierre
+                        ? `${sucursal.horario_apertura} - ${sucursal.horario_cierre}`
+                        : "8:00 AM - 8:00 PM",
+                    sabado: "8:00 AM - 6:00 PM",
+                    domingo: "9:00 AM - 5:00 PM"
+                },
+                gerente: sucursal.gerente || "Por asignar",
+                servicios: ["Ventas", "Asesoría", "Mezcla de colores"]
+            }));
+
+            console.log(`✅ ${tiendas.length} sucursales cargadas desde el backend`);
+            return true;
+        }
+
+        return false;
+    } catch (error) {
+        console.error('❌ Error cargando sucursales:', error);
+        showToast('Error al cargar sucursales. Usando datos de respaldo.', 'error');
+        // Cargar datos de respaldo
+        cargarSucursalesRespaldo();
+        return false;
+    }
+}
+
+// Datos de respaldo en caso de error
+function cargarSucursalesRespaldo() {
+    tiendas = [
+        {
+            id: 1,
+            nombre: "Paints Pradera Chimaltenango",
+            direccion: "Centro Comercial Pradera Chimaltenango, Local 205",
+            lat: 14.6579,
+            lng: -90.8172,
+            telefono: "7849-1234",
+            email: "chimaltenango@paints.com.gt",
+            horarios: {
+                lunes_viernes: "8:00 AM - 8:00 PM",
+                sabado: "8:00 AM - 6:00 PM",
+                domingo: "9:00 AM - 5:00 PM"
+            },
+            gerente: "María González",
+            servicios: ["Ventas", "Asesoría", "Mezcla de colores", "Delivery"]
+        }
+    ];
+}
+
 // Inicializar página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    // Primero cargar las sucursales desde el backend
+    await cargarSucursales();
+
+    // Luego inicializar el mapa y mostrar tiendas
     inicializarMapa();
     mostrarTiendas();
     configurarEventos();

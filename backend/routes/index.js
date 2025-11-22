@@ -10,6 +10,7 @@ const inventarioRoutes = require('./inventario');
 const facturasRoutes = require('./facturas');
 const reportesRoutes = require('./reportes');
 const usuariosRoutes = require('./usuarios');
+const proveedoresRoutes = require('./proveedores');
 
 // Configurar rutas
 router.use('/auth', authRoutes);
@@ -20,6 +21,7 @@ router.use('/inventario', inventarioRoutes);
 router.use('/facturas', facturasRoutes);
 router.use('/reportes', reportesRoutes);
 router.use('/usuarios', usuariosRoutes);
+router.use('/proveedores', proveedoresRoutes);
 
 // Ruta de prueba
 router.get('/test', (req, res) => {

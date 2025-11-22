@@ -428,6 +428,207 @@ router.get('/estadisticas',
 );
 
 /**
+ * @route   GET /api/facturas/numero/:numero
+ * @desc    Buscar factura por número (ej: A00000001)
+ * @access  Private
+ */
+router.get('/numero/:numero',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      const { numero } = req.params;
+      console.log(`🔍 Buscando factura por número: ${numero}...`);
+
+      // Extraer letra de serie y correlativo del número
+      // Formato esperado: A00000001 (1 letra + 8 dígitos)
+      const letra_serie = numero.charAt(0);
+      const correlativo = parseInt(numero.substring(1));
+
+      if (!letra_serie || isNaN(correlativo)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Formato de número de factura inválido. Formato esperado: A00000001'
+        });
+      }
+
+      const factura = await Factura.findOne({
+        where: {
+          letra_serie,
+          numero_correlativo: correlativo
+        },
+        include: [
+          {
+            model: Cliente,
+            as: 'cliente',
+            attributes: ['id', 'nombre_completo', 'nit', 'email', 'telefono', 'direccion']
+          },
+          {
+            model: Sucursal,
+            as: 'sucursal',
+            attributes: ['id', 'nombre', 'direccion', 'telefono']
+          },
+          {
+            model: Usuario,
+            as: 'usuario',
+            attributes: ['id', 'nombre_completo', 'email']
+          },
+          {
+            model: FacturaDetalle,
+            as: 'detalles',
+            include: [
+              {
+                model: Producto,
+                as: 'producto',
+                attributes: ['id', 'nombre', 'codigo_producto']
+              },
+              {
+                model: UnidadMedida,
+                as: 'unidad_medida',
+                attributes: ['id', 'nombre', 'abreviatura']
+              }
+            ]
+          },
+          {
+            model: FacturaPago,
+            as: 'pagos',
+            include: [
+              {
+                model: MedioPago,
+                as: 'medioPago',
+                attributes: ['id', 'nombre']
+              }
+            ]
+          }
+        ]
+      });
+
+      if (!factura) {
+        return res.status(404).json({
+          success: false,
+          message: `Factura ${numero} no encontrada`
+        });
+      }
+
+      console.log(`✅ Factura ${numero} encontrada`);
+
+      res.json({
+        success: true,
+        data: factura
+      });
+
+    } catch (error) {
+      console.error('❌ Error buscando factura:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
+ * @route   PUT /api/facturas/:id/anular
+ * @desc    Anular factura
+ * @access  Private (Admin, Gerente)
+ */
+router.put('/:id/anular',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+      const { id } = req.params;
+      const { motivo_anulacion } = req.body;
+
+      console.log(`🚫 Anulando factura ${id}...`);
+
+      if (!motivo_anulacion) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: 'El motivo de anulación es requerido'
+        });
+      }
+
+      // Obtener factura con detalles
+      const factura = await Factura.findByPk(id, {
+        include: [
+          {
+            model: FacturaDetalle,
+            as: 'detalles'
+          }
+        ]
+      });
+
+      if (!factura) {
+        await transaction.rollback();
+        return res.status(404).json({
+          success: false,
+          message: 'Factura no encontrada'
+        });
+      }
+
+      // Verificar que la factura no esté ya anulada
+      if (factura.estado === 'anulada') {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: 'La factura ya está anulada'
+        });
+      }
+
+      // Restaurar inventario de cada producto
+      for (const detalle of factura.detalles) {
+        await InventarioSucursal.increment('stock_actual', {
+          by: detalle.cantidad,
+          where: {
+            sucursal_id: factura.sucursal_id,
+            producto_id: detalle.producto_id,
+            unidad_medida_id: detalle.unidad_medida_id
+          },
+          transaction
+        });
+
+        console.log(`📦 Stock restaurado - Producto ${detalle.producto_id}: +${detalle.cantidad}`);
+      }
+
+      // Anular factura
+      await factura.update({
+        estado: 'anulada',
+        fecha_anulacion: new Date(),
+        motivo_anulacion
+      }, { transaction });
+
+      await transaction.commit();
+
+      console.log(`✅ Factura ${id} anulada exitosamente`);
+
+      res.json({
+        success: true,
+        message: 'Factura anulada exitosamente',
+        data: {
+          id: factura.id,
+          numero_factura: `${factura.letra_serie}${factura.numero_correlativo.toString().padStart(8, '0')}`,
+          estado: factura.estado,
+          fecha_anulacion: factura.fecha_anulacion,
+          motivo_anulacion: factura.motivo_anulacion
+        }
+      });
+
+    } catch (error) {
+      await transaction.rollback();
+      console.error('❌ Error anulando factura:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
  * @route   GET /api/facturas/:id
  * @desc    Obtener factura por ID
  * @access  Private

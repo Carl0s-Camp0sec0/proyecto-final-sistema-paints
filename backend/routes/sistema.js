@@ -41,10 +41,9 @@ router.get('/categorias',
 /**
  * @route   GET /api/sistema/sucursales
  * @desc    Obtener todas las sucursales
- * @access  Private
+ * @access  Public (necesario para mapa de tiendas)
  */
 router.get('/sucursales',
-  AuthMiddleware.verificarToken,
   async (req, res) => {
     try {
       console.log('🏪 Obteniendo sucursales...');
@@ -140,6 +139,311 @@ router.get('/medios-pago',
       });
     } catch (error) {
       console.error('❌ Error obteniendo medios de pago:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
+ * @route   POST /api/sistema/categorias
+ * @desc    Crear nueva categoría
+ * @access  Private (Admin, Digitador)
+ */
+router.post('/categorias',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      console.log('📋 Creando nueva categoría...');
+
+      const { nombre, descripcion, requiere_medidas = false } = req.body;
+
+      if (!nombre) {
+        return res.status(400).json({
+          success: false,
+          message: 'El nombre es requerido'
+        });
+      }
+
+      // Verificar si ya existe
+      const categoriaExistente = await Categoria.findOne({
+        where: { nombre }
+      });
+
+      if (categoriaExistente) {
+        return res.status(400).json({
+          success: false,
+          message: 'Ya existe una categoría con ese nombre'
+        });
+      }
+
+      const categoria = await Categoria.create({
+        nombre,
+        descripcion,
+        requiere_medidas,
+        activo: true
+      });
+
+      console.log(`✅ Categoría creada: ${categoria.nombre}`);
+
+      res.status(201).json({
+        success: true,
+        message: 'Categoría creada exitosamente',
+        data: categoria
+      });
+    } catch (error) {
+      console.error('❌ Error creando categoría:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
+ * @route   PUT /api/sistema/categorias/:id
+ * @desc    Actualizar categoría
+ * @access  Private (Admin, Digitador)
+ */
+router.put('/categorias/:id',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { nombre, descripcion, requiere_medidas, activo } = req.body;
+
+      const categoria = await Categoria.findByPk(id);
+      if (!categoria) {
+        return res.status(404).json({
+          success: false,
+          message: 'Categoría no encontrada'
+        });
+      }
+
+      // Si se está cambiando el nombre, verificar que no exista otra con ese nombre
+      if (nombre && nombre !== categoria.nombre) {
+        const { Op } = require('sequelize');
+        const categoriaExistente = await Categoria.findOne({
+          where: {
+            nombre,
+            id: { [Op.ne]: id }
+          }
+        });
+
+        if (categoriaExistente) {
+          return res.status(400).json({
+            success: false,
+            message: 'Ya existe otra categoría con ese nombre'
+          });
+        }
+      }
+
+      await categoria.update({
+        nombre: nombre || categoria.nombre,
+        descripcion: descripcion !== undefined ? descripcion : categoria.descripcion,
+        requiere_medidas: requiere_medidas !== undefined ? requiere_medidas : categoria.requiere_medidas,
+        activo: activo !== undefined ? activo : categoria.activo
+      });
+
+      console.log(`✅ Categoría actualizada: ${categoria.nombre}`);
+
+      res.json({
+        success: true,
+        message: 'Categoría actualizada exitosamente',
+        data: categoria
+      });
+    } catch (error) {
+      console.error('❌ Error actualizando categoría:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
+ * @route   DELETE /api/sistema/categorias/:id
+ * @desc    Eliminar categoría (soft delete)
+ * @access  Private (Solo Admin)
+ */
+router.delete('/categorias/:id',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const categoria = await Categoria.findByPk(id);
+      if (!categoria) {
+        return res.status(404).json({
+          success: false,
+          message: 'Categoría no encontrada'
+        });
+      }
+
+      await categoria.update({ activo: false });
+
+      console.log(`✅ Categoría eliminada: ${categoria.nombre}`);
+
+      res.json({
+        success: true,
+        message: 'Categoría eliminada exitosamente'
+      });
+    } catch (error) {
+      console.error('❌ Error eliminando categoría:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
+ * @route   POST /api/sistema/sucursales
+ * @desc    Crear nueva sucursal
+ * @access  Private (Solo Admin)
+ */
+router.post('/sucursales',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      console.log('🏪 Creando nueva sucursal...');
+
+      const {
+        nombre,
+        direccion,
+        telefono,
+        email,
+        latitud,
+        longitud,
+        horario_apertura,
+        horario_cierre
+      } = req.body;
+
+      if (!nombre || !direccion) {
+        return res.status(400).json({
+          success: false,
+          message: 'Nombre y dirección son requeridos'
+        });
+      }
+
+      const sucursal = await Sucursal.create({
+        nombre,
+        direccion,
+        telefono,
+        email,
+        latitud: latitud ? parseFloat(latitud) : null,
+        longitud: longitud ? parseFloat(longitud) : null,
+        horario_apertura,
+        horario_cierre,
+        activo: true
+      });
+
+      console.log(`✅ Sucursal creada: ${sucursal.nombre}`);
+
+      res.status(201).json({
+        success: true,
+        message: 'Sucursal creada exitosamente',
+        data: sucursal
+      });
+    } catch (error) {
+      console.error('❌ Error creando sucursal:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
+ * @route   PUT /api/sistema/sucursales/:id
+ * @desc    Actualizar sucursal
+ * @access  Private (Solo Admin)
+ */
+router.put('/sucursales/:id',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const datos = req.body;
+
+      const sucursal = await Sucursal.findByPk(id);
+      if (!sucursal) {
+        return res.status(404).json({
+          success: false,
+          message: 'Sucursal no encontrada'
+        });
+      }
+
+      await sucursal.update({
+        nombre: datos.nombre || sucursal.nombre,
+        direccion: datos.direccion || sucursal.direccion,
+        telefono: datos.telefono !== undefined ? datos.telefono : sucursal.telefono,
+        email: datos.email !== undefined ? datos.email : sucursal.email,
+        latitud: datos.latitud !== undefined ? parseFloat(datos.latitud) : sucursal.latitud,
+        longitud: datos.longitud !== undefined ? parseFloat(datos.longitud) : sucursal.longitud,
+        horario_apertura: datos.horario_apertura || sucursal.horario_apertura,
+        horario_cierre: datos.horario_cierre || sucursal.horario_cierre,
+        activo: datos.activo !== undefined ? datos.activo : sucursal.activo
+      });
+
+      console.log(`✅ Sucursal actualizada: ${sucursal.nombre}`);
+
+      res.json({
+        success: true,
+        message: 'Sucursal actualizada exitosamente',
+        data: sucursal
+      });
+    } catch (error) {
+      console.error('❌ Error actualizando sucursal:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+);
+
+/**
+ * @route   DELETE /api/sistema/sucursales/:id
+ * @desc    Eliminar sucursal (soft delete)
+ * @access  Private (Solo Admin)
+ */
+router.delete('/sucursales/:id',
+  AuthMiddleware.verificarToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const sucursal = await Sucursal.findByPk(id);
+      if (!sucursal) {
+        return res.status(404).json({
+          success: false,
+          message: 'Sucursal no encontrada'
+        });
+      }
+
+      await sucursal.update({ activo: false });
+
+      console.log(`✅ Sucursal eliminada: ${sucursal.nombre}`);
+
+      res.json({
+        success: true,
+        message: 'Sucursal eliminada exitosamente'
+      });
+    } catch (error) {
+      console.error('❌ Error eliminando sucursal:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
